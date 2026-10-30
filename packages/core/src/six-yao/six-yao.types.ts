@@ -182,6 +182,7 @@ export interface HexagramAnalysisBlock {
   readonly sinoVietnamese: string;
   readonly chineseName: string;
   readonly symbol: string;
+  readonly rawValues: readonly (0 | 1)[];
   readonly upperTrigram: {
     readonly code: TrigramCode;
     readonly name: string;

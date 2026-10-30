@@ -1,0 +1,921 @@
+/* ==========================================================================
+   Six Yao Analysis Result View Styles
+   Bắc Hà Tân An Phái Design System
+   ========================================================================== */
+
+.six-yao-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+/* 1. Header Card */
+.six-yao-header-card {
+  background-color: var(--bha-bg-surface);
+  border-radius: var(--bha-radius-lg);
+  border: 1px solid var(--bha-border-gold);
+  box-shadow: var(--bha-shadow-sm);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.six-yao-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-bottom: 1px solid var(--bha-border-light);
+  padding-bottom: 16px;
+}
+
+.six-yao-badge-main {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: var(--bha-gold-50);
+  border: 1px solid var(--bha-gold-300);
+  border-radius: var(--bha-radius-full);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--bha-gold-800);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.six-yao-main-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--bha-crimson-700);
+  margin: 0 0 6px 0;
+  line-height: 1.25;
+}
+
+.six-yao-palace-text {
+  font-size: 0.9375rem;
+  color: var(--bha-text-secondary);
+  margin: 0;
+}
+
+.six-yao-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.six-yao-tag-version,
+.six-yao-tag-ruleset {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: var(--bha-radius-sm);
+  background-color: var(--bha-bg-subtle);
+  border: 1px solid var(--bha-border-base);
+  color: var(--bha-text-muted);
+  font-family: var(--bha-font-mono, monospace);
+}
+
+/* Time & Calendar Grid */
+.six-yao-time-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.six-yao-time-item {
+  background-color: var(--bha-bg-subtle);
+  border-radius: var(--bha-radius-md);
+  border: 1px solid var(--bha-border-light);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.six-yao-time-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bha-text-muted);
+}
+
+.six-yao-time-val p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--bha-text-primary);
+}
+
+.six-yao-time-solar {
+  font-weight: 600;
+  color: var(--bha-crimson-800);
+}
+
+.six-yao-time-lunar {
+  font-size: 0.8125rem !important;
+  color: var(--bha-text-secondary) !important;
+}
+
+.six-yao-time-break {
+  font-size: 0.8125rem !important;
+  color: var(--bha-text-secondary) !important;
+}
+
+.six-yao-canchi-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.six-yao-canchi-pill {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--bha-radius-sm);
+  background-color: var(--bha-bg-surface);
+  border: 1px solid var(--bha-border-base);
+  color: var(--bha-text-secondary);
+}
+
+.six-yao-canchi-pill--day {
+  background-color: var(--bha-gold-50);
+  border-color: var(--bha-gold-300);
+  color: var(--bha-gold-800);
+  font-weight: 700;
+}
+
+/* 2. Trio Grid (Quẻ Chủ • Quẻ Biến • Quẻ Hỗ) */
+.six-yao-trio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.six-yao-hex-card {
+  background-color: var(--bha-bg-surface);
+  border-radius: var(--bha-radius-lg);
+  border: 1px solid var(--bha-border-base);
+  box-shadow: var(--bha-shadow-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.six-yao-hex-card--primary {
+  border-top: 4px solid var(--bha-crimson-700);
+}
+
+.six-yao-hex-card--changing {
+  border-top: 4px solid var(--bha-gold-600);
+}
+
+.six-yao-hex-card--nuclear {
+  border-top: 4px solid var(--bha-border-dark, #8c8c8c);
+}
+
+.six-yao-hex-card__badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bha-text-secondary);
+}
+
+.six-yao-hex-card__content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.six-yao-hex-symbol {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.six-yao-hex-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--bha-crimson-800);
+  margin: 0 0 2px 0;
+}
+
+.six-yao-hex-sub {
+  font-size: 0.8125rem;
+  color: var(--bha-text-secondary);
+  margin: 0 0 4px 0;
+}
+
+.six-yao-hex-palace {
+  font-size: 0.75rem;
+  color: var(--bha-text-muted);
+  margin: 0;
+}
+
+.six-yao-static-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--bha-text-secondary);
+  font-size: 0.875rem;
+}
+
+.six-yao-static-icon {
+  font-size: 1.8rem;
+  color: var(--bha-gold-600);
+}
+
+/* 3. Table Section */
+.six-yao-table-section {
+  background-color: var(--bha-bg-surface);
+  border-radius: var(--bha-radius-lg);
+  border: 1px solid var(--bha-border-base);
+  box-shadow: var(--bha-shadow-sm);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.six-yao-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 14px;
+  border-bottom: 1px solid var(--bha-border-light);
+  padding-bottom: 12px;
+}
+
+.six-yao-table-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--bha-crimson-700);
+  margin: 0 0 4px 0;
+}
+
+.six-yao-table-subtitle {
+  font-size: 0.875rem;
+  color: var(--bha-text-secondary);
+  margin: 0;
+}
+
+.six-yao-table-legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  color: var(--bha-text-secondary);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-tag {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--bha-radius-full);
+}
+
+.legend-tag--world,
+.tag-world {
+  background-color: var(--bha-gold-500);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.6875rem;
+  padding: 3px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  text-align: center;
+}
+
+.legend-tag--response,
+.tag-response {
+  background-color: #2b6cb0;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.6875rem;
+  padding: 3px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  text-align: center;
+}
+
+.legend-dot--moving {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--bha-crimson-600);
+  display: inline-block;
+}
+
+/* Master Table */
+.six-yao-table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.six-yao-master-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.six-yao-master-table th {
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--bha-text-muted);
+  border-bottom: 2px solid var(--bha-border-base);
+  background-color: var(--bha-bg-subtle);
+  white-space: nowrap;
+}
+
+.six-yao-master-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--bha-border-light);
+  vertical-align: middle;
+}
+
+.six-yao-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.six-yao-row:hover {
+  background-color: rgba(200, 155, 60, 0.08);
+}
+
+.six-yao-row--selected {
+  background-color: rgba(200, 155, 60, 0.14) !important;
+  border-left: 3px solid var(--bha-gold-600);
+}
+
+.six-yao-row--moving {
+  font-weight: 500;
+}
+
+/* Row Cells */
+.cell-world-response {
+  text-align: center;
+}
+
+.cell-spirit .spirit-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--bha-radius-sm);
+  background-color: var(--bha-bg-subtle);
+  border: 1px solid var(--bha-border-base);
+  color: var(--bha-text-secondary);
+  white-space: nowrap;
+}
+
+.cell-position {
+  white-space: nowrap;
+}
+
+.line-pos-num {
+  font-weight: 700;
+  display: block;
+  color: var(--bha-text-primary);
+}
+
+.line-pos-trad {
+  font-size: 0.75rem;
+  color: var(--bha-text-muted);
+}
+
+/* Graphic Line Bars */
+.cell-graphic {
+  min-width: 110px;
+}
+
+.line-bar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+
+.line-bar {
+  height: 9px;
+  border-radius: 2px;
+}
+
+.line-bar--yang {
+  background-color: var(--bha-crimson-800);
+}
+
+.line-bar-yin-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.line-bar--yin {
+  flex: 1;
+  background-color: var(--bha-crimson-800);
+}
+
+.line-bar-yin-gap {
+  width: 12px;
+}
+
+.line-bar--moving {
+  background-color: var(--bha-gold-600) !important;
+}
+
+.moving-indicator {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--bha-crimson-700);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* NaJia Cell */
+.cell-najia {
+  white-space: nowrap;
+}
+
+.najia-canchi {
+  font-weight: 600;
+  margin-right: 6px;
+  color: var(--bha-text-primary);
+}
+
+.element-pill {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.element-pill--KIM {
+  background-color: #f7fafc;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+}
+
+.element-pill--MOC {
+  background-color: #f0fff4;
+  color: #276749;
+  border: 1px solid #9ae6b4;
+}
+
+.element-pill--THUY {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+  border: 1px solid #bee3f8;
+}
+
+.element-pill--HOA {
+  background-color: #fff5f5;
+  color: #c53030;
+  border: 1px solid #feb2b2;
+}
+
+.element-pill--THO {
+  background-color: #fffaf0;
+  color: #9c4221;
+  border: 1px solid #fbd38d;
+}
+
+.relation-name {
+  font-weight: 700;
+  color: var(--bha-text-primary);
+}
+
+/* Changing Cell */
+.cell-changing {
+  white-space: nowrap;
+}
+
+.changing-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8125rem;
+}
+
+.changing-arrow {
+  color: var(--bha-gold-600);
+  font-weight: 700;
+}
+
+.changing-canchi {
+  font-weight: 600;
+}
+
+.changing-rel {
+  font-weight: 600;
+  color: var(--bha-text-primary);
+}
+
+.changing-tag {
+  font-size: 0.6875rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background-color: var(--bha-gold-50);
+  border: 1px solid var(--bha-gold-300);
+  color: var(--bha-gold-800);
+  font-weight: 600;
+}
+
+.cell-empty {
+  color: var(--bha-text-muted);
+}
+
+/* Calendar Tags */
+.calendar-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.cal-tag {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.cal-tag--void {
+  background-color: #fed7d7;
+  color: #9b2c2c;
+  border: 1px solid #feb2b2;
+}
+
+.cal-tag--break {
+  background-color: #fed7d7;
+  color: #9b2c2c;
+  font-weight: 700;
+  border: 1px solid #fc8181;
+}
+
+.cal-tag--harmony {
+  background-color: #c6f6d5;
+  color: #22543d;
+  border: 1px solid #9ae6b4;
+}
+
+.cal-tag--clash {
+  background-color: #feebc8;
+  color: #7b341e;
+  border: 1px solid #fbd38d;
+}
+
+.cal-tag--am-dong {
+  background-color: var(--bha-gold-100);
+  color: var(--bha-gold-900);
+  font-weight: 700;
+  border: 1px solid var(--bha-gold-400);
+}
+
+.cal-tag--neutral {
+  background-color: var(--bha-bg-subtle);
+  color: var(--bha-text-muted);
+  border: 1px solid var(--bha-border-light);
+}
+
+/* Strength Cell */
+.cell-strength {
+  white-space: nowrap;
+}
+
+.seasonal-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.seasonal-badge--VUONG {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.seasonal-badge--TUONG {
+  background-color: #bee3f8;
+  color: #2b6cb0;
+}
+
+.seasonal-badge--HUU {
+  background-color: #feebc8;
+  color: #7b341e;
+}
+
+.seasonal-badge--TU {
+  background-color: #fed7d7;
+  color: #9b2c2c;
+}
+
+.seasonal-badge--TU_SI {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.strength-level-text {
+  font-size: 0.75rem;
+  color: var(--bha-text-secondary);
+}
+
+/* 4. Inspector Section (Chi Tiết Hào) */
+.six-yao-inspector-section {
+  width: 100%;
+}
+
+.inspector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.inspector-card {
+  background-color: var(--bha-bg-subtle);
+  border-radius: var(--bha-radius-md);
+  border: 1px solid var(--bha-border-light);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inspector-card--changing {
+  border-left: 3px solid var(--bha-gold-600);
+  background-color: rgba(200, 155, 60, 0.05);
+}
+
+.inspector-card__title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--bha-crimson-800);
+  margin: 0;
+  border-bottom: 1px solid var(--bha-border-light);
+  padding-bottom: 6px;
+}
+
+.inspector-card__body p {
+  margin: 0 0 6px 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--bha-text-primary);
+}
+
+.inspector-card__body p:last-child {
+  margin-bottom: 0;
+}
+
+.inspector-desc {
+  font-size: 0.8125rem !important;
+  color: var(--bha-text-secondary) !important;
+  font-style: italic;
+}
+
+.highlight-text {
+  font-weight: 700;
+  color: var(--bha-crimson-700);
+}
+
+.text-danger {
+  color: #c53030;
+  font-weight: 700;
+}
+
+.text-warning {
+  color: #dd6b20;
+  font-weight: 700;
+}
+
+.text-success {
+  color: #2f855a;
+  font-weight: 700;
+}
+
+.seasonal-tag {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.seasonal-tag--VUONG {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.seasonal-tag--TUONG {
+  background-color: #bee3f8;
+  color: #2b6cb0;
+}
+
+.seasonal-tag--HUU {
+  background-color: #feebc8;
+  color: #7b341e;
+}
+
+.seasonal-tag--TU {
+  background-color: #fed7d7;
+  color: #9b2c2c;
+}
+
+.seasonal-tag--TU_SI {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.changing-tag-highlight {
+  font-weight: 700;
+  color: var(--bha-gold-800);
+  background-color: var(--bha-gold-50);
+  border: 1px solid var(--bha-gold-300);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Factors Table */
+.inspector-factors-section {
+  border-top: 1px solid var(--bha-border-light);
+  padding-top: 16px;
+}
+
+.inspector-factors-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--bha-crimson-800);
+  margin: 0 0 10px 0;
+}
+
+.factors-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.factors-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.factors-table th {
+  padding: 8px 10px;
+  background-color: var(--bha-bg-subtle);
+  border-bottom: 1px solid var(--bha-border-base);
+  font-weight: 600;
+  color: var(--bha-text-muted);
+  text-align: left;
+}
+
+.factors-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--bha-border-light);
+}
+
+.factor-source {
+  font-family: var(--bha-font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--bha-text-secondary);
+}
+
+.factor-type {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background-color: var(--bha-bg-subtle);
+  border: 1px solid var(--bha-border-base);
+}
+
+.factor-weight-pos {
+  font-weight: 700;
+  color: #2f855a;
+  text-align: right;
+}
+
+.factor-weight-neg {
+  font-weight: 700;
+  color: #c53030;
+  text-align: right;
+}
+
+.factor-reason {
+  color: var(--bha-text-primary);
+}
+
+.inspector-rationale {
+  font-size: 0.875rem;
+  color: var(--bha-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  background-color: var(--bha-bg-subtle);
+  border-radius: var(--bha-radius-md);
+  padding: 10px 14px;
+  border: 1px solid var(--bha-border-light);
+}
+
+/* 5. Footer Summary */
+.six-yao-summary-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: var(--bha-bg-surface);
+  border-radius: var(--bha-radius-lg);
+  border: 1px solid var(--bha-border-base);
+  box-shadow: var(--bha-shadow-sm);
+  padding: 20px;
+}
+
+.summary-overview-box {
+  border-bottom: 1px solid var(--bha-border-light);
+  padding-bottom: 14px;
+}
+
+.summary-overview-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--bha-crimson-800);
+  margin: 0 0 6px 0;
+}
+
+.summary-overview-text {
+  font-size: 0.9375rem;
+  color: var(--bha-text-primary);
+  line-height: 1.6;
+  margin: 0 0 8px 0;
+}
+
+.summary-disclaimer {
+  font-size: 0.8125rem;
+  color: var(--bha-text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.summary-sources-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--bha-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 8px 0;
+}
+
+.summary-sources-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8125rem;
+  color: var(--bha-text-secondary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .six-yao-main-title {
+    font-size: 1.4rem;
+  }
+
+  .six-yao-header-card {
+    padding: 16px;
+  }
+
+  .six-yao-table-section {
+    padding: 14px;
+  }
+
+  .six-yao-master-table th,
+  .six-yao-master-table td {
+    padding: 8px 6px;
+  }
+
+  .six-yao-trio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inspector-grid {
+    grid-template-columns: 1fr;
+  }
+}

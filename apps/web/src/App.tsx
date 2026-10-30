@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Button, Card, Select, Modal } from '@kindich/shared';
 import { SerialCastingResult, MaiHuaCastingResult } from '@kindich/core';
 import { CalendarConversionResult } from '@kindich/calendar';
+import { HEXAGRAMS, LinePosition } from '@kindich/domain';
 import { SerialCastingForm, SerialCastingResultView } from './components/SerialCasting';
 import { MaiHuaCastingForm, MaiHuaCastingResultView } from './components/MaiHuaCasting';
+import { SixYaoAnalysisView } from './components/SixYaoAnalysis';
 import './App.css';
 
-type CastingMode = 'serial' | 'time';
+type CastingMode = 'serial' | 'time' | 'six-yao';
 
 export const App: React.FC = () => {
   const [activeMode, setActiveMode] = useState<CastingMode>('serial');
@@ -17,6 +19,17 @@ export const App: React.FC = () => {
   } | null>(null);
   const [inquiryType, setInquiryType] = useState('general');
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
+  // Trạng thái cho tab Phân Tích Lục Hào Chuyên Sâu
+  const [selectedHexNumber, setSelectedHexNumber] = useState<number>(1);
+  const [selectedMovingLines, setSelectedMovingLines] = useState<number[]>([1]);
+  const [showSerialSixYao, setShowSerialSixYao] = useState(false);
+  const [showMaiHuaSixYao, setShowMaiHuaSixYao] = useState(false);
+
+  const hexagramOptions = HEXAGRAMS.map((h) => ({
+    value: h.number.toString(),
+    label: `#${h.number} - ${h.name} (${h.sinoVietnameseName})`,
+  }));
 
   const inquiryOptions = [
     { value: 'general', label: 'Chiêm việc đại thể (Việc chung)' },
@@ -59,6 +72,14 @@ export const App: React.FC = () => {
           <span className="tab-icon">⏳</span>
           <span>Giờ động tâm</span>
         </button>
+        <button
+          type="button"
+          className={`mode-tab ${activeMode === 'six-yao' ? 'active' : ''}`}
+          onClick={() => setActiveMode('six-yao')}
+        >
+          <span className="tab-icon">☯</span>
+          <span>Phân tích Lục Hào</span>
+        </button>
       </nav>
 
       {/* Main Content Area */}
@@ -99,7 +120,27 @@ export const App: React.FC = () => {
               {/* Khu vực hiển thị kết quả hoặc thông báo chờ */}
               <div style={{ marginTop: '28px' }}>
                 {serialResult ? (
-                  <SerialCastingResultView result={serialResult} />
+                  <>
+                    <SerialCastingResultView result={serialResult} />
+                    <div style={{ marginTop: '24px', textAlign: 'center' }}>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowSerialSixYao(!showSerialSixYao)}
+                      >
+                        {showSerialSixYao
+                          ? '▲ Thu gọn đồ bản Lục Hào'
+                          : '☯ Xem bảng phân tích Lục Hào chi tiết'}
+                      </Button>
+                    </div>
+                    {showSerialSixYao && (
+                      <div style={{ marginTop: '24px' }}>
+                        <SixYaoAnalysisView
+                          primaryHexagram={serialResult.trio.primary.number}
+                          movingLineIndices={[serialResult.movingLine as LinePosition]}
+                        />
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="placeholder-box">
                     <div className="placeholder-icon">☯</div>
@@ -113,7 +154,7 @@ export const App: React.FC = () => {
               </div>
             </Card>
           </div>
-        ) : (
+        ) : activeMode === 'time' ? (
           <div className="mai-hua-mode-section">
             <Card
               title="Lập Quẻ Theo Giờ Động Tâm (Mai Hoa Dịch Số)"
@@ -151,10 +192,36 @@ export const App: React.FC = () => {
               {/* Khu vực hiển thị kết quả Mai Hoa hoặc thông báo chờ */}
               <div style={{ marginTop: '28px' }}>
                 {maiHuaData ? (
-                  <MaiHuaCastingResultView
-                    result={maiHuaData.result}
-                    calendarInfo={maiHuaData.calendarInfo}
-                  />
+                  <>
+                    <MaiHuaCastingResultView
+                      result={maiHuaData.result}
+                      calendarInfo={maiHuaData.calendarInfo}
+                    />
+                    <div style={{ marginTop: '24px', textAlign: 'center' }}>
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowMaiHuaSixYao(!showMaiHuaSixYao)}
+                      >
+                        {showMaiHuaSixYao
+                          ? '▲ Thu gọn đồ bản Lục Hào'
+                          : '☯ Xem bảng phân tích Lục Hào chi tiết'}
+                      </Button>
+                    </div>
+                    {showMaiHuaSixYao && (
+                      <div style={{ marginTop: '24px' }}>
+                        <SixYaoAnalysisView
+                          primaryHexagram={maiHuaData.result.trio.primary.number}
+                          movingLineIndices={[maiHuaData.result.movingLine as LinePosition]}
+                          dateTime={{
+                            dayCanChi: maiHuaData.calendarInfo.canChi.day,
+                            monthCanChi: maiHuaData.calendarInfo.canChi.month,
+                            yearCanChi: maiHuaData.calendarInfo.canChi.year,
+                            hourCanChi: maiHuaData.calendarInfo.canChi.hour,
+                          }}
+                        />
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="placeholder-box">
                     <div className="placeholder-icon">⌛</div>
@@ -166,6 +233,88 @@ export const App: React.FC = () => {
                   </div>
                 )}
               </div>
+            </Card>
+          </div>
+        ) : (
+          <div className="six-yao-mode-section">
+            <Card
+              title="Khảo Sát & Phân Tích Lục Hào Chuyên Sâu"
+              subtitle="Tra cứu và phân tích toàn diện 64 quẻ, Bát Cung, Nạp Giáp, Lục Thân, Lục Thú và Vượng Suy theo Nhật/Nguyệt"
+              borderVariant="gold"
+              hoverable
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '28px' }}>
+                <Select
+                  label="Chọn Quẻ Chủ cần phân tích (1 đến 64):"
+                  options={hexagramOptions}
+                  value={selectedHexNumber.toString()}
+                  onChange={(e) => setSelectedHexNumber(Number(e.target.value))}
+                  helperText="Tra cứu đồ hình Bát Cung, Thế Ứng và Nạp Giáp theo cổ pháp Chu Dịch"
+                  fullWidth
+                />
+
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontWeight: 600,
+                      fontSize: '0.875rem',
+                      marginBottom: '8px',
+                      color: 'var(--bha-text-primary)',
+                    }}
+                  >
+                    Chọn các hào động (nếu có):
+                  </label>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    {[1, 2, 3, 4, 5, 6].map((p) => {
+                      const isChecked = selectedMovingLines.includes(p);
+                      return (
+                        <label
+                          key={p}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '6px 14px',
+                            borderRadius: '6px',
+                            border: `1px solid ${
+                              isChecked ? 'var(--bha-crimson-600)' : 'var(--bha-border-base)'
+                            }`,
+                            backgroundColor: isChecked
+                              ? 'rgba(133, 22, 22, 0.08)'
+                              : 'var(--bha-bg-subtle)',
+                            cursor: 'pointer',
+                            fontSize: '0.875rem',
+                            fontWeight: isChecked ? 700 : 500,
+                            color: isChecked
+                              ? 'var(--bha-crimson-800)'
+                              : 'var(--bha-text-secondary)',
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedMovingLines([...selectedMovingLines, p].sort());
+                              } else {
+                                setSelectedMovingLines(selectedMovingLines.filter((x) => x !== p));
+                              }
+                            }}
+                          />
+                          Hào {p} {isChecked ? '●' : ''}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <SixYaoAnalysisView
+                primaryHexagram={selectedHexNumber}
+                movingLineIndices={selectedMovingLines}
+              />
             </Card>
           </div>
         )}

@@ -668,6 +668,7 @@ export function orchestrateSixYaoAnalysis(
     sinoVietnamese: primaryHex.sinoVietnameseName,
     chineseName: primaryHex.chineseName,
     symbol: primaryHex.symbol,
+    rawValues: primaryHex.rawValues,
     upperTrigram: {
       code: primaryHex.upperTrigram.code,
       name: primaryHex.upperTrigram.name,
@@ -699,6 +700,7 @@ export function orchestrateSixYaoAnalysis(
       sinoVietnamese: changingHex.sinoVietnameseName,
       chineseName: changingHex.chineseName,
       symbol: changingHex.symbol,
+      rawValues: changingHex.rawValues,
       upperTrigram: {
         code: changingHex.upperTrigram.code,
         name: changingHex.upperTrigram.name,
