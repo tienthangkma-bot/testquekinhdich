@@ -1,0 +1,213 @@
+.backup-restore-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Tabs */
+.backup-restore-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 2px solid var(--bha-border, #E0E0E0);
+  padding-bottom: 8px;
+}
+
+.backup-tab-btn {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--bha-radius-md, 6px);
+  border: none;
+  background: transparent;
+  color: var(--bha-text-secondary, #616161);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.backup-tab-btn:hover {
+  background-color: rgba(212, 175, 55, 0.1);
+  color: var(--bha-crimson-800, #8B0000);
+}
+
+.backup-tab-btn--active {
+  background-color: var(--bha-crimson-800, #8B0000);
+  color: #FFFFFF;
+}
+
+.backup-tab-btn--active:hover {
+  background-color: var(--bha-crimson-700, #A00000);
+  color: #FFFFFF;
+}
+
+/* Stats Summary Grid */
+.backup-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.backup-stat-card {
+  padding: 12px;
+  background-color: var(--bha-surface-variant, #FAFAFA);
+  border: 1px solid var(--bha-border, #E0E0E0);
+  border-radius: var(--bha-radius-md, 6px);
+  text-align: center;
+}
+
+.backup-stat-card__label {
+  font-size: 0.75rem;
+  color: var(--bha-text-muted, #757575);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.backup-stat-card__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--bha-crimson-800, #8B0000);
+}
+
+/* Metadata pills */
+.backup-meta-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.backup-meta-pill {
+  font-size: 0.8rem;
+  background-color: rgba(212, 175, 55, 0.12);
+  color: var(--bha-crimson-800, #8B0000);
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  font-weight: 500;
+}
+
+/* Alerts */
+.backup-alert {
+  padding: 12px 16px;
+  border-radius: var(--bha-radius-md, 6px);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.backup-alert--success {
+  background-color: #E8F5E9;
+  border: 1px solid #A5D6A7;
+  color: #2E7D32;
+}
+
+.backup-alert--error {
+  background-color: #FFEBEE;
+  border: 1px solid #FFCDD2;
+  color: #C62828;
+}
+
+.backup-alert--warning {
+  background-color: #FFF8E1;
+  border: 1px solid #FFE082;
+  color: #B78103;
+}
+
+.backup-alert__title {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.backup-alert__list {
+  margin: 4px 0 0 16px;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+/* Dropzone / File Picker */
+.backup-dropzone {
+  border: 2px dashed var(--bha-border, #E0E0E0);
+  border-radius: var(--bha-radius-md, 8px);
+  padding: 24px;
+  text-align: center;
+  background-color: var(--bha-surface-variant, #FAFAFA);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.backup-dropzone:hover {
+  border-color: var(--bha-gold-500, #D4AF37);
+  background-color: rgba(212, 175, 55, 0.05);
+}
+
+.backup-dropzone__icon {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+}
+
+.backup-dropzone__text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--bha-text-primary, #212121);
+  margin-bottom: 4px;
+}
+
+.backup-dropzone__sub {
+  font-size: 0.8rem;
+  color: var(--bha-text-muted, #757575);
+}
+
+/* Conflict Mode Choice Box */
+.conflict-options-box {
+  background-color: #FFFDE7;
+  border: 1px solid #FFF59D;
+  border-radius: var(--bha-radius-md, 6px);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.conflict-option-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--bha-radius-md, 4px);
+  cursor: pointer;
+  background-color: #FFFFFF;
+  border: 1px solid var(--bha-border, #E0E0E0);
+  transition: border-color 0.2s ease;
+}
+
+.conflict-option-item:hover {
+  border-color: var(--bha-gold-500, #D4AF37);
+}
+
+.conflict-option-item input[type="radio"] {
+  margin-top: 3px;
+}
+
+.conflict-option-item__label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.conflict-option-item__title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--bha-text-primary, #212121);
+}
+
+.conflict-option-item__desc {
+  font-size: 0.8rem;
+  color: var(--bha-text-secondary, #616161);
+}

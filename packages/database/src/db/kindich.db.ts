@@ -4,6 +4,7 @@ import {
   DivinationResultEntity,
   DivinationAnalysisEntity,
   DivinationNoteEntity,
+  UserSettingEntity,
 } from '@kindich/domain';
 
 /**
@@ -12,14 +13,20 @@ import {
 export const DEFAULT_DB_NAME = 'kindich_db';
 
 /**
+ * Phiên bản Schema hiện tại của Database
+ */
+export const CURRENT_SCHEMA_VERSION = 3;
+
+/**
  * Lớp quản trị cơ sở dữ liệu IndexedDB bằng Dexie cho ứng dụng Kinh Dịch (offline-first)
- * Hỗ trợ lưu trữ thông tin quẻ, kết quả, phân tích Lục Hào, snapshot bất biến và ghi chú nghiệm lý.
+ * Hỗ trợ lưu trữ thông tin quẻ, kết quả, phân tích Lục Hào, snapshot bất biến, ghi chú nghiệm lý và cấu hình cá nhân.
  */
 export class KinDichDatabase extends Dexie {
   divinations!: EntityTable<DivinationEntity, 'id'>;
   divination_results!: EntityTable<DivinationResultEntity, 'id'>;
   divination_analyses!: EntityTable<DivinationAnalysisEntity, 'id'>;
   divination_notes!: EntityTable<DivinationNoteEntity, 'id'>;
+  user_settings!: EntityTable<UserSettingEntity, 'key'>;
 
   constructor(dbName: string = DEFAULT_DB_NAME, options?: DexieOptions) {
     super(dbName, options);
@@ -54,7 +61,43 @@ export class KinDichDatabase extends Dexie {
         }
       });
     });
+
+    // Phiên bản 3: Bổ sung bảng user_settings lưu trữ cấu hình cá nhân
+    this.version(3).stores({
+      divinations: 'id, createdAt, updatedAt, method, ruleSetId, inquiryType, [method+createdAt], [ruleSetId+createdAt], *tags',
+      divination_results: 'id, divinationId, primaryHexagramNumber, changingHexagramNumber, [divinationId+createdAt]',
+      divination_analyses: 'id, divinationId, ruleSetId, algorithmVersion, palaceId, [divinationId+ruleSetId]',
+      divination_notes: 'id, divinationId, createdAt, updatedAt, [divinationId+createdAt]',
+      user_settings: 'key, updatedAt',
+    });
   }
+}
+
+/**
+ * Lấy danh sách cấu hình cá nhân của người dùng từ cơ sở dữ liệu
+ */
+export async function getUserSettings(db: KinDichDatabase): Promise<Record<string, unknown>> {
+  const records = await db.user_settings.toArray();
+  const settings: Record<string, unknown> = {};
+  for (const r of records) {
+    settings[r.key] = r.value;
+  }
+  return settings;
+}
+
+/**
+ * Lưu hoặc cập nhật một mục cấu hình cá nhân
+ */
+export async function saveUserSetting(
+  db: KinDichDatabase,
+  key: string,
+  value: unknown
+): Promise<void> {
+  await db.user_settings.put({
+    key,
+    value,
+    updatedAt: new Date().toISOString(),
+  });
 }
 
 /**

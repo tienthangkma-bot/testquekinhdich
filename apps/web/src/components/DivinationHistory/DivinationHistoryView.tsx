@@ -8,6 +8,7 @@ import {
 } from '@kindich/domain';
 import { getDivinationRepository } from '../../services/repository.service';
 import { DivinationDetailModal } from './DivinationDetailModal';
+import { BackupRestoreModal } from '../BackupRestore';
 import {
   QUESTION_CATEGORIES,
   getCategoryDefinition,
@@ -49,6 +50,9 @@ export const DivinationHistoryView: React.FC<DivinationHistoryViewProps> = ({
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+  // Sao lưu & Khôi phục
+  const [isBackupRestoreOpen, setIsBackupRestoreOpen] = useState<boolean>(false);
 
   // Thông báo phản hồi người dùng
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -167,6 +171,16 @@ export const DivinationHistoryView: React.FC<DivinationHistoryViewProps> = ({
         title="Lịch Sử Lập Quẻ & Chiêm Đoán"
         subtitle="Toàn bộ lịch sử được lưu trữ bảo mật offline trên thiết bị qua IndexedDB, không phụ thuộc internet"
         borderVariant="gold"
+        extra={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsBackupRestoreOpen(true)}
+            data-testid="open-backup-restore-button"
+          >
+            💾 Sao lưu & Khôi phục
+          </Button>
+        }
       >
         {/* Thanh tìm kiếm và bộ lọc */}
         <form onSubmit={handleSearchSubmit} className="history-filters-bar">
@@ -495,6 +509,17 @@ export const DivinationHistoryView: React.FC<DivinationHistoryViewProps> = ({
           </p>
         </div>
       </Modal>
+
+      {/* Modal Sao lưu & Khôi phục Dữ liệu (Requirements 1-8) */}
+      <BackupRestoreModal
+        isOpen={isBackupRestoreOpen}
+        onClose={() => setIsBackupRestoreOpen(false)}
+        onRestoreSuccess={() => {
+          loadHistory();
+          setStatusMessage('✓ Khôi phục dữ liệu thành công! Danh sách lịch sử đã được cập nhật.');
+          setTimeout(() => setStatusMessage(null), 5000);
+        }}
+      />
     </div>
   );
 };
