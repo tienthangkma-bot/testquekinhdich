@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Button, Input, Card, Select, Modal } from '@kindich/shared';
+import { Button, Card, Select, Modal } from '@kindich/shared';
+import { SerialCastingResult } from '@kindich/core';
+import { SerialCastingForm, SerialCastingResultView } from './components/SerialCasting';
 import './App.css';
 
 type CastingMode = 'serial' | 'time';
 
 export const App: React.FC = () => {
   const [activeMode, setActiveMode] = useState<CastingMode>('serial');
-  const [serialInput, setSerialInput] = useState('');
+  const [serialResult, setSerialResult] = useState<SerialCastingResult | null>(null);
   const [selectedTime, setSelectedTime] = useState(new Date().toISOString().slice(0, 16));
   const [inquiryType, setInquiryType] = useState('general');
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
@@ -57,77 +59,89 @@ export const App: React.FC = () => {
       {/* Main Content Area */}
       <main className="main-content">
         {activeMode === 'serial' ? (
-          <Card
-            title="Lập Quẻ Theo Số Seri Tiền (SERIAL-MOD8-V1)"
-            subtitle="Thuật toán chuẩn vị trí lẻ thượng quái, chẵn hạ quái và tổng xác định hào động"
-            borderVariant="gold"
-            hoverable
-          >
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
-            >
-              <Input
-                label="Dãy số seri tờ tiền đang cầm:"
-                placeholder="Ví dụ: 19864205"
-                value={serialInput}
-                onChange={(e) => setSerialInput(e.target.value.replace(/\D/g, ''))}
-                maxLength={16}
-                helperText="Chỉ nhập ký số từ tờ tiền lưu hành thực tế (khuyến nghị từ 4 - 10 chữ số)"
-                isRequired
-                fullWidth
-              />
-
-              <Select
-                label="Mục đích chiêm đoán:"
-                options={inquiryOptions}
-                value={inquiryType}
-                onChange={(e) => setInquiryType(e.target.value)}
-                helperText="Mục đích chiêm đoán sẽ làm căn cứ định Dụng Thần trong Lục Hào"
-                fullWidth
-              />
-
-              <div className="form-actions">
-                <Button variant="primary" size="lg" type="submit">
-                  Khởi quẻ theo số seri
-                </Button>
-                <Button variant="outline" size="lg" onClick={() => setIsHelpModalOpen(true)}>
+          <div className="serial-mode-section">
+            <Card
+              title="Lập Quẻ Theo Số Seri Tiền (SERIAL-MOD8-V1)"
+              subtitle="Thuật toán chuẩn vị trí lẻ thượng quái, chẵn hạ quái và tổng xác định hào động"
+              borderVariant="gold"
+              hoverable
+              extra={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsHelpModalOpen(true)}
+                >
                   Quy tắc thuật toán
                 </Button>
-              </div>
-            </form>
+              }
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <SerialCastingForm
+                  onCastSuccess={(result) => setSerialResult(result)}
+                  onReset={() => setSerialResult(null)}
+                />
 
-            <div style={{ marginTop: '24px' }}>
-              <div className="placeholder-box">
-                <div className="placeholder-icon">☯</div>
-                <h4 className="placeholder-text">Khu vực phân tích Quẻ Chủ, Quẻ Biến & Quẻ Hỗ</h4>
-                <p className="placeholder-sub">
-                  (Design System đã sẵn sàng — Core Engine & Thuật toán sẽ được kích hoạt ở Sprint
-                  sau)
-                </p>
+                <Select
+                  label="Mục đích chiêm đoán (Tùy chọn):"
+                  options={inquiryOptions}
+                  value={inquiryType}
+                  onChange={(e) => setInquiryType(e.target.value)}
+                  helperText="Mục đích chiêm đoán làm căn cứ định Dụng Thần khi phân tích Lục Hào"
+                  fullWidth
+                />
               </div>
-            </div>
-          </Card>
+
+              {/* Khu vực hiển thị kết quả hoặc thông báo chờ */}
+              <div style={{ marginTop: '28px' }}>
+                {serialResult ? (
+                  <SerialCastingResultView result={serialResult} />
+                ) : (
+                  <div className="placeholder-box">
+                    <div className="placeholder-icon">☯</div>
+                    <h4 className="placeholder-text">Chưa khởi quẻ</h4>
+                    <p className="placeholder-sub">
+                      Vui lòng nhập số seri tiền ở trên (tối thiểu 2 chữ số) và bấm{' '}
+                      <strong>"Lập quẻ"</strong> để xem đồ hình Quẻ Chủ, Quẻ Biến và Quẻ Hỗ.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
         ) : (
           <Card
             title="Lập Quẻ Theo Giờ Động Tâm (Mai Hoa Dịch Số)"
             subtitle="Phương pháp khởi quẻ căn cứ theo thời khắc khởi tâm, phối hợp Can Chi và Lịch Âm"
             borderVariant="gold"
             hoverable
+            extra={
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsHelpModalOpen(true)}
+              >
+                Quy tắc Mai Hoa
+              </Button>
+            }
           >
             <form
               onSubmit={(e) => e.preventDefault()}
               style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
-              <Input
-                label="Thời điểm khởi tâm chiêm nghiệm:"
-                type="datetime-local"
-                value={selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
-                helperText="Mặc định lấy thời khắc hiện tại. Hệ thống sẽ tự quy đổi Tiết Khí, Can Chi và Lịch Âm"
-                isRequired
-                fullWidth
-              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--bha-text-primary)' }}>
+                  Thời điểm khởi tâm chiêm nghiệm:
+                </label>
+                <input
+                  type="datetime-local"
+                  className="bha-input"
+                  value={selectedTime}
+                  onChange={(e) => setSelectedTime(e.target.value)}
+                />
+                <span style={{ fontSize: '0.75rem', color: 'var(--bha-text-muted)' }}>
+                  Mặc định thời khắc hiện tại. Hệ thống sẽ tự quy đổi Can Chi và Lịch Âm khi phân tích.
+                </span>
+              </div>
 
               <Select
                 label="Mục đích chiêm đoán:"
@@ -142,19 +156,15 @@ export const App: React.FC = () => {
                 <Button variant="gold" size="lg" type="submit">
                   Khởi quẻ giờ động tâm
                 </Button>
-                <Button variant="outline" size="lg" onClick={() => setIsHelpModalOpen(true)}>
-                  Quy tắc Mai Hoa
-                </Button>
               </div>
             </form>
 
             <div style={{ marginTop: '24px' }}>
               <div className="placeholder-box">
                 <div className="placeholder-icon">⌛</div>
-                <h4 className="placeholder-text">Khu vực phân tích Quẻ Chủ, Quẻ Biến & Quẻ Hỗ</h4>
+                <h4 className="placeholder-text">Phương pháp Mai Hoa Dịch Số</h4>
                 <p className="placeholder-sub">
-                  (Design System đã sẵn sàng — Core Engine & Thuật toán sẽ được kích hoạt ở Sprint
-                  sau)
+                  (Module Giờ Động Tâm & Gói Lịch Âm Dương sẽ được tích hợp ở nhiệm vụ tiếp theo)
                 </p>
               </div>
             </div>
@@ -256,7 +266,7 @@ export const App: React.FC = () => {
           </span>
           {' • '}Hệ thống Bắc Hà Tân An Phái Monorepo
         </p>
-        <p>Bản quyền © 2026 Bắc Hà Tân An Phái • Phiên bản 0.1.0 (Design System)</p>
+        <p>Bản quyền © 2026 Bắc Hà Tân An Phái • Phiên bản 0.1.0 (Core Engine Connected)</p>
       </footer>
 
       {/* Modal: Quy tắc thuật toán */}

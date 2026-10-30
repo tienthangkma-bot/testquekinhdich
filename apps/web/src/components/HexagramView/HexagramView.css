@@ -1,0 +1,279 @@
+.hexagram-card {
+  background-color: var(--bha-bg-surface);
+  border-radius: var(--bha-radius-lg);
+  border: 1px solid var(--bha-border-base);
+  box-shadow: var(--bha-shadow-sm);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hexagram-card:hover {
+  box-shadow: var(--bha-shadow-md);
+}
+
+.hexagram-card--primary {
+  border-top: 4px solid var(--bha-crimson-700);
+}
+
+.hexagram-card--transformed {
+  border-top: 4px solid var(--bha-gold-600);
+}
+
+.hexagram-card--nuclear {
+  border-top: 4px solid var(--bha-border-dark);
+}
+
+/* Header & Role */
+.hexagram-card__role {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hexagram-card__role-tag {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--bha-radius-full);
+}
+
+.hexagram-card--primary .hexagram-card__role-tag {
+  background-color: rgba(133, 22, 22, 0.08);
+  color: var(--bha-crimson-800);
+  border: 1px solid rgba(133, 22, 22, 0.2);
+}
+
+.hexagram-card--transformed .hexagram-card__role-tag {
+  background-color: var(--bha-gold-50);
+  color: var(--bha-gold-800);
+  border: 1px solid var(--bha-gold-300);
+}
+
+.hexagram-card--nuclear .hexagram-card__role-tag {
+  background-color: var(--bha-bg-subtle);
+  color: var(--bha-text-secondary);
+  border: 1px solid var(--bha-border-base);
+}
+
+.hexagram-card__number {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--bha-text-muted);
+}
+
+/* Header: Symbol & Titles */
+.hexagram-card__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--bha-border-light);
+}
+
+.hexagram-card__symbol {
+  font-size: 2.8rem;
+  line-height: 1;
+  color: var(--bha-crimson-800);
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bha-bg-subtle);
+  border-radius: var(--bha-radius-md);
+  border: 1px solid var(--bha-border-base);
+}
+
+.hexagram-card__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hexagram-card__name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--bha-crimson-800);
+  margin: 0;
+  font-family: var(--bha-font-serif);
+}
+
+.hexagram-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--bha-text-secondary);
+}
+
+.hexagram-card__hantu {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--bha-gold-700);
+}
+
+.hexagram-card__trigrams {
+  font-style: italic;
+}
+
+/* 6 Lines Container */
+.hexagram-card__lines-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hexagram-card__lines-legend {
+  display: grid;
+  grid-template-columns: 85px 1fr 65px;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--bha-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 4px;
+}
+
+.hexagram-line-row {
+  display: grid;
+  grid-template-columns: 85px 1fr 65px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px;
+  border-radius: var(--bha-radius-sm);
+  background-color: var(--bha-bg-subtle);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.hexagram-line-row:hover {
+  background-color: rgba(181, 135, 29, 0.08);
+}
+
+.hexagram-line-row--moving {
+  background-color: rgba(181, 135, 29, 0.12);
+  border-color: var(--bha-gold-500);
+  box-shadow: 0 0 0 1px var(--bha-gold-300);
+}
+
+/* Line Label */
+.hexagram-line-row__label {
+  display: flex;
+  flex-direction: column;
+}
+
+.hexagram-line-row__pos {
+  font-size: 0.7rem;
+  color: var(--bha-text-muted);
+  line-height: 1.2;
+}
+
+.hexagram-line-row__name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--bha-text-primary);
+  line-height: 1.2;
+}
+
+.hexagram-line-row--moving .hexagram-line-row__name {
+  color: var(--bha-crimson-800);
+  font-weight: 700;
+}
+
+/* Visual Bars */
+.hexagram-line-row__bar-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.hexagram-bar {
+  height: 11px;
+  border-radius: 3px;
+  background-color: var(--bha-crimson-800);
+  transition: all 0.2s ease;
+}
+
+.hexagram-bar--yang {
+  width: 100%;
+}
+
+.hexagram-bar-yin-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
+}
+
+.hexagram-bar--yin-segment {
+  flex: 1;
+  width: 100%;
+}
+
+.hexagram-bar-yin-gap {
+  width: 16px;
+  height: 11px;
+}
+
+.hexagram-bar--moving {
+  background-color: var(--bha-gold-600);
+  box-shadow: 0 0 4px rgba(181, 135, 29, 0.5);
+}
+
+/* Status Badge */
+.hexagram-line-row__status {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hexagram-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--bha-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.hexagram-badge--static {
+  color: var(--bha-text-muted);
+  background-color: transparent;
+}
+
+.hexagram-badge--moving {
+  color: #ffffff;
+  background-color: var(--bha-crimson-700);
+  box-shadow: 0 1px 3px rgba(133, 22, 22, 0.3);
+  animation: pulse-moving 2s infinite ease-in-out;
+}
+
+@keyframes pulse-moving {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .hexagram-card__lines-legend,
+  .hexagram-line-row {
+    grid-template-columns: 75px 1fr 50px;
+    gap: 6px;
+  }
+
+  .hexagram-bar-yin-container {
+    gap: 10px;
+  }
+}
