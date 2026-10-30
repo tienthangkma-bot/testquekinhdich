@@ -3,11 +3,16 @@ import { Element } from '../enums/element.enum';
 import { RawTrigramValues } from './yao.model';
 
 /**
- * Mô hình một Quái đơn (1 trong 8 quẻ của Bát Quái)
+ * Mô hình một Quái đơn chuẩn trong 8 quẻ Bát Quái
  */
 export interface Trigram {
   /**
-   * Mã định danh chuẩn của quái (CAN, DOAI, LY, CHAN, TON, KHAM, CAN_SON, KHON)
+   * Mã ID định danh chuẩn của quái (CAN, DOAI, LY, CHAN, TON, KHAM, CAN_SON, KHON)
+   */
+  readonly id: TrigramCode | string;
+
+  /**
+   * Mã code định danh dạng enum
    */
   readonly code: TrigramCode;
 
@@ -17,7 +22,12 @@ export interface Trigram {
   readonly name: string;
 
   /**
-   * Tên chữ Hán (ví dụ: "乾", "兌", "離"...)
+   * Tên Hán Việt (ví dụ: "Càn", "Đoài", "Ly", "Chấn", "Tốn", "Khảm", "Cấn", "Khôn")
+   */
+  readonly sinoVietnameseName: string;
+
+  /**
+   * Ký tự chữ Hán (乾, 兌, 離, 震, 巽, 坎, 艮, 坤)
    */
   readonly chineseName: string;
 
@@ -27,15 +37,25 @@ export interface Trigram {
   readonly symbol: string;
 
   /**
-   * Tượng quẻ trong tự nhiên (Thiên, Trạch, Hỏa, Lôi, Phong, Thủy, Sơn, Địa)
+   * Ngũ Hành bản thể của quái (Kim, Mộc, Thủy, Hỏa, Thổ)
    */
-  readonly nature: string;
+  readonly element: Element;
 
   /**
-   * Cấu trúc 3 hào của quái đơn (lưu từ dưới lên: [hào 1, hào 2, hào 3])
-   * 0 = Âm, 1 = Dương
+   * Cấu trúc ba hào theo thứ tự từ dưới lên: [hào 1, hào 2, hào 3]
+   * Quy ước: 0 = Âm, 1 = Dương
    */
   readonly lines: RawTrigramValues;
+
+  /**
+   * Chuỗi nhị phân mã hóa tương ứng với 3 hào từ dưới lên (ví dụ: "111", "110", "101"...)
+   */
+  readonly binary: string;
+
+  /**
+   * Tượng quẻ trong tự nhiên (Thiên / Trời, Trạch / Đầm, Hỏa / Lửa, Lôi / Sấm, Phong / Gió, Thủy / Nước, Sơn / Núi, Địa / Đất)
+   */
+  readonly nature: string;
 
   /**
    * Số Tiên Thiên Bát Quái (dùng cho Mai Hoa Dịch Số & thuật toán MOD 8):
@@ -48,9 +68,4 @@ export interface Trigram {
    * Khảm 1, Khôn 2, Chấn 3, Tốn 4, Càn 6, Đoài 7, Cấn 8, Ly 9
    */
   readonly laterHeavenNumber: number;
-
-  /**
-   * Ngũ Hành bản thể của quái
-   */
-  readonly element: Element;
 }

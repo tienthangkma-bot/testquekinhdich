@@ -8,10 +8,12 @@
     "dev": "pnpm --filter web dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
-    "lint": "pnpm -r --if-present lint"
+    "lint": "pnpm -r --if-present lint",
+    "test": "pnpm -r --if-present test"
   },
   "devDependencies": {
     "@types/node": "^22.13.9",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^5.0.5"
   }
 }
