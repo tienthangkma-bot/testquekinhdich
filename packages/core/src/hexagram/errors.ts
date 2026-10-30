@@ -1,5 +1,5 @@
 /**
- * Các lớp lỗi chuyên biệt trong Hexagram Engine
+ * Các lớp lỗi chuyên biệt trong Hexagram Engine và Casting Modules
  */
 
 export class HexagramEngineError extends Error {
@@ -27,5 +27,12 @@ export class HexagramNotFoundError extends HexagramEngineError {
   constructor(message: string) {
     super(message);
     this.name = 'HexagramNotFoundError';
+  }
+}
+
+export class InvalidSerialInputError extends HexagramEngineError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidSerialInputError';
   }
 }
