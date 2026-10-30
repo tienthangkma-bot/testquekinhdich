@@ -5,7 +5,8 @@
   "description": "Ứng dụng Kinh Dịch đa nền tảng, offline-first - Bắc Hà Tân An Phái",
   "packageManager": "pnpm@12.16.1",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {
     "@types/node": "^22.13.9",

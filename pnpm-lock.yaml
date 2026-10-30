@@ -173,6 +173,44 @@ importers:
         specifier: ^5.8.2
         version: 5.9.3
 
+  packages/calendar:
+    dependencies:
+      '@kindich/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/core:
+    dependencies:
+      '@kindich/calendar':
+        specifier: workspace:*
+        version: link:../calendar
+      '@kindich/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@kindich/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/database:
+    dependencies:
+      '@kindich/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@kindich/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/domain:
+    dependencies:
+      '@kindich/calendar':
+        specifier: workspace:*
+        version: link:../calendar
+      '@kindich/shared':
+        specifier: workspace:*
+        version: link:../shared
+
+  packages/shared: {}
+
 packages:
 
   '@types/node@22.20.5':

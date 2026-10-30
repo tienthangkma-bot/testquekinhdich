@@ -25,6 +25,19 @@
     "skipLibCheck": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@kindich/shared": ["packages/shared/src/index.ts"],
+      "@kindich/shared/*": ["packages/shared/src/*"],
+      "@kindich/calendar": ["packages/calendar/src/index.ts"],
+      "@kindich/calendar/*": ["packages/calendar/src/*"],
+      "@kindich/domain": ["packages/domain/src/index.ts"],
+      "@kindich/domain/*": ["packages/domain/src/*"],
+      "@kindich/core": ["packages/core/src/index.ts"],
+      "@kindich/core/*": ["packages/core/src/*"],
+      "@kindich/database": ["packages/database/src/index.ts"],
+      "@kindich/database/*": ["packages/database/src/*"]
+    }
   }
 }
