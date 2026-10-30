@@ -36,3 +36,10 @@ export class InvalidSerialInputError extends HexagramEngineError {
     this.name = 'InvalidSerialInputError';
   }
 }
+
+export class InvalidMaiHuaInputError extends HexagramEngineError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'InvalidMaiHuaInputError';
+  }
+}
