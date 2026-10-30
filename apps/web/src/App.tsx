@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, Select, Modal, Input } from '@kindich/shared';
+import { Button, Card, Select, Modal } from '@kindich/shared';
 import {
   SerialCastingResult,
   MaiHuaCastingResult,
@@ -19,6 +19,7 @@ import { SerialCastingForm, SerialCastingResultView } from './components/SerialC
 import { MaiHuaCastingForm, MaiHuaCastingResultView } from './components/MaiHuaCasting';
 import { SixYaoAnalysisView } from './components/SixYaoAnalysis';
 import { DivinationHistoryView } from './components/DivinationHistory';
+import { QuestionCategorySelector, QuestionCategory } from './components/NotesAndQuestions';
 import './App.css';
 
 type CastingMode = 'serial' | 'time' | 'six-yao' | 'history';
@@ -26,7 +27,7 @@ type CastingMode = 'serial' | 'time' | 'six-yao' | 'history';
 export const App: React.FC = () => {
   const [activeMode, setActiveMode] = useState<CastingMode>('serial');
   const [question, setQuestion] = useState<string>('');
-  const [inquiryType, setInquiryType] = useState('general');
+  const [inquiryType, setInquiryType] = useState<QuestionCategory>('work');
   const [serialResult, setSerialResult] = useState<SerialCastingResult | null>(null);
   const [maiHuaData, setMaiHuaData] = useState<{
     result: MaiHuaCastingResult;
@@ -45,15 +46,6 @@ export const App: React.FC = () => {
     value: h.number.toString(),
     label: `#${h.number} - ${h.name} (${h.sinoVietnameseName})`,
   }));
-
-  const inquiryOptions = [
-    { value: 'general', label: 'Chiêm việc đại thể (Việc chung)' },
-    { value: 'career', label: 'Cầu công danh, sự nghiệp, thi cử' },
-    { value: 'wealth', label: 'Cầu tài lộc, kinh doanh, buôn bán' },
-    { value: 'family', label: 'Gia đạo, hôn nhân, tình duyên' },
-    { value: 'health', label: 'Bệnh tật, sức khỏe, bình an' },
-    { value: 'travel', label: 'Xuất hành, đi xa, mưu sự' },
-  ];
 
   /**
    * Tự động lưu lịch sử khi lập quẻ Seri tiền thành công (Requirement 1)
@@ -289,26 +281,17 @@ export const App: React.FC = () => {
               }
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <Input
-                  label="Nội dung câu hỏi / Việc cần chiêm đoán (Tùy chọn):"
-                  placeholder="Ví dụ: Kỳ thi công chức tháng 11 có thuận lợi không?"
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  fullWidth
+                <QuestionCategorySelector
+                  question={question}
+                  onQuestionChange={setQuestion}
+                  category={inquiryType}
+                  onCategoryChange={setInquiryType}
+                  inputPlaceholder="Ví dụ: Kỳ thi công chức tháng 11 có thuận lợi không?"
                 />
 
                 <SerialCastingForm
                   onCastSuccess={handleSerialCastSuccess}
                   onReset={() => setSerialResult(null)}
-                />
-
-                <Select
-                  label="Mục đích chiêm đoán (Tùy chọn):"
-                  options={inquiryOptions}
-                  value={inquiryType}
-                  onChange={(e) => setInquiryType(e.target.value)}
-                  helperText="Mục đích chiêm đoán làm căn cứ định Dụng Thần khi phân tích Lục Hào"
-                  fullWidth
                 />
               </div>
 
@@ -367,26 +350,17 @@ export const App: React.FC = () => {
               }
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <Input
-                  label="Nội dung câu hỏi / Việc cần chiêm đoán (Tùy chọn):"
-                  placeholder="Ví dụ: Việc hợp tác kinh doanh sắp tới diễn biến ra sao?"
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  fullWidth
+                <QuestionCategorySelector
+                  question={question}
+                  onQuestionChange={setQuestion}
+                  category={inquiryType}
+                  onCategoryChange={setInquiryType}
+                  inputPlaceholder="Ví dụ: Việc hợp tác kinh doanh sắp tới diễn biến ra sao?"
                 />
 
                 <MaiHuaCastingForm
                   onCastSuccess={handleMaiHuaCastSuccess}
                   onReset={() => setMaiHuaData(null)}
-                />
-
-                <Select
-                  label="Mục đích chiêm đoán (Tùy chọn):"
-                  options={inquiryOptions}
-                  value={inquiryType}
-                  onChange={(e) => setInquiryType(e.target.value)}
-                  helperText="Giúp định vị tương quan Thể - Dụng trong Mai Hoa và Dụng Thần trong Lục Hào"
-                  fullWidth
                 />
               </div>
 

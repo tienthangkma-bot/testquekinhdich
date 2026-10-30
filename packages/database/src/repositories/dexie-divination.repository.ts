@@ -280,6 +280,11 @@ export class DexieDivinationRepository implements IDivinationRepository {
         return false;
       }
 
+      // Lọc theo phân loại danh mục câu hỏi (inquiryType)
+      if (filter?.inquiryType && d.inquiryType !== filter.inquiryType) {
+        return false;
+      }
+
       // Lọc theo trạng thái yêu thích
       if (filter?.starred !== undefined && (d.starred ?? false) !== filter.starred) {
         return false;

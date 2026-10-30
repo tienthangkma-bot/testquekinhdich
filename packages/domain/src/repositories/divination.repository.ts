@@ -136,6 +136,7 @@ export interface DivinationFilterOptions {
   readonly endDate?: string;
   readonly tags?: readonly string[];
   readonly starred?: boolean;
+  readonly inquiryType?: string;
 }
 
 /**

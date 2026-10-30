@@ -8,6 +8,12 @@ import {
 } from '@kindich/domain';
 import { getDivinationRepository } from '../../services/repository.service';
 import { DivinationDetailModal } from './DivinationDetailModal';
+import {
+  QUESTION_CATEGORIES,
+  getCategoryDefinition,
+  getCategoryIcon,
+  getCategoryLabel,
+} from '../NotesAndQuestions';
 import './DivinationHistory.css';
 
 export interface DivinationHistoryViewProps {
@@ -31,6 +37,7 @@ export const DivinationHistoryView: React.FC<DivinationHistoryViewProps> = ({
   // Bộ lọc tìm kiếm
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [methodFilter, setMethodFilter] = useState<string>('ALL');
+  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
@@ -58,6 +65,7 @@ export const DivinationHistoryView: React.FC<DivinationHistoryViewProps> = ({
           methodFilter === 'ALL'
             ? undefined
             : (methodFilter as CastingMethod),
+        inquiryType: categoryFilter === 'ALL' ? undefined : categoryFilter,
         startDate: startDate ? `${startDate}T00:00:00.000Z` : undefined,
         endDate: endDate ? `${endDate}T23:59:59.999Z` : undefined,
       };
@@ -72,7 +80,7 @@ export const DivinationHistoryView: React.FC<DivinationHistoryViewProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [repo, searchQuery, methodFilter, startDate, endDate, page, pageSize]);
+  }, [repo, searchQuery, methodFilter, categoryFilter, startDate, endDate, page, pageSize]);
 
   useEffect(() => {
     loadHistory();
@@ -89,6 +97,7 @@ export const DivinationHistoryView: React.FC<DivinationHistoryViewProps> = ({
   const handleResetFilters = () => {
     setSearchQuery('');
     setMethodFilter('ALL');
+    setCategoryFilter('ALL');
     setStartDate('');
     setEndDate('');
     setPage(1);
@@ -144,6 +153,14 @@ export const DivinationHistoryView: React.FC<DivinationHistoryViewProps> = ({
     { value: CastingMethod.MAI_HUA, label: 'Giờ động tâm (Mai Hoa Dịch Số)' },
   ];
 
+  const categoryOptions = [
+    { value: 'ALL', label: 'Tất cả danh mục câu hỏi' },
+    ...QUESTION_CATEGORIES.map((c) => ({
+      value: c.id,
+      label: `${c.icon} ${c.label}`,
+    })),
+  ];
+
   return (
     <div className="history-view-container">
       <Card
@@ -170,6 +187,19 @@ export const DivinationHistoryView: React.FC<DivinationHistoryViewProps> = ({
               value={methodFilter}
               onChange={(e) => {
                 setMethodFilter(e.target.value);
+                setPage(1);
+              }}
+              fullWidth
+              size="md"
+            />
+          </div>
+
+          <div className="filter-item category-select" data-testid="category-filter-select">
+            <Select
+              options={categoryOptions}
+              value={categoryFilter}
+              onChange={(e) => {
+                setCategoryFilter(e.target.value);
                 setPage(1);
               }}
               fullWidth
@@ -269,6 +299,22 @@ export const DivinationHistoryView: React.FC<DivinationHistoryViewProps> = ({
                     <span className="history-time-str">
                       {new Date(item.createdAt).toLocaleString('vi-VN')}
                     </span>
+                    {item.inquiryType && (
+                      <span
+                        className="category-badge"
+                        style={{
+                          backgroundColor: getCategoryDefinition(item.inquiryType).bgColor,
+                          color: getCategoryDefinition(item.inquiryType).color,
+                          border: `1px solid ${getCategoryDefinition(item.inquiryType).color}40`,
+                          fontSize: '0.75rem',
+                          padding: '2px 8px',
+                        }}
+                        data-testid={`history-category-badge-${item.id}`}
+                      >
+                        <span>{getCategoryIcon(item.inquiryType)}</span>
+                        <span>{getCategoryLabel(item.inquiryType)}</span>
+                      </span>
+                    )}
                   </div>
 
                   <button

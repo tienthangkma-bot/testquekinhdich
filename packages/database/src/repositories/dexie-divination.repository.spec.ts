@@ -338,6 +338,7 @@ describe('DexieDivinationRepository & IndexedDB Database Layer', () => {
         algorithmVersion: 'SERIAL-MOD8-V1',
         ruleSetId: 'BO_PHE_CHINH_TONG_V1',
         question: 'Hỏi về việc chuyển đổi công tác',
+        inquiryType: 'work',
         tags: ['cong_viec', 'thang_tien'],
         input: { method: CastingMethod.SERIAL, serialNumber: '11111111' },
         dateTimeInfo: sampleDateTime,
@@ -358,6 +359,7 @@ describe('DexieDivinationRepository & IndexedDB Database Layer', () => {
         algorithmVersion: 'MAI-HUA-V1',
         ruleSetId: 'BO_PHE_CHINH_TONG_V1',
         question: 'Hỏi về sức khỏe cha mẹ',
+        inquiryType: 'family',
         tags: ['gia_dao', 'suc_khoe'],
         input: { method: CastingMethod.MAI_HUA, dateTime: '2026-10-30T10:00:00.000Z' },
         dateTimeInfo: {
@@ -380,6 +382,7 @@ describe('DexieDivinationRepository & IndexedDB Database Layer', () => {
         algorithmVersion: 'SERIAL-MOD8-V1',
         ruleSetId: 'BO_PHE_CHINH_TONG_V1',
         question: 'Đầu tư tài chính ngắn hạn',
+        inquiryType: 'finance',
         tags: ['tai_chinh', 'dau_tu'],
         input: { method: CastingMethod.SERIAL, serialNumber: '33333333' },
         dateTimeInfo: sampleDateTime,
@@ -453,6 +456,24 @@ describe('DexieDivinationRepository & IndexedDB Database Layer', () => {
       const tagRes = await repo.list({ tags: ['tai_chinh'] });
       expect(tagRes.totalCount).toBe(1);
       expect(tagRes.items[0]?.id).toBe('div-03');
+    });
+
+    it('lọc theo danh mục câu hỏi (inquiryType - Requirement 4 & 5)', async () => {
+      const workRes = await repo.list({ inquiryType: 'work' });
+      expect(workRes.totalCount).toBe(1);
+      expect(workRes.items[0]?.id).toBe('div-01');
+
+      const familyRes = await repo.list({ inquiryType: 'family' });
+      expect(familyRes.totalCount).toBe(1);
+      expect(familyRes.items[0]?.id).toBe('div-02');
+
+      const financeRes = await repo.list({ inquiryType: 'finance' });
+      expect(financeRes.totalCount).toBe(1);
+      expect(financeRes.items[0]?.id).toBe('div-03');
+
+      const nonExistentRes = await repo.list({ inquiryType: 'study' });
+      expect(nonExistentRes.totalCount).toBe(0);
+      expect(nonExistentRes.items).toHaveLength(0);
     });
 
     it('hỗ trợ phân trang và tính toán tổng số trang chính xác', async () => {
