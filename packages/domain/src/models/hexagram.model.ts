@@ -4,7 +4,7 @@ import { TrigramCode } from '../enums/trigram-name.enum';
 import { Element } from '../enums/element.enum';
 
 /**
- * Thứ bậc biến hóa của quẻ trong Bát Cung:
+ * Thứ bậc biến hóa của quẻ trong Bát Cung (Lục Hào):
  * - BAN_CUNG: Quẻ gốc / Thuần quái (Thế hào 6, Ứng hào 3)
  * - NHAT_THE: Biến hào 1 (Thế hào 1, Ứng hào 4)
  * - NHI_THE: Biến hào 2 (Thế hào 2, Ứng hào 5)
@@ -30,7 +30,12 @@ export enum PalaceGeneration {
  */
 export interface Hexagram {
   /**
-   * Số thứ tự quẻ theo trình tự Văn Vương (1 đến 64)
+   * Mã ID định danh duy nhất của quẻ (ví dụ: 'HEX_01', 'HEX_02', ..., 'HEX_64')
+   */
+  readonly id: string;
+
+  /**
+   * Số thứ tự quẻ theo trình tự Văn Vương trong Chu Dịch (1 đến 64)
    * 1 = Thuần Càn, 2 = Thuần Khôn, ..., 64 = Hỏa Thủy Vị Tế
    */
   readonly number: number;
@@ -41,12 +46,17 @@ export interface Hexagram {
   readonly name: string;
 
   /**
-   * Tên quẻ chữ Hán (ví dụ: "乾為天", "天地否", "火雷噬嗑")
+   * Tên Hán Việt đầy đủ (ví dụ: "Càn vi Thiên", "Khôn vi Địa", "Thủy Lôi Truân")
+   */
+  readonly sinoVietnameseName: string;
+
+  /**
+   * Tên quẻ bằng chữ Hán (ví dụ: "乾為天", "天地否", "火雷噬嗑")
    */
   readonly chineseName: string;
 
   /**
-   * Ký tự biểu tượng Unicode của quẻ 6 hào (䷀ đến ䷿)
+   * Ký tự biểu tượng Unicode của quẻ 6 hào (từ U+4DC0 ䷀ đến U+4DFF ䷿)
    */
   readonly symbol: string;
 
@@ -61,42 +71,48 @@ export interface Hexagram {
   readonly lowerTrigram: Trigram;
 
   /**
-   * Cấu trúc 6 hào đầy đủ, lưu từ dưới lên (index 0 = hào 1, index 5 = hào 6)
+   * Cấu trúc 6 hào chi tiết, lưu từ dưới lên (index 0 = hào 1, index 5 = hào 6)
    */
   readonly lines: HexagramLines;
 
   /**
    * Dãy giá trị nhị phân thô của 6 hào từ dưới lên (0 = Âm, 1 = Dương)
+   * [hào 1, hào 2, hào 3, hào 4, hào 5, hào 6]
    */
   readonly rawValues: RawHexagramValues;
 
   /**
+   * Chuỗi nhị phân 6 ký tự đại diện cho 6 hào từ dưới lên (ví dụ: "111111", "000000")
+   */
+  readonly binary: string;
+
+  /**
    * Quẻ thuộc Cung nào trong Bát Cung (Càn, Khảm, Cấn, Chấn, Tốn, Ly, Khôn, Đoài)
    */
-  readonly palace: TrigramCode;
+  readonly palace?: TrigramCode;
 
   /**
    * Ngũ Hành của Bát Cung mà quẻ trực thuộc (Kim, Mộc, Thủy, Hỏa, Thổ)
    */
-  readonly palaceElement: Element;
+  readonly palaceElement?: Element;
 
   /**
    * Thứ bậc của quẻ trong Cung (Bản cung, Nhất thế... Quy hồn)
    */
-  readonly generation: PalaceGeneration;
+  readonly generation?: PalaceGeneration;
 
   /**
    * Vị trí hào Thế trong quẻ (tính từ dưới lên: 1 đến 6)
    */
-  readonly worldLine: LinePosition;
+  readonly worldLine?: LinePosition;
 
   /**
    * Vị trí hào Ứng trong quẻ (tính từ dưới lên: 1 đến 6)
    */
-  readonly responseLine: LinePosition;
+  readonly responseLine?: LinePosition;
 
   /**
-   * Thoán từ / Lời thoán tóm lược ý nghĩa quẻ (tùy chọn)
+   * Thoán từ / Lời thoán tóm lược ý nghĩa quẻ
    */
   readonly judgement?: string;
 }
