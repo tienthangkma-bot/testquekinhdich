@@ -52,23 +52,24 @@
 .mode-switcher {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   background-color: var(--bha-bg-subtle);
   padding: 6px;
   border-radius: var(--bha-radius-lg);
   border: 1px solid var(--bha-border-base);
-  max-width: 580px;
+  max-width: 820px;
   margin: 0 auto;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .mode-tab {
-  flex: 1;
+  flex: 1 1 180px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 12px 20px;
+  gap: 8px;
+  padding: 10px 16px;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--bha-text-secondary);
@@ -78,6 +79,7 @@
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: var(--bha-font-sans);
+  white-space: nowrap;
 }
 
 .mode-tab:hover {
