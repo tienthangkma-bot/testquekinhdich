@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Card, Select, Modal } from '@kindich/shared';
-import { SerialCastingResult } from '@kindich/core';
+import { SerialCastingResult, MaiHuaCastingResult } from '@kindich/core';
+import { CalendarConversionResult } from '@kindich/calendar';
 import { SerialCastingForm, SerialCastingResultView } from './components/SerialCasting';
+import { MaiHuaCastingForm, MaiHuaCastingResultView } from './components/MaiHuaCasting';
 import './App.css';
 
 type CastingMode = 'serial' | 'time';
@@ -9,7 +11,10 @@ type CastingMode = 'serial' | 'time';
 export const App: React.FC = () => {
   const [activeMode, setActiveMode] = useState<CastingMode>('serial');
   const [serialResult, setSerialResult] = useState<SerialCastingResult | null>(null);
-  const [selectedTime, setSelectedTime] = useState(new Date().toISOString().slice(0, 16));
+  const [maiHuaData, setMaiHuaData] = useState<{
+    result: MaiHuaCastingResult;
+    calendarInfo: CalendarConversionResult;
+  } | null>(null);
   const [inquiryType, setInquiryType] = useState('general');
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
@@ -109,66 +114,60 @@ export const App: React.FC = () => {
             </Card>
           </div>
         ) : (
-          <Card
-            title="Lập Quẻ Theo Giờ Động Tâm (Mai Hoa Dịch Số)"
-            subtitle="Phương pháp khởi quẻ căn cứ theo thời khắc khởi tâm, phối hợp Can Chi và Lịch Âm"
-            borderVariant="gold"
-            hoverable
-            extra={
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsHelpModalOpen(true)}
-              >
-                Quy tắc Mai Hoa
-              </Button>
-            }
-          >
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--bha-text-primary)' }}>
-                  Thời điểm khởi tâm chiêm nghiệm:
-                </label>
-                <input
-                  type="datetime-local"
-                  className="bha-input"
-                  value={selectedTime}
-                  onChange={(e) => setSelectedTime(e.target.value)}
-                />
-                <span style={{ fontSize: '0.75rem', color: 'var(--bha-text-muted)' }}>
-                  Mặc định thời khắc hiện tại. Hệ thống sẽ tự quy đổi Can Chi và Lịch Âm khi phân tích.
-                </span>
-              </div>
-
-              <Select
-                label="Mục đích chiêm đoán:"
-                options={inquiryOptions}
-                value={inquiryType}
-                onChange={(e) => setInquiryType(e.target.value)}
-                helperText="Giúp xác định tương quan Thể - Dụng trong Mai Hoa và Dụng Thần trong Lục Hào"
-                fullWidth
-              />
-
-              <div className="form-actions">
-                <Button variant="gold" size="lg" type="submit">
-                  Khởi quẻ giờ động tâm
+          <div className="mai-hua-mode-section">
+            <Card
+              title="Lập Quẻ Theo Giờ Động Tâm (Mai Hoa Dịch Số)"
+              subtitle="Phương pháp khởi quẻ căn cứ theo thời khắc khởi tâm, phối hợp Can Chi, Lịch Âm và Thể/Dụng"
+              borderVariant="gold"
+              hoverable
+              extra={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsHelpModalOpen(true)}
+                >
+                  Quy tắc Mai Hoa
                 </Button>
-              </div>
-            </form>
+              }
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <MaiHuaCastingForm
+                  onCastSuccess={(result, calendarInfo) =>
+                    setMaiHuaData({ result, calendarInfo })
+                  }
+                  onReset={() => setMaiHuaData(null)}
+                />
 
-            <div style={{ marginTop: '24px' }}>
-              <div className="placeholder-box">
-                <div className="placeholder-icon">⌛</div>
-                <h4 className="placeholder-text">Phương pháp Mai Hoa Dịch Số</h4>
-                <p className="placeholder-sub">
-                  (Module Giờ Động Tâm & Gói Lịch Âm Dương sẽ được tích hợp ở nhiệm vụ tiếp theo)
-                </p>
+                <Select
+                  label="Mục đích chiêm đoán (Tùy chọn):"
+                  options={inquiryOptions}
+                  value={inquiryType}
+                  onChange={(e) => setInquiryType(e.target.value)}
+                  helperText="Giúp định vị tương quan Thể - Dụng trong Mai Hoa và Dụng Thần trong Lục Hào"
+                  fullWidth
+                />
               </div>
-            </div>
-          </Card>
+
+              {/* Khu vực hiển thị kết quả Mai Hoa hoặc thông báo chờ */}
+              <div style={{ marginTop: '28px' }}>
+                {maiHuaData ? (
+                  <MaiHuaCastingResultView
+                    result={maiHuaData.result}
+                    calendarInfo={maiHuaData.calendarInfo}
+                  />
+                ) : (
+                  <div className="placeholder-box">
+                    <div className="placeholder-icon">⌛</div>
+                    <h4 className="placeholder-text">Chưa khởi quẻ giờ động tâm</h4>
+                    <p className="placeholder-sub">
+                      Chọn thời điểm khởi tâm chiêm nghiệm ở trên và bấm{' '}
+                      <strong>"Lập quẻ Mai Hoa"</strong> để phân tích Quẻ Chủ, Quẻ Biến, Quẻ Hỗ và quan hệ Thể/Dụng.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
         )}
 
         {/* Feature Grid: Architecture Overview */}
