@@ -4,6 +4,8 @@ export * from './mai-hua';
 export * from './six-relations';
 export * from './six-spirits';
 export * from './calendar-analysis';
+export * from './yao-strength';
+
 
 
 
