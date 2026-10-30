@@ -5,6 +5,7 @@ export * from './six-relations';
 export * from './six-spirits';
 export * from './calendar-analysis';
 export * from './yao-strength';
+export * from './six-yao';
 
 
 
