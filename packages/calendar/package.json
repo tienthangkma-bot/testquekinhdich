@@ -14,9 +14,12 @@
   },
   "scripts": {
     "build": "tsc",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@kindich/shared": "workspace:*"
+    "@kindich/domain": "workspace:*",
+    "@kindich/shared": "workspace:*",
+    "@lunar-calendar/sdk": "^0.2.0"
   }
 }

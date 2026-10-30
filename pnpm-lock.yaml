@@ -251,9 +251,15 @@ importers:
 
   packages/calendar:
     dependencies:
+      '@kindich/domain':
+        specifier: workspace:*
+        version: link:../domain
       '@kindich/shared':
         specifier: workspace:*
         version: link:../shared
+      '@lunar-calendar/sdk':
+        specifier: ^0.2.0
+        version: 0.2.0
 
   packages/core:
     dependencies:
@@ -278,9 +284,6 @@ importers:
 
   packages/domain:
     dependencies:
-      '@kindich/calendar':
-        specifier: workspace:*
-        version: link:../calendar
       '@kindich/shared':
         specifier: workspace:*
         version: link:../shared
@@ -678,6 +681,10 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@lunar-calendar/sdk@0.2.0':
+    resolution: {integrity: sha512-h1iBZJyCet5EoefYCcNmn0WPDesuBp067L6EHHUa7tQhfbhfg1K7VySd6cqdvfdHcesf1LwtiUakx1s/mCxM3Q==}
+    engines: {node: '>=18'}
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     resolution: {integrity: sha512-oTXEIha4SsuXdTA4Iyskj0kpdx2yVXdhd75c2v3xGrHFfVMsbhTPZU/nMPL4sWKo4pBHm3aucLaqGlF696dTyQ==}
@@ -2035,6 +2042,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.6.0
+
+  '@lunar-calendar/sdk@0.2.0': {}
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
