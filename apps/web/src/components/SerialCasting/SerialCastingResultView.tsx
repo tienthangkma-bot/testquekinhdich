@@ -1,6 +1,7 @@
 import React from 'react';
 import { SerialCastingResult } from '@kindich/core';
 import { HexagramView } from '../HexagramView';
+import { HexagramInterpretationView } from '../HexagramInterpretation';
 import { getElementDisplayName } from './serial-casting.utils';
 import './SerialCasting.css';
 
@@ -129,6 +130,9 @@ export const SerialCastingResultView: React.FC<SerialCastingResultViewProps> = (
           </div>
         </div>
       </div>
+
+      {/* 3. Khu vực Luận Giải Quẻ Toàn Diện (Interpretation Engine) */}
+      <HexagramInterpretationView trio={trio} />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import { MaiHuaCastingResult } from '@kindich/core';
 import { CalendarConversionResult } from '@kindich/calendar';
 import { HexagramView } from '../HexagramView';
+import { HexagramInterpretationView } from '../HexagramInterpretation';
 import { getElementDisplayName } from '../SerialCasting/serial-casting.utils';
 import { formatSolarLunarSummary } from './mai-hua.utils';
 import './MaiHuaCasting.css';
@@ -222,6 +223,9 @@ export const MaiHuaCastingResultView: React.FC<MaiHuaCastingResultViewProps> = (
           </div>
         </div>
       </div>
+
+      {/* 4. Khu Vực Luận Giải Quẻ Toàn Diện (Interpretation Engine) */}
+      <HexagramInterpretationView trio={trio} maiHuaResult={result} />
     </div>
   );
 };

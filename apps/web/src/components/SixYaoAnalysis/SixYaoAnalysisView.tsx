@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import {
   Hexagram,
+  HexagramTrio,
   LinePosition,
   getHexagramById,
 } from '@kindich/domain';
@@ -12,6 +13,7 @@ import {
   SixYaoOrchestratorInput,
 } from '@kindich/core';
 import { getTraditionalLineName } from '../HexagramView/line-name.utils';
+import { HexagramInterpretationView } from '../HexagramInterpretation';
 import { Card } from '@kindich/shared';
 import './SixYaoAnalysis.css';
 
@@ -56,6 +58,21 @@ export const SixYaoAnalysisView: React.FC<SixYaoAnalysisViewProps> = ({
     }
     return createNuclearHexagram(result.primaryHexagram as unknown as Hexagram);
   }, [result.primaryHexagram]);
+
+  // Bộ 3 Quẻ chuẩn hóa cho Interpretation Engine
+  const trio: HexagramTrio = useMemo(() => {
+    const primary = getHexagramById(result.primaryHexagram.hexagramNumber)!;
+    const transformed = result.changingHexagram
+      ? getHexagramById(result.changingHexagram.hexagramNumber) || primary
+      : primary;
+    return {
+      primary,
+      transformed,
+      nuclear: nuclearHexagram,
+      movingLineIndices: result.movingLines.map((m) => m.position),
+      hasMovingLines: result.movingLines.length > 0,
+    };
+  }, [result, nuclearHexagram]);
 
   // 3. Quản lý hào được chọn để hiển thị khu vực giải thích chi tiết (mặc định hào Thế)
   const [selectedPosition, setSelectedPosition] = useState<LinePosition>(
@@ -583,6 +600,9 @@ export const SixYaoAnalysisView: React.FC<SixYaoAnalysisViewProps> = ({
           </ul>
         </div>
       </div>
+
+      {/* 6. Khu Vực Luận Giải Quẻ Toàn Diện (Interpretation Engine) */}
+      <HexagramInterpretationView trio={trio} sixYaoResult={result} initialTab="overview" />
     </div>
   );
 };
