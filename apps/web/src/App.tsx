@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button, Input, Card, Select, Modal } from '@kindich/shared';
 import './App.css';
 
 type CastingMode = 'serial' | 'time';
@@ -7,6 +8,17 @@ export const App: React.FC = () => {
   const [activeMode, setActiveMode] = useState<CastingMode>('serial');
   const [serialInput, setSerialInput] = useState('');
   const [selectedTime, setSelectedTime] = useState(new Date().toISOString().slice(0, 16));
+  const [inquiryType, setInquiryType] = useState('general');
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
+  const inquiryOptions = [
+    { value: 'general', label: 'Chiêm việc đại thể (Việc chung)' },
+    { value: 'career', label: 'Cầu công danh, sự nghiệp, thi cử' },
+    { value: 'wealth', label: 'Cầu tài lộc, kinh doanh, buôn bán' },
+    { value: 'family', label: 'Gia đạo, hôn nhân, tình duyên' },
+    { value: 'health', label: 'Bệnh tật, sức khỏe, bình an' },
+    { value: 'travel', label: 'Xuất hành, đi xa, mưu sự' },
+  ];
 
   return (
     <div className="app-container">
@@ -18,8 +30,7 @@ export const App: React.FC = () => {
         </div>
         <h1 className="brand-title">Bắc Hà Tân An Phái</h1>
         <p className="brand-subtitle">
-          Ứng dụng lập và phân tích quẻ Kinh Dịch, Mai Hoa Dịch Số & Lục Hào toàn diện
-          (Offline-First)
+          Ứng dụng Kinh Dịch Lục Hào & Mai Hoa Dịch Số Toàn Diện • Chuẩn Cổ Pháp • Offline-First
         </p>
       </header>
 
@@ -46,149 +57,283 @@ export const App: React.FC = () => {
       {/* Main Content Area */}
       <main className="main-content">
         {activeMode === 'serial' ? (
-          <section className="card" aria-labelledby="serial-title">
-            <h2 id="serial-title" className="card-title">
-              <span>💵</span> Lập quẻ theo số seri tiền (SERIAL-MOD8-V1)
-            </h2>
-            <p className="card-desc">
-              Thuật toán sử dụng các chữ số ở vị trí lẻ để tính thượng quái, vị trí chẵn để tính hạ
-              quái, và tổng tất cả chữ số để xác định hào động.
-            </p>
-
+          <Card
+            title="Lập Quẻ Theo Số Seri Tiền (SERIAL-MOD8-V1)"
+            subtitle="Thuật toán chuẩn vị trí lẻ thượng quái, chẵn hạ quái và tổng xác định hào động"
+            borderVariant="gold"
+            hoverable
+          >
             <form
               onSubmit={(e) => e.preventDefault()}
-              style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
+              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
-              <div className="form-group">
-                <label htmlFor="serialNumber" className="form-label">
-                  Dãy số seri tờ tiền:
-                </label>
-                <input
-                  id="serialNumber"
-                  type="text"
-                  className="form-input"
-                  placeholder="Ví dụ: 19864205"
-                  value={serialInput}
-                  onChange={(e) => setSerialInput(e.target.value.replace(/\D/g, ''))}
-                  maxLength={16}
-                />
-                <span className="form-help">
-                  Chỉ nhập các ký số tự nhiên từ tờ tiền lưu hành (tối thiểu 4 chữ số).
-                </span>
-              </div>
+              <Input
+                label="Dãy số seri tờ tiền đang cầm:"
+                placeholder="Ví dụ: 19864205"
+                value={serialInput}
+                onChange={(e) => setSerialInput(e.target.value.replace(/\D/g, ''))}
+                maxLength={16}
+                helperText="Chỉ nhập ký số từ tờ tiền lưu hành thực tế (khuyến nghị từ 4 - 10 chữ số)"
+                isRequired
+                fullWidth
+              />
 
-              <button type="submit" className="btn-primary">
-                <span>Khởi quẻ theo số seri</span>
-              </button>
+              <Select
+                label="Mục đích chiêm đoán:"
+                options={inquiryOptions}
+                value={inquiryType}
+                onChange={(e) => setInquiryType(e.target.value)}
+                helperText="Mục đích chiêm đoán sẽ làm căn cứ định Dụng Thần trong Lục Hào"
+                fullWidth
+              />
+
+              <div className="form-actions">
+                <Button variant="primary" size="lg" type="submit">
+                  Khởi quẻ theo số seri
+                </Button>
+                <Button variant="outline" size="lg" onClick={() => setIsHelpModalOpen(true)}>
+                  Quy tắc thuật toán
+                </Button>
+              </div>
             </form>
 
             <div style={{ marginTop: '24px' }}>
               <div className="placeholder-box">
                 <div className="placeholder-icon">☯</div>
-                <p className="placeholder-text">Khu vực hiển thị Quẻ Chủ, Quẻ Biến và Quẻ Hỗ</p>
+                <h4 className="placeholder-text">Khu vực phân tích Quẻ Chủ, Quẻ Biến & Quẻ Hỗ</h4>
                 <p className="placeholder-sub">
-                  (Mô hình giao diện sẵn sàng — Đang chờ kích hoạt Core Engine ở Sprint kế tiếp)
+                  (Design System đã sẵn sàng — Core Engine & Thuật toán sẽ được kích hoạt ở Sprint
+                  sau)
                 </p>
               </div>
             </div>
-          </section>
+          </Card>
         ) : (
-          <section className="card" aria-labelledby="time-title">
-            <h2 id="time-title" className="card-title">
-              <span>⏱️</span> Lập quẻ theo giờ động tâm (Mai Hoa Dịch Số)
-            </h2>
-            <p className="card-desc">
-              Phương pháp khởi quẻ dựa trên năm, tháng, ngày, giờ âm lịch tại thời điểm khởi tâm để
-              tìm Thượng quái, Hạ quái và Hào biến.
-            </p>
-
+          <Card
+            title="Lập Quẻ Theo Giờ Động Tâm (Mai Hoa Dịch Số)"
+            subtitle="Phương pháp khởi quẻ căn cứ theo thời khắc khởi tâm, phối hợp Can Chi và Lịch Âm"
+            borderVariant="gold"
+            hoverable
+          >
             <form
               onSubmit={(e) => e.preventDefault()}
-              style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
+              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
             >
-              <div className="form-group">
-                <label htmlFor="datetimeInput" className="form-label">
-                  Thời điểm khởi tâm:
-                </label>
-                <input
-                  id="datetimeInput"
-                  type="datetime-local"
-                  className="form-input"
-                  value={selectedTime}
-                  onChange={(e) => setSelectedTime(e.target.value)}
-                />
-                <span className="form-help">
-                  Mặc định là thời gian thực tế, hệ thống sẽ tự động đối soát sang Can Chi và Lịch
-                  Âm.
-                </span>
-              </div>
+              <Input
+                label="Thời điểm khởi tâm chiêm nghiệm:"
+                type="datetime-local"
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+                helperText="Mặc định lấy thời khắc hiện tại. Hệ thống sẽ tự quy đổi Tiết Khí, Can Chi và Lịch Âm"
+                isRequired
+                fullWidth
+              />
 
-              <button type="submit" className="btn-primary">
-                <span>Khởi quẻ theo giờ động tâm</span>
-              </button>
+              <Select
+                label="Mục đích chiêm đoán:"
+                options={inquiryOptions}
+                value={inquiryType}
+                onChange={(e) => setInquiryType(e.target.value)}
+                helperText="Giúp xác định tương quan Thể - Dụng trong Mai Hoa và Dụng Thần trong Lục Hào"
+                fullWidth
+              />
+
+              <div className="form-actions">
+                <Button variant="gold" size="lg" type="submit">
+                  Khởi quẻ giờ động tâm
+                </Button>
+                <Button variant="outline" size="lg" onClick={() => setIsHelpModalOpen(true)}>
+                  Quy tắc Mai Hoa
+                </Button>
+              </div>
             </form>
 
             <div style={{ marginTop: '24px' }}>
               <div className="placeholder-box">
                 <div className="placeholder-icon">⌛</div>
-                <p className="placeholder-text">Khu vực hiển thị Quẻ Chủ, Quẻ Biến và Quẻ Hỗ</p>
+                <h4 className="placeholder-text">Khu vực phân tích Quẻ Chủ, Quẻ Biến & Quẻ Hỗ</h4>
                 <p className="placeholder-sub">
-                  (Mô hình giao diện sẵn sàng — Đang chờ kích hoạt Core Engine ở Sprint kế tiếp)
+                  (Design System đã sẵn sàng — Core Engine & Thuật toán sẽ được kích hoạt ở Sprint
+                  sau)
                 </p>
               </div>
             </div>
-          </section>
+          </Card>
         )}
 
         {/* Feature Grid: Architecture Overview */}
-        <section className="card">
-          <h2 className="card-title">
-            <span>🛡️</span> Kiến trúc Lục Hào & Tính năng cốt lõi
-          </h2>
+        <Card
+          title="Hệ Thống Phân Tích Lục Hào Toàn Diện"
+          subtitle="Tập hợp đầy đủ các đồ hình và quy tắc cổ pháp chính truyền"
+          padding="lg"
+        >
           <div className="feature-grid">
-            <div className="feature-item">
-              <h3 className="feature-title">Bát Cung & Thế Ứng</h3>
-              <p className="feature-desc">
-                Xác định chính xác cung vị quẻ (Càn, Khảm, Cấn, Chấn, Tốn, Ly, Khôn, Đoài) và hào
-                Thế/Ứng theo chuẩn Dịch học cổ truyền.
+            <Card padding="sm" borderVariant="default" hoverable>
+              <div className="feature-icon-badge">I</div>
+              <h4
+                style={{ fontSize: '1rem', marginBottom: '6px', color: 'var(--bha-crimson-700)' }}
+              >
+                Bát Cung & Thế Ứng
+              </h4>
+              <p
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--bha-text-secondary)',
+                  lineHeight: 1.5,
+                }}
+              >
+                Phân bổ 64 quẻ vào 8 cung Càn, Khảm, Cấn, Chấn, Tốn, Ly, Khôn, Đoài. Định vị chuẩn
+                xác hào Thế và hào Ứng.
               </p>
-            </div>
-            <div className="feature-item">
-              <h3 className="feature-title">Nạp Giáp & Ngũ Hành</h3>
-              <p className="feature-desc">
-                Tự động an Can Chi cho 6 hào, phân bố Ngũ hành (Kim, Mộc, Thủy, Hỏa, Thổ) và Lục
-                Thân (Phụ mẫu, Huynh đệ, Tử tôn, Thê tài, Quan quỷ).
+            </Card>
+
+            <Card padding="sm" borderVariant="default" hoverable>
+              <div className="feature-icon-badge">II</div>
+              <h4
+                style={{ fontSize: '1rem', marginBottom: '6px', color: 'var(--bha-crimson-700)' }}
+              >
+                Nạp Giáp & Lục Thân
+              </h4>
+              <p
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--bha-text-secondary)',
+                  lineHeight: 1.5,
+                }}
+              >
+                An Can Chi cho từng hào, phối Ngũ Hành bản mệnh và lập 5 mối quan hệ Lục Thân (Phụ
+                Mẫu, Huynh Đệ, Tử Tôn, Thê Tài, Quan Quỷ).
               </p>
-            </div>
-            <div className="feature-item">
-              <h3 className="feature-title">Nhật Thần & Nguyệt Kiến</h3>
-              <p className="feature-desc">
-                Xét sự vượng suy, tuần không, nguyệt phá, ám động, quan hệ tương sinh, tương khắc,
-                tam hợp, lục hợp, lục xung.
+            </Card>
+
+            <Card padding="sm" borderVariant="default" hoverable>
+              <div className="feature-icon-badge">III</div>
+              <h4
+                style={{ fontSize: '1rem', marginBottom: '6px', color: 'var(--bha-crimson-700)' }}
+              >
+                Nhật Nguyệt Vượng Suy
+              </h4>
+              <p
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--bha-text-secondary)',
+                  lineHeight: 1.5,
+                }}
+              >
+                Đối soát sinh khắc với Nhật Thần, Nguyệt Kiến, xét Tuần Không, Nguyệt Phá, Ám Động,
+                Tam Hợp, Lục Xung.
               </p>
-            </div>
-            <div className="feature-item">
-              <h3 className="feature-title">Offline-First Engine</h3>
-              <p className="feature-desc">
-                Toàn bộ dữ liệu Bát Quái, Lục Thập Hoa Giáp và thuật toán tính toán 100% cục bộ,
-                không cần kết nối mạng.
+            </Card>
+
+            <Card padding="sm" borderVariant="default" hoverable>
+              <div className="feature-icon-badge">IV</div>
+              <h4
+                style={{ fontSize: '1rem', marginBottom: '6px', color: 'var(--bha-crimson-700)' }}
+              >
+                Lục Thú Hộ Trì
+              </h4>
+              <p
+                style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--bha-text-secondary)',
+                  lineHeight: 1.5,
+                }}
+              >
+                Khởi Thanh Long, Chu Tước, Câu Trần, Đằng Xà, Bạch Hổ, Huyền Vũ dựa theo Can của
+                ngày khởi quẻ.
               </p>
-            </div>
+            </Card>
           </div>
-        </section>
+        </Card>
       </main>
 
       {/* Footer */}
       <footer className="app-footer">
-        <p style={{ marginBottom: '6px' }}>
+        <p style={{ marginBottom: '8px' }}>
           <span className="status-tag">
             <span className="status-dot"></span>
-            Chế độ Offline khả dụng
+            Offline-First Sẵn Sàng (Không cần Internet)
           </span>
-          {' • '}Bắc Hà Tân An Phái Monorepo (TypeScript)
+          {' • '}Hệ thống Bắc Hà Tân An Phái Monorepo
         </p>
-        <p>Phiên bản 0.1.0 • Web App (React + Vite)</p>
+        <p>Bản quyền © 2026 Bắc Hà Tân An Phái • Phiên bản 0.1.0 (Design System)</p>
       </footer>
+
+      {/* Modal: Quy tắc thuật toán */}
+      <Modal
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+        title={
+          activeMode === 'serial'
+            ? 'Quy Tắc Lập Quẻ Seri Tiền (SERIAL-MOD8-V1)'
+            : 'Quy Tắc Mai Hoa Dịch Số'
+        }
+        size="md"
+        footer={
+          <Button variant="primary" onClick={() => setIsHelpModalOpen(false)}>
+            Đã hiểu
+          </Button>
+        }
+      >
+        {activeMode === 'serial' ? (
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.9375rem' }}
+          >
+            <p>
+              <strong>Thuật toán SERIAL-MOD8-V1</strong> được thiết kế theo đúng nguyên tắc âm dương
+              phối hợp:
+            </p>
+            <ul
+              style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}
+            >
+              <li>
+                <strong>Thượng quái (Quẻ trên):</strong> Cộng tất cả chữ số ở các vị trí lẻ (vị trí
+                1, 3, 5, 7...), lấy tổng chia cho 8 lấy số dư (dư 0 tính là 8 - quẻ Khôn).
+              </li>
+              <li>
+                <strong>Hạ quái (Quẻ dưới):</strong> Cộng tất cả chữ số ở các vị trí chẵn (vị trí 2,
+                4, 6, 8...), lấy tổng chia cho 8 lấy số dư (dư 0 tính là 8 - quẻ Khôn).
+              </li>
+              <li>
+                <strong>Hào động:</strong> Cộng toàn bộ chữ số trong chuỗi seri, lấy tổng chia cho 6
+                lấy số dư (dư 0 tính là hào 6 động).
+              </li>
+            </ul>
+            <p style={{ color: 'var(--bha-text-muted)', fontSize: '0.85rem', marginTop: '6px' }}>
+              * Ghi chú: Dữ liệu tính toán chạy trực tiếp trên máy của bạn (offline), đảm bảo tính
+              bảo mật và độc lập hoàn toàn.
+            </p>
+          </div>
+        ) : (
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.9375rem' }}
+          >
+            <p>
+              <strong>Phương pháp Mai Hoa Dịch Số</strong> căn cứ trên số lý thời gian theo truyền
+              thống Thiệu Ung:
+            </p>
+            <ul
+              style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}
+            >
+              <li>
+                <strong>Thượng quái:</strong> (Địa chi năm + Tháng âm lịch + Ngày âm lịch) mod 8.
+              </li>
+              <li>
+                <strong>Hạ quái:</strong> (Địa chi năm + Tháng âm lịch + Ngày âm lịch + Địa chi giờ)
+                mod 8.
+              </li>
+              <li>
+                <strong>Hào động:</strong> (Địa chi năm + Tháng âm lịch + Ngày âm lịch + Địa chi
+                giờ) mod 6.
+              </li>
+            </ul>
+            <p style={{ color: 'var(--bha-text-muted)', fontSize: '0.85rem', marginTop: '6px' }}>
+              * Can Chi của năm, tháng, ngày, giờ được tính toán chuẩn theo Tiết Khí thiên văn học
+              phương Đông.
+            </p>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

@@ -1,0 +1,69 @@
+:root {
+  /* Backgrounds */
+  --bha-bg-base: #FAF8F5;
+  --bha-bg-surface: #FFFFFF;
+  --bha-bg-subtle: #F2EFE9;
+  --bha-bg-muted: #EAE5DC;
+
+  /* Borders */
+  --bha-border-light: #ECE8E0;
+  --bha-border-base: #E0D8CB;
+  --bha-border-hover: #C5BAA9;
+  --bha-border-focus: #851616;
+  --bha-border-gold: #D6B462;
+
+  /* Texts */
+  --bha-text-primary: #1F1916;
+  --bha-text-secondary: #594F48;
+  --bha-text-muted: #8C8178;
+  --bha-text-inverse: #FFFFFF;
+
+  /* Crimson (Đỏ sẫm) */
+  --bha-crimson-50: #FDF2F2;
+  --bha-crimson-100: #FBE4E4;
+  --bha-crimson-200: #F5C2C2;
+  --bha-crimson-300: #E99696;
+  --bha-crimson-500: #B82828;
+  --bha-crimson-600: #9B1B1B;
+  --bha-crimson-700: #851616;
+  --bha-crimson-800: #6E1212;
+
+  /* Gold (Vàng đồng) */
+  --bha-gold-50: #FCF9EE;
+  --bha-gold-100: #F8F1D5;
+  --bha-gold-200: #EFE1A7;
+  --bha-gold-300: #E5CB77;
+  --bha-gold-500: #C99E28;
+  --bha-gold-600: #B5871D;
+  --bha-gold-700: #946B12;
+  --bha-gold-800: #73510C;
+
+  /* Feedback */
+  --bha-success: #1B7340;
+  --bha-success-bg: #E8F5E9;
+  --bha-warning: #C27803;
+  --bha-warning-bg: #FEF3C7;
+  --bha-error: #C53030;
+  --bha-error-bg: #FEE2E2;
+  --bha-info: #1D64B2;
+  --bha-info-bg: #EFF6FF;
+
+  /* Typography */
+  --bha-font-serif: 'Cinzel', 'Playfair Display', 'Merriweather', 'Noto Serif', Georgia, serif;
+  --bha-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --bha-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Radius */
+  --bha-radius-sm: 4px;
+  --bha-radius-md: 8px;
+  --bha-radius-lg: 12px;
+  --bha-radius-xl: 16px;
+  --bha-radius-full: 9999px;
+
+  /* Shadows */
+  --bha-shadow-sm: 0 1px 2px 0 rgba(31, 25, 22, 0.05);
+  --bha-shadow-md: 0 4px 6px -1px rgba(31, 25, 22, 0.08), 0 2px 4px -2px rgba(31, 25, 22, 0.05);
+  --bha-shadow-lg: 0 10px 15px -3px rgba(31, 25, 22, 0.08), 0 4px 6px -4px rgba(31, 25, 22, 0.04);
+  --bha-shadow-crimson: 0 4px 14px 0 rgba(133, 22, 22, 0.25);
+  --bha-shadow-gold: 0 4px 14px 0 rgba(181, 135, 29, 0.25);
+}

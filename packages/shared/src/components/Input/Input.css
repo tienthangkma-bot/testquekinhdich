@@ -1,0 +1,120 @@
+.bha-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--bha-font-sans);
+}
+
+.bha-input-container--full-width {
+  width: 100%;
+}
+
+.bha-input-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--bha-text-secondary);
+}
+
+.bha-input-label--required::after {
+  content: ' *';
+  color: var(--bha-error);
+}
+
+.bha-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.bha-input {
+  width: 100%;
+  font-family: var(--bha-font-sans);
+  color: var(--bha-text-primary);
+  background-color: var(--bha-bg-surface);
+  border: 1px solid var(--bha-border-base);
+  border-radius: var(--bha-radius-md);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.bha-input::placeholder {
+  color: var(--bha-text-muted);
+}
+
+.bha-input:hover:not(:disabled) {
+  border-color: var(--bha-border-hover);
+}
+
+.bha-input:focus {
+  border-color: var(--bha-crimson-700);
+  box-shadow: 0 0 0 3px rgba(133, 22, 22, 0.12);
+}
+
+.bha-input:disabled {
+  background-color: var(--bha-bg-subtle);
+  color: var(--bha-text-muted);
+  cursor: not-allowed;
+}
+
+/* Sizes */
+.bha-input--sm {
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+  height: 34px;
+}
+
+.bha-input--md {
+  padding: 10px 14px;
+  font-size: 0.9375rem;
+  height: 42px;
+}
+
+.bha-input--lg {
+  padding: 12px 16px;
+  font-size: 1.0625rem;
+  height: 48px;
+}
+
+/* Error State */
+.bha-input--error,
+.bha-input--error:focus {
+  border-color: var(--bha-error);
+  box-shadow: 0 0 0 3px rgba(197, 48, 48, 0.12);
+}
+
+.bha-input-icon-left,
+.bha-input-icon-right {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bha-text-muted);
+  pointer-events: none;
+}
+
+.bha-input-icon-left {
+  left: 12px;
+}
+
+.bha-input-icon-right {
+  right: 12px;
+}
+
+.bha-input--has-icon-left {
+  padding-left: 38px;
+}
+
+.bha-input--has-icon-right {
+  padding-right: 38px;
+}
+
+.bha-input-helper {
+  font-size: 0.8125rem;
+  color: var(--bha-text-muted);
+}
+
+.bha-input-error-msg {
+  font-size: 0.8125rem;
+  color: var(--bha-error);
+}
