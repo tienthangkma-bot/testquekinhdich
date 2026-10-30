@@ -1,0 +1,14 @@
+{
+  "name": "bac-ha-tan-an-phai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Ứng dụng Kinh Dịch đa nền tảng, offline-first - Bắc Hà Tân An Phái",
+  "packageManager": "pnpm@12.16.1",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "typescript": "^5.8.2"
+  }
+}
