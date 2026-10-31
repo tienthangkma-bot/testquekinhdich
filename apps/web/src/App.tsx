@@ -315,7 +315,16 @@ export const App: React.FC = () => {
           <span className="bha-taiji-spinner">☯</span>
           <span>Bắc Hà Tân An Phái</span>
         </div>
-        <h1 className="brand-title">Kinh Dịch Tân An Phái</h1>
+        <div className="brand-header-main">
+          <img
+            src="/logo-tan-an-phai.png"
+            alt="Tân An Phái Logo"
+            className="brand-header-logo"
+            width={48}
+            height={48}
+          />
+          <h1 className="brand-title">Kinh Dịch Tân An Phái</h1>
+        </div>
         {/* Tiện ích PWA: Trạng thái kết nối mạng & Hướng dẫn cài đặt (Requirements 5 & 6) */}
         <PwaHeaderActions />
       </header>

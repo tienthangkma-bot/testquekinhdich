@@ -117,32 +117,42 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
           </h2>
           <div className="workspace-meta-grid">
             <div className="meta-row">
-              <span className="meta-label">Thời gian lập quẻ:</span>
+              <span className="meta-label">
+                <span className="meta-icon">🕒</span> Thời gian lập quẻ:
+              </span>
               <span className="meta-value">
                 <strong>{timeFormatted}</strong> {lunarStr}
               </span>
             </div>
 
             <div className="meta-row">
-              <span className="meta-label">Can Chi:</span>
+              <span className="meta-label">
+                <span className="meta-icon">📜</span> Can Chi:
+              </span>
               <span className="meta-value">{canChiStr}</span>
             </div>
 
             <div className="meta-row meta-row--multi">
               <div>
-                <span className="meta-label">Tiết khí:</span>
+                <span className="meta-label">
+                  <span className="meta-icon">🌦️</span> Tiết khí:
+                </span>
                 <span className="meta-value">
                   <strong>{dt.solarTerm || 'Bình thường'}</strong>
                 </span>
               </div>
               <div>
-                <span className="meta-label">Nhật thần:</span>
+                <span className="meta-label">
+                  <span className="meta-icon">☀️</span> Nhật thần:
+                </span>
                 <span className="meta-value">
                   <strong>{dayBranch}</strong>
                 </span>
               </div>
               <div>
-                <span className="meta-label">Nguyệt lệnh:</span>
+                <span className="meta-label">
+                  <span className="meta-icon">🌙</span> Nguyệt lệnh:
+                </span>
                 <span className="meta-value">
                   <strong>{monthBranch}</strong>
                 </span>
@@ -151,13 +161,17 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
 
             <div className="meta-row meta-row--multi">
               <div>
-                <span className="meta-label">Phương pháp lập quẻ:</span>
+                <span className="meta-label">
+                  <span className="meta-icon">🔢</span> Phương pháp lập quẻ:
+                </span>
                 <span className="meta-value">
                   <strong>{methodName}</strong>
                 </span>
               </div>
               <div>
-                <span className="meta-label">Tuần Không:</span>
+                <span className="meta-label">
+                  <span className="meta-icon">⭕</span> Tuần Không:
+                </span>
                 <span className="meta-value">
                   <strong>{(dt.voidBranches || []).join('-') || 'Không có'}</strong>
                 </span>
@@ -165,7 +179,9 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
             </div>
 
             <div className="meta-row meta-row--question">
-              <span className="meta-label">Việc cần xem:</span>
+              <span className="meta-label">
+                <span className="meta-icon">❓</span> Việc cần xem:
+              </span>
               <span className="meta-value meta-value--question">
                 {question && question.trim() ? question : 'Chiêm nghiệm tổng quan sự việc'}
               </span>
@@ -173,16 +189,18 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
           </div>
         </div>
 
-        {/* Đồng tiền Cổ / Thái Cực Biểu Trưng */}
-        <div className="workspace-coin-emblem" aria-hidden="true">
-          <div className="coin-outer-circle">
-            <div className="coin-inner-square">
-              <span className="coin-character top">Bắc</span>
-              <span className="coin-character bottom">Hà</span>
-              <span className="coin-character left">Tân</span>
-              <span className="coin-character right">An</span>
-            </div>
+        {/* Biểu trưng chính thức Tân An Phái */}
+        <div className="workspace-brand-logo-emblem" aria-hidden="true">
+          <div className="logo-emblem-frame">
+            <img
+              src="/logo-tan-an-phai.png"
+              alt="Bắc Hà Tân An Phái Logo"
+              className="logo-emblem-img"
+              width={80}
+              height={80}
+            />
           </div>
+          <span className="logo-emblem-caption">Bắc Hà Tân An</span>
         </div>
       </div>
     </div>

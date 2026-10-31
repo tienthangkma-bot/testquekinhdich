@@ -218,18 +218,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   solidBar: {
-    height: 12,
-    borderRadius: 3,
+    height: 14,
+    borderRadius: 4,
   },
   brokenBarRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 12,
+    height: 14,
   },
   brokenHalfBar: {
     flex: 1,
-    height: 12,
-    borderRadius: 3,
+    height: 14,
+    borderRadius: 4,
   },
   brokenGap: {
     width: 14,
@@ -238,7 +238,12 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.dark,
   },
   movingBar: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: '#F87171',
+    shadowColor: '#F87171',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 4,
+    elevation: 2,
   },
   tagCol: {
     width: 60,

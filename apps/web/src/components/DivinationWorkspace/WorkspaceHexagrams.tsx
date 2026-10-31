@@ -24,6 +24,16 @@ const LINE_POSITION_NAMES: Record<number, string> = {
   6: 'Hào Thượng (Hào 6)',
 };
 
+const getPalaceElementClass = (elementName?: string): string => {
+  if (!elementName) return 'hex-element--kim';
+  const norm = elementName.toLowerCase();
+  if (norm.includes('thủy')) return 'hex-element--thuy';
+  if (norm.includes('hỏa')) return 'hex-element--hoa';
+  if (norm.includes('mộc')) return 'hex-element--moc';
+  if (norm.includes('thổ')) return 'hex-element--tho';
+  return 'hex-element--kim';
+};
+
 export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
   trio,
   selectedLine: externalSelectedLine,
@@ -110,6 +120,7 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
                   />
                 </div>
               )}
+              {isMoving && <span className="hex-moving-dot-marker" title="Hào phát động">●</span>}
             </div>
           );
         })}
@@ -128,66 +139,78 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
 
       <div className="workspace-hexagrams-grid">
         {/* Cột 1: QUẺ CHỦ */}
-        <div className="hexagram-figure-card hexagram-figure-card--primary bha-glass-card">
+        <div className={`hexagram-figure-card hexagram-figure-card--primary bha-glass-card ${getPalaceElementClass(primaryPalace.palaceElement)}`}>
           <div className="bha-corner-accent bha-corner-accent--tl" />
           <div className="bha-corner-accent bha-corner-accent--tr" />
           <div className="bha-corner-accent bha-corner-accent--bl" />
           <div className="bha-corner-accent bha-corner-accent--br" />
 
-          <h3 className="hex-title hex-title--primary">{primary.sinoVietnameseName || primary.name}</h3>
+          <div className="hex-role-pill">QUẺ CHỦ</div>
           {renderHexagramLines(primary, { isPrimary: true })}
-          <div className="hex-palace-label">
-            HỌ {primaryPalace.palaceName.toUpperCase()}
-          </div>
-          <div className="hex-omen-badge" title={primaryOmen.meaning}>
-            <span className="omen-label">Lời Triệu:</span>{' '}
-            <span className="omen-text">{primaryOmen.omen}</span>
+          
+          <div className="hex-showcase-meta">
+            <h3 className="hex-title hex-title--primary">{primary.sinoVietnameseName || primary.name}</h3>
+            <div className="hex-palace-label">
+              HỌ {primaryPalace.palaceName.toUpperCase()}
+            </div>
+            <div className="hex-omen-badge" title={primaryOmen.meaning}>
+              <span className="omen-label">Lời Triệu:</span>{' '}
+              <span className="omen-text">{primaryOmen.omen}</span>
+            </div>
           </div>
         </div>
 
         {/* Cột 2: QUẺ HỖ */}
         {nuclear && (
-          <div className="hexagram-figure-card hexagram-figure-card--nuclear bha-glass-card">
+          <div className={`hexagram-figure-card hexagram-figure-card--nuclear bha-glass-card ${getPalaceElementClass(nuclearPalace?.palaceElement)}`}>
             <div className="bha-corner-accent bha-corner-accent--tl" />
             <div className="bha-corner-accent bha-corner-accent--tr" />
             <div className="bha-corner-accent bha-corner-accent--bl" />
             <div className="bha-corner-accent bha-corner-accent--br" />
 
-            <h3 className="hex-title hex-title--nuclear">{nuclear.sinoVietnameseName || nuclear.name}</h3>
+            <div className="hex-role-pill hex-role-pill--nuclear">QUẺ HỖ</div>
             {renderHexagramLines(nuclear)}
-            <div className="hex-palace-label">
-              HỌ {nuclearPalace ? nuclearPalace.palaceName.toUpperCase() : ''}
-            </div>
-            {nuclearOmen && (
-              <div className="hex-omen-badge" title={nuclearOmen.meaning}>
-                <span className="omen-label">Lời Triệu:</span>{' '}
-                <span className="omen-text">{nuclearOmen.omen}</span>
+            
+            <div className="hex-showcase-meta">
+              <h3 className="hex-title hex-title--nuclear">{nuclear.sinoVietnameseName || nuclear.name}</h3>
+              <div className="hex-palace-label">
+                HỌ {nuclearPalace ? nuclearPalace.palaceName.toUpperCase() : ''}
               </div>
-            )}
+              {nuclearOmen && (
+                <div className="hex-omen-badge" title={nuclearOmen.meaning}>
+                  <span className="omen-label">Lời Triệu:</span>{' '}
+                  <span className="omen-text">{nuclearOmen.omen}</span>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {/* Cột 3: QUẺ BIẾN */}
         {transformed ? (
-          <div className="hexagram-figure-card hexagram-figure-card--transformed bha-glass-card">
+          <div className={`hexagram-figure-card hexagram-figure-card--transformed bha-glass-card ${getPalaceElementClass(transformedPalace?.palaceElement)}`}>
             <div className="bha-corner-accent bha-corner-accent--tl" />
             <div className="bha-corner-accent bha-corner-accent--tr" />
             <div className="bha-corner-accent bha-corner-accent--bl" />
             <div className="bha-corner-accent bha-corner-accent--br" />
 
-            <h3 className="hex-title hex-title--transformed">
-              {transformed.sinoVietnameseName || transformed.name}
-            </h3>
+            <div className="hex-role-pill hex-role-pill--transformed">QUẺ BIẾN</div>
             {renderHexagramLines(transformed, { isTransformed: true })}
-            <div className="hex-palace-label">
-              HỌ {transformedPalace ? transformedPalace.palaceName.toUpperCase() : ''}
-            </div>
-            {transformedOmen && (
-              <div className="hex-omen-badge" title={transformedOmen.meaning}>
-                <span className="omen-label">Lời Triệu:</span>{' '}
-                <span className="omen-text">{transformedOmen.omen}</span>
+            
+            <div className="hex-showcase-meta">
+              <h3 className="hex-title hex-title--transformed">
+                {transformed.sinoVietnameseName || transformed.name}
+              </h3>
+              <div className="hex-palace-label">
+                HỌ {transformedPalace ? transformedPalace.palaceName.toUpperCase() : ''}
               </div>
-            )}
+              {transformedOmen && (
+                <div className="hex-omen-badge" title={transformedOmen.meaning}>
+                  <span className="omen-label">Lời Triệu:</span>{' '}
+                  <span className="omen-text">{transformedOmen.omen}</span>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div className="hexagram-figure-card hexagram-figure-card--static bha-glass-card">

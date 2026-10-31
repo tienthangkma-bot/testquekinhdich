@@ -1,38 +1,38 @@
 /* ==========================================================================
-   BẮC HÀ TÂN AN PHÁI — PREMIUM DESIGN SYSTEM V3
+   BẮC HÀ TÂN AN PHÁI — PREMIUM DESIGN SYSTEM V3 (UPGRADED)
    Art Direction: Premium Oriental Mystic + Modern Luxury + Dynamic Interface
    ========================================================================== */
 
 :root,
 [data-theme="light"],
 .theme-imperial-ivory {
-  /* 1. Backgrounds — Imperial Ivory / Giấy Xuyến Chỉ */
-  --bha-bg-base: #FAF6EE;
+  /* 1. Backgrounds — Imperial Ivory / Giấy Xuyến Chỉ Cổ Điển Nhẹ Nhàng */
+  --bha-bg-base: #F8F6F1;
   --bha-bg-surface: #FFFFFF;
-  --bha-bg-subtle: #F3ECE1;
-  --bha-bg-muted: #E8DFC8;
+  --bha-bg-subtle: #F1EDE4;
+  --bha-bg-muted: #E8E0D5;
   --bha-bg-glass: rgba(255, 255, 255, 0.88);
-  --bha-bg-overlay: rgba(250, 246, 238, 0.95);
-  --bha-bg-gradient: radial-gradient(circle at 50% 15%, #FFFDF9 0%, #FAF6EE 60%, #EFE5D3 100%);
+  --bha-bg-overlay: rgba(248, 246, 241, 0.96);
+  --bha-bg-gradient: radial-gradient(circle at 50% 15%, #FFFFFF 0%, #F8F6F1 60%, #EFEBE0 100%);
 
   /* 2. Borders & Dividers */
-  --bha-border-light: #ECE4D6;
-  --bha-border-base: #DECBB6;
-  --bha-border-hover: #C5B095;
+  --bha-border-light: #F0EAE0;
+  --bha-border-base: #E8E0D5;
+  --bha-border-hover: #D8CEBE;
   --bha-border-focus: #851616;
-  --bha-border-gold: #D6B462;
-  --bha-border-glass: rgba(214, 180, 98, 0.35);
+  --bha-border-gold: #B8860B;
+  --bha-border-glass: rgba(184, 134, 11, 0.25);
 
-  /* 3. Texts */
-  --bha-text-primary: #1C1714;
-  --bha-text-secondary: #56483E;
-  --bha-text-muted: #8C7B70;
+  /* 3. Texts — Mực Tàu Cổ Điển & Chữ Phụ Ấm Áp */
+  --bha-text-primary: #1C1917;
+  --bha-text-secondary: #594F48;
+  --bha-text-muted: #8C8178;
   --bha-text-inverse: #FFFFFF;
-  --bha-text-gold: #B5871D;
+  --bha-text-gold: #B8860B;
   --bha-text-crimson: #851616;
   --bha-text-jade: #059669;
 
-  /* 4. Crimson & Gold */
+  /* 4. Crimson, Gold & Accents */
   --bha-crimson-50: #FDF2F2;
   --bha-crimson-100: #FBE4E4;
   --bha-crimson-200: #F5C2C2;
@@ -46,10 +46,17 @@
   --bha-gold-100: #F8F1D5;
   --bha-gold-200: #EFE1A7;
   --bha-gold-300: #E5CB77;
+  --bha-gold-400: #DAB54E;
   --bha-gold-500: #C99E28;
-  --bha-gold-600: #B5871D;
+  --bha-gold-600: #B8860B;
   --bha-gold-700: #946B12;
   --bha-gold-800: #73510C;
+
+  /* Hào động / tĩnh */
+  --bha-accent-dong: #EF4444;
+  --bha-accent-tinh: #3B82F6;
+  --bha-row-dong-tint: linear-gradient(90deg, rgba(239, 68, 68, 0.09) 0%, rgba(239, 68, 68, 0.02) 100%);
+  --bha-row-highlight: rgba(184, 134, 11, 0.06);
 
   /* 5. Feedback */
   --bha-success: #1B7340;
@@ -62,22 +69,22 @@
   --bha-info-bg: #EFF6FF;
 
   /* 6. Shadows & Glows */
-  --bha-shadow-sm: 0 1px 3px 0 rgba(31, 23, 20, 0.05);
-  --bha-shadow-md: 0 4px 12px -2px rgba(31, 23, 20, 0.08), 0 2px 4px -1px rgba(31, 23, 20, 0.04);
-  --bha-shadow-lg: 0 12px 24px -4px rgba(31, 23, 20, 0.12), 0 4px 8px -2px rgba(31, 23, 20, 0.06);
-  --bha-shadow-crimson: 0 6px 20px 0 rgba(133, 22, 22, 0.22);
-  --bha-shadow-gold: 0 6px 20px 0 rgba(181, 135, 29, 0.22);
-  --bha-glow-gold: 0 0 15px rgba(214, 180, 98, 0.35);
-  --bha-glow-moving-line: 0 0 14px rgba(198, 40, 40, 0.45);
+  --bha-shadow-sm: 0 1px 3px 0 rgba(28, 25, 23, 0.04);
+  --bha-shadow-md: 0 4px 14px -2px rgba(28, 25, 23, 0.06), 0 2px 4px -1px rgba(28, 25, 23, 0.03);
+  --bha-shadow-lg: 0 12px 28px -4px rgba(28, 25, 23, 0.09), 0 4px 10px -2px rgba(28, 25, 23, 0.04);
+  --bha-shadow-crimson: 0 6px 20px 0 rgba(133, 22, 22, 0.18);
+  --bha-shadow-gold: 0 6px 20px 0 rgba(184, 134, 11, 0.18);
+  --bha-glow-gold: 0 0 12px rgba(184, 134, 11, 0.25);
+  --bha-glow-moving-line: 0 0 10px rgba(239, 68, 68, 0.35);
 
   /* 7. Ambient Pattern Overlay */
-  --bha-pattern-opacity: 0.045;
-  --bha-ambient-glow-color: rgba(214, 180, 98, 0.15);
+  --bha-pattern-opacity: 0.035;
+  --bha-ambient-glow-color: rgba(184, 134, 11, 0.12);
 
   /* Typography */
-  --bha-font-serif: 'Noto Serif', 'Playfair Display', 'Merriweather', 'Times New Roman', Georgia, serif;
+  --bha-font-serif: 'Cinzel', 'Playfair Display', 'Cormorant Garamond', 'Noto Serif', 'Times New Roman', Georgia, serif;
   --bha-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-  --bha-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --bha-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Radius */
   --bha-radius-sm: 4px;
@@ -88,55 +95,62 @@
 }
 
 /* ==========================================================================
-   DARK MYSTIC THEME (Huyền Học Dạ Thần — Cực Phẩm Cổ Phong Hiện Đại)
+   DARK MYSTIC THEME (Huyền Học Dạ Thần — Tinh Tế, Dịu Mắt, Hiện Đại)
    ========================================================================== */
 
 [data-theme="dark"],
 .theme-dark-mystic {
-  /* 1. Backgrounds — Mực Tàu & Than Đêm Huyền Vũ */
-  --bha-bg-base: #0B0E14;
-  --bha-bg-surface: #121722;
-  --bha-bg-subtle: #171E2C;
-  --bha-bg-muted: #1F283A;
-  --bha-bg-glass: rgba(18, 23, 34, 0.85);
-  --bha-bg-overlay: rgba(11, 14, 20, 0.96);
-  --bha-bg-gradient: radial-gradient(circle at 50% 15%, #182030 0%, #0E131D 50%, #080A0F 100%);
+  /* 1. Backgrounds — Sâu hơn, dịu hơn, không dùng đen thuần */
+  --bha-bg-base: #0B0F1A;
+  --bha-bg-surface: #151B2B;
+  --bha-bg-subtle: #1A2332;
+  --bha-bg-muted: #222D40;
+  --bha-bg-glass: rgba(21, 27, 43, 0.85);
+  --bha-bg-overlay: rgba(11, 15, 26, 0.96);
+  --bha-bg-gradient: radial-gradient(circle at 50% 15%, #182236 0%, #111726 50%, #0B0F1A 100%);
 
   /* 2. Borders & Dividers */
-  --bha-border-light: rgba(229, 192, 88, 0.12);
-  --bha-border-base: rgba(229, 192, 88, 0.22);
-  --bha-border-hover: rgba(240, 210, 120, 0.45);
-  --bha-border-focus: #D32F2F;
-  --bha-border-gold: #E5C058;
-  --bha-border-glass: rgba(229, 192, 88, 0.28);
+  --bha-border-light: rgba(255, 255, 255, 0.08);
+  --bha-border-base: rgba(255, 255, 255, 0.10);
+  --bha-border-hover: rgba(201, 162, 39, 0.45);
+  --bha-border-focus: #F87171;
+  --bha-border-gold: #C9A227;
+  --bha-border-glass: rgba(201, 162, 39, 0.22);
 
   /* 3. Texts */
-  --bha-text-primary: #F7F3EB;
-  --bha-text-secondary: #C8BAA0;
-  --bha-text-muted: #828F9F;
-  --bha-text-inverse: #0B0E14;
-  --bha-text-gold: #F0D278;
-  --bha-text-crimson: #EF5350;
+  --bha-text-primary: #E8EDF5;
+  --bha-text-secondary: #94A3B8;
+  --bha-text-muted: #64748B;
+  --bha-text-inverse: #0B0F1A;
+  --bha-text-gold: #C9A227;
+  --bha-text-crimson: #F87171;
   --bha-text-jade: #34D399;
 
-  /* 4. Crimson & Gold */
-  --bha-crimson-50: #2C1212;
-  --bha-crimson-100: #3E1616;
-  --bha-crimson-200: #5D1C1C;
-  --bha-crimson-300: #852222;
-  --bha-crimson-500: #D32F2F;
-  --bha-crimson-600: #E53935;
-  --bha-crimson-700: #EF5350;
-  --bha-crimson-800: #FF6659;
+  /* 4. Crimson, Gold & Accents */
+  --bha-crimson-50: #2C1215;
+  --bha-crimson-100: #3E161A;
+  --bha-crimson-200: #5D1C22;
+  --bha-crimson-300: #85222B;
+  --bha-crimson-500: #F87171;
+  --bha-crimson-600: #EF4444;
+  --bha-crimson-700: #F87171;
+  --bha-crimson-800: #FCA5A5;
 
-  --bha-gold-50: #262114;
-  --bha-gold-100: #3D331A;
-  --bha-gold-200: #574820;
-  --bha-gold-300: #8C732E;
-  --bha-gold-500: #C99E28;
-  --bha-gold-600: #E5C058;
-  --bha-gold-700: #F0D278;
-  --bha-gold-800: #F8E4A0;
+  --bha-gold-50: #231E12;
+  --bha-gold-100: #382F18;
+  --bha-gold-200: #4E411F;
+  --bha-gold-300: #7E692C;
+  --bha-gold-400: #A88D34;
+  --bha-gold-500: #C9A227;
+  --bha-gold-600: #C9A227;
+  --bha-gold-700: #DEC15C;
+  --bha-gold-800: #EFE099;
+
+  /* Hào động / tĩnh */
+  --bha-accent-dong: #F87171;
+  --bha-accent-tinh: #60A5FA;
+  --bha-row-dong-tint: linear-gradient(90deg, rgba(248, 113, 113, 0.15) 0%, rgba(248, 113, 113, 0.02) 100%);
+  --bha-row-highlight: linear-gradient(90deg, rgba(201, 162, 39, 0.12) 0%, rgba(201, 162, 39, 0.02) 100%);
 
   /* 5. Feedback */
   --bha-success: #34D399;
@@ -149,22 +163,63 @@
   --bha-info-bg: rgba(59, 130, 246, 0.15);
 
   /* 6. Shadows & Glows */
-  --bha-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
-  --bha-shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.6), 0 2px 6px -1px rgba(0, 0, 0, 0.4);
-  --bha-shadow-lg: 0 16px 32px -4px rgba(0, 0, 0, 0.75), 0 6px 12px -2px rgba(0, 0, 0, 0.5);
-  --bha-shadow-crimson: 0 6px 24px 0 rgba(211, 47, 47, 0.35);
-  --bha-shadow-gold: 0 6px 24px 0 rgba(229, 192, 88, 0.3);
-  --bha-glow-gold: 0 0 20px rgba(240, 210, 120, 0.4);
-  --bha-glow-moving-line: 0 0 18px rgba(239, 83, 80, 0.6);
+  --bha-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --bha-shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.45), 0 2px 6px -1px rgba(0, 0, 0, 0.25);
+  --bha-shadow-lg: 0 16px 32px -4px rgba(0, 0, 0, 0.6), 0 6px 12px -2px rgba(0, 0, 0, 0.4);
+  --bha-shadow-crimson: 0 6px 24px 0 rgba(248, 113, 113, 0.25);
+  --bha-shadow-gold: 0 6px 24px 0 rgba(201, 162, 39, 0.22);
+  --bha-glow-gold: 0 0 18px rgba(201, 162, 39, 0.35);
+  --bha-glow-moving-line: 0 0 14px rgba(248, 113, 113, 0.55);
 
   /* 7. Ambient Pattern Overlay */
-  --bha-pattern-opacity: 0.08;
-  --bha-ambient-glow-color: rgba(229, 192, 88, 0.12);
+  --bha-pattern-opacity: 0.06;
+  --bha-ambient-glow-color: rgba(201, 162, 39, 0.1);
 }
 
 /* ==========================================================================
-   PREMIUM VISUAL & DYNAMIC UTILITIES
+   GLOBAL UTILITIES & MICRO-INTERACTIONS
    ========================================================================== */
+
+/* Typography & Numerics */
+.bha-tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Smooth Theme Transitions */
+body,
+.app-wrapper,
+.app-container,
+.card,
+.bha-glass-card,
+.workspace-brand-banner,
+.workspace-hex-card,
+.workspace-table-card {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease, box-shadow 0.25s ease;
+}
+
+/* Custom Slim Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bha-border-gold);
+  border-radius: 9999px;
+  opacity: 0.6;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bha-gold-500);
+}
+
+/* Accessibility Focus Ring (WCAG AA Compliant) */
+:focus-visible {
+  outline: 2px solid var(--bha-border-gold);
+  outline-offset: 2px;
+}
 
 /* 1. Ambient Background Layer */
 .bha-ambient-background {
@@ -172,7 +227,6 @@
   min-height: 100vh;
   background: var(--bha-bg-gradient);
   color: var(--bha-text-primary);
-  transition: background 0.4s ease, color 0.3s ease;
   overflow-x: hidden;
 }
 
@@ -254,11 +308,6 @@
   transform: scale(1.02);
 }
 
-.bha-theme-toggle-icon {
-  font-size: 1rem;
-  line-height: 1;
-}
-
 /* 4. Taiji Animated Spinner & Crest */
 .bha-taiji-spinner {
   display: inline-block;
@@ -273,12 +322,12 @@
 
 @keyframes movingLinePulse {
   0%, 100% {
-    box-shadow: 0 0 4px rgba(211, 47, 47, 0.4);
+    box-shadow: 0 0 4px rgba(248, 113, 113, 0.4);
     filter: brightness(1);
   }
   50% {
-    box-shadow: 0 0 14px rgba(211, 47, 47, 0.85);
-    filter: brightness(1.25);
+    box-shadow: 0 0 14px rgba(248, 113, 113, 0.85);
+    filter: brightness(1.2);
   }
 }
 

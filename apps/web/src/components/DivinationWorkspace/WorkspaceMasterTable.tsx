@@ -63,11 +63,16 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
     });
   }, [primaryHexagram.lines, changingHexagram?.lines, phucThanMap]);
 
-  // Hàm render thanh vạch hào (dương: nét liền, âm: 2 đoạn bằng tổng chiều dài nét dương)
+  // Hàm render thanh vạch hào với 2 chấm (●● / ●) và thanh vạch bo góc tròn
   const renderTableBar = (isYang: boolean, isMoving: boolean, titleText: string) => {
     const movingClass = isMoving ? 'table-hex-bar--moving' : '';
+    const dotColorClass = isMoving ? 'dot--moving' : 'dot--static';
+
     return (
       <div className="table-hex-bar-wrapper" title={titleText}>
+        <span className={`table-hex-dot-indicator ${dotColorClass}`} aria-hidden="true">
+          {isYang ? '●' : '●●'}
+        </span>
         {isYang ? (
           <div className={`table-hex-bar table-hex-bar--yang ${movingClass}`} />
         ) : (

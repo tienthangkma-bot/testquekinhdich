@@ -72,33 +72,41 @@ export const colors = {
     800: '#065F46',
   },
 
-  // Dark Mystic Palette (Huyền Học Dạ Thần)
+  // Dark Mystic Palette (Huyền Học Dạ Thần — Tinh Chỉnh Dịu Mắt & Sang Trọng)
   darkMystic: {
     background: {
-      base: '#0A0D14',     // Mực huyền vũ sâu thẳm
-      surface: '#121722',  // Đen than phiến ngọc
-      subtle: '#182030',   // Nền tương phản nhẹ
-      muted: '#202A3D',    // Nền card/panel mờ
-      glass: 'rgba(18, 23, 34, 0.82)',
+      base: '#0B0F1A',     // Sâu hơn, dịu hơn theo yêu cầu
+      surface: '#151B2B',  // Đen than phiến ngọc / Surface card
+      subtle: '#1A2332',   // Nền tương phản nhẹ
+      muted: '#222D40',    // Nền card/panel mờ
+      glass: 'rgba(21, 27, 43, 0.82)',
     },
     border: {
-      light: 'rgba(214, 180, 98, 0.12)',
-      base: 'rgba(214, 180, 98, 0.22)',
-      hover: 'rgba(229, 192, 88, 0.5)',
-      gold: '#E5C058',
-      focus: '#D32F2F',
+      light: 'rgba(255, 255, 255, 0.08)',
+      base: 'rgba(255, 255, 255, 0.10)',
+      hover: 'rgba(201, 162, 39, 0.45)',
+      gold: '#C9A227',
+      focus: '#F87171',
     },
     text: {
-      primary: '#F5EFEB',  // Trắng xuyến chỉ sáng
-      secondary: '#C5B79D',// Vàng lụa nhạt
-      muted: '#7E8B9E',    // Bạc xám cổ phong
-      inverse: '#0A0D14',  // Chữ trên nền sáng
-      gold: '#F0D278',     // Hoàng kim phát quang
+      primary: '#E8EDF5',  // Dịu sáng theo yêu cầu
+      secondary: '#94A3B8',// Slate gray nhạt
+      muted: '#64748B',    // Bạc xám cổ phong
+      inverse: '#0B0F1A',  // Chữ trên nền sáng
+      gold: '#C9A227',     // Hoàng kim cổ dịu
       jade: '#34D399',     // Ngọc bích phát quang
+      crimson: '#F87171',  // Đỏ hào động dịu hơn
+      blue: '#60A5FA',     // Xanh dương hào tĩnh
+    },
+    accent: {
+      gold: '#C9A227',
+      crimson: '#F87171',
+      blue: '#60A5FA',
     },
     glow: {
-      gold: 'rgba(229, 192, 88, 0.35)',
-      crimson: 'rgba(215, 60, 60, 0.35)',
+      gold: 'rgba(201, 162, 39, 0.35)',
+      crimson: 'rgba(248, 113, 113, 0.35)',
+      blue: 'rgba(96, 165, 250, 0.35)',
       jade: 'rgba(16, 185, 129, 0.35)',
     },
   },
@@ -115,5 +123,7 @@ export const colors = {
     infoBg: '#EFF6FF',
   },
 } as const;
+
+export const darkMystic = colors.darkMystic;
 
 export type Colors = typeof colors;

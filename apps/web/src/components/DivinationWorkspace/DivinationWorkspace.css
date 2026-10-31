@@ -1328,3 +1328,387 @@
   border-color: var(--bha-border-gold);
   color: var(--bha-gold-300);
 }
+
+
+/* ==========================================================================
+   HEXAGRAM SHOWCASE (3 QUẺ LỚN - NGŨ HÀNH GRADIENT & HOVER DEPTH)
+   ========================================================================== */
+
+.workspace-hexagrams-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.hexagram-figure-card {
+  position: relative;
+  border-radius: var(--bha-radius-lg);
+  padding: 18px 16px 20px 16px;
+  border: 1.5px solid var(--bha-border-gold);
+  box-shadow: var(--bha-shadow-md);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hexagram-figure-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--bha-shadow-lg), var(--bha-glow-gold);
+}
+
+/* Ngũ Hành Background Gradients */
+.hex-element--kim {
+  background: radial-gradient(circle at 50% 20%, rgba(201, 162, 39, 0.12) 0%, var(--bha-bg-surface) 75%);
+}
+
+.hex-element--moc {
+  background: radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.10) 0%, var(--bha-bg-surface) 75%);
+}
+
+.hex-element--thuy {
+  background: radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.12) 0%, var(--bha-bg-surface) 75%);
+}
+
+.hex-element--hoa {
+  background: radial-gradient(circle at 50% 20%, rgba(239, 68, 68, 0.12) 0%, var(--bha-bg-surface) 75%);
+}
+
+.hex-element--tho {
+  background: radial-gradient(circle at 50% 20%, rgba(180, 83, 9, 0.10) 0%, var(--bha-bg-surface) 75%);
+}
+
+.hex-role-pill {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: var(--bha-radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  background-color: rgba(201, 162, 39, 0.15);
+  color: var(--bha-gold-600);
+  border: 1px solid var(--bha-border-gold);
+}
+
+.hex-role-pill--nuclear {
+  background-color: rgba(59, 130, 246, 0.12);
+  color: var(--bha-info);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.hex-role-pill--transformed {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: var(--bha-accent-dong);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+/* Hexagram Lines Enhancement (Dày hơn, bo góc tròn, khoảng cách đều) */
+.hex-lines-vertical-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 220px;
+  margin: 8px 0 16px 0;
+}
+
+.hex-line-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  height: 22px;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.hex-line-row:hover {
+  background-color: rgba(201, 162, 39, 0.1);
+}
+
+.hex-bar--yang {
+  width: 100%;
+  height: 14px;
+  border-radius: 4px;
+  background-color: var(--bha-accent-tinh);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.hex-bar-yin-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
+}
+
+.hex-bar--yin-half {
+  flex: 1;
+  height: 14px;
+  border-radius: 4px;
+  background-color: var(--bha-accent-tinh);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.hex-bar--moving {
+  background-color: var(--bha-accent-dong) !important;
+  box-shadow: 0 0 12px rgba(248, 113, 113, 0.6) !important;
+}
+
+.hex-moving-dot-marker {
+  position: absolute;
+  right: -16px;
+  color: var(--bha-accent-dong);
+  font-size: 0.9rem;
+  line-height: 1;
+  animation: movingLinePulse 2s infinite ease-in-out;
+}
+
+/* Hex Showcase Bottom Meta */
+.hex-showcase-meta {
+  width: 100%;
+  text-align: center;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.hex-title {
+  font-family: var(--bha-font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin: 0;
+  color: var(--bha-text-primary);
+}
+
+.hex-title--primary {
+  color: var(--bha-crimson-700);
+}
+
+[data-theme="dark"] .hex-title--primary {
+  color: var(--bha-gold-500);
+}
+
+.hex-palace-label {
+  font-family: var(--bha-font-serif);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--bha-text-secondary);
+  letter-spacing: 0.04em;
+}
+
+.hex-omen-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--bha-radius-full);
+  background-color: var(--bha-bg-subtle);
+  border: 1px solid var(--bha-border-base);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.omen-label {
+  color: var(--bha-text-muted);
+  font-weight: 500;
+}
+
+.omen-text {
+  font-weight: 700;
+  color: var(--bha-text-primary);
+}
+
+/* ==========================================================================
+   METADATA BANNER & OFFICIAL TÂN AN PHÁI LOGO
+   ========================================================================== */
+
+.workspace-brand-logo-emblem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: 20px;
+}
+
+.logo-emblem-frame {
+  width: 86px;
+  height: 86px;
+  border-radius: 14px;
+  border: 2px solid var(--bha-border-gold);
+  background-color: #0B0F1A;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: transform 0.25s ease;
+}
+
+.logo-emblem-frame:hover {
+  transform: scale(1.04);
+}
+
+.logo-emblem-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-emblem-caption {
+  font-family: var(--bha-font-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--bha-border-gold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.meta-icon {
+  margin-right: 4px;
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   TABLES: STICKY HEADER, DOTS INDICATOR & ROWS ENHANCEMENT
+   ========================================================================== */
+
+.workspace-table-card,
+.workspace-supplementary-card {
+  position: relative;
+  background-color: var(--bha-bg-surface);
+  border: 1px solid var(--bha-border-base);
+  border-radius: var(--bha-radius-lg);
+  box-shadow: var(--bha-shadow-sm);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.workspace-table-scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  max-height: 70vh;
+}
+
+.workspace-master-table,
+.workspace-supp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-master-table thead th,
+.workspace-supp-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--bha-bg-subtle);
+  border-bottom: 2px solid var(--bha-border-gold);
+  padding: 10px 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--bha-text-secondary);
+  white-space: nowrap;
+}
+
+.workspace-master-table td,
+.workspace-supp-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--bha-border-light);
+  white-space: nowrap;
+}
+
+.workspace-master-row,
+.workspace-supp-row {
+  transition: background-color 0.15s ease;
+}
+
+.workspace-master-row:hover,
+.workspace-supp-row:hover {
+  background-color: var(--bha-row-highlight);
+}
+
+.workspace-master-row.row--moving,
+.workspace-supp-row.row--moving {
+  background: var(--bha-row-dong-tint) !important;
+  border-left: 3px solid var(--bha-accent-dong);
+}
+
+/* Dot indicator on Hào column */
+.table-hex-bar-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.table-hex-dot-indicator {
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.table-hex-dot-indicator.dot--static {
+  color: var(--bha-accent-tinh);
+}
+
+.table-hex-dot-indicator.dot--moving {
+  color: var(--bha-accent-dong);
+}
+
+.table-hex-bar {
+  height: 10px;
+  border-radius: 3px;
+  background-color: var(--bha-accent-tinh);
+}
+
+.table-hex-bar--yang {
+  width: 54px;
+}
+
+.table-hex-bar-yin-wrap {
+  display: flex;
+  gap: 6px;
+  width: 54px;
+}
+
+.table-hex-bar-yin-seg {
+  flex: 1;
+  height: 10px;
+  border-radius: 3px;
+  background-color: var(--bha-accent-tinh);
+}
+
+.table-hex-bar--moving,
+.table-hex-bar-yin-seg.table-hex-bar--moving {
+  background-color: var(--bha-accent-dong) !important;
+  box-shadow: 0 0 8px rgba(248, 113, 113, 0.5) !important;
+}
+
+@media (max-width: 768px) {
+  .workspace-hexagrams-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .workspace-master-table th:first-child,
+  .workspace-master-table td:first-child,
+  .workspace-supp-table th:first-child,
+  .workspace-supp-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    background-color: var(--bha-bg-surface);
+  }
+}
