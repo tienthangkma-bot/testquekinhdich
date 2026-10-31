@@ -177,11 +177,13 @@ export const App: React.FC = () => {
     calendarInfo: CalendarConversionResult
   ) => {
     setMaiHuaData({ result, calendarInfo });
+    const pad = (n: number) => String(n).padStart(2, '0');
     const { stem: mStem, branch: mBranch } = parseCanChiString(calendarInfo.canChi.day);
     const { voidBranches: mVoidBranches } = calculateVoidBranches(mStem, mBranch);
-    const mSolarDateStr = `${calendarInfo.solar.year}-${String(calendarInfo.solar.month).padStart(2, '0')}-${String(calendarInfo.solar.day).padStart(2, '0')}T${String(calendarInfo.solar.hour).padStart(2, '0')}:${String(calendarInfo.solar.minute).padStart(2, '0')}:00.000Z`;
+    // Chuẩn ISO 8601 theo múi giờ Việt Nam (UTC+7, Asia/Ho_Chi_Minh), tránh bị cộng dồn +7h sang 22h
+    const solarDateStr = `${calendarInfo.solar.year}-${pad(calendarInfo.solar.month)}-${pad(calendarInfo.solar.day)}T${pad(calendarInfo.solar.hour)}:${pad(calendarInfo.solar.minute)}:00+07:00`;
     const mDt: DivinationDateTime = {
-      solarDateTime: mSolarDateStr,
+      solarDateTime: solarDateStr,
       lunarYear: calendarInfo.lunar.year,
       lunarMonth: calendarInfo.lunar.month,
       lunarDay: calendarInfo.lunar.day,
@@ -196,24 +198,8 @@ export const App: React.FC = () => {
     setMaiHuaDateTimeInfo(mDt);
     try {
       const repo = getDivinationRepository();
-      const { stem, branch } = parseCanChiString(calendarInfo.canChi.day);
-      const { voidBranches } = calculateVoidBranches(stem, branch);
 
-      const solarDateStr = `${calendarInfo.solar.year}-${String(calendarInfo.solar.month).padStart(2, '0')}-${String(calendarInfo.solar.day).padStart(2, '0')}T${String(calendarInfo.solar.hour).padStart(2, '0')}:${String(calendarInfo.solar.minute).padStart(2, '0')}:00.000Z`;
-
-      const dt: DivinationDateTime = {
-        solarDateTime: solarDateStr,
-        lunarYear: calendarInfo.lunar.year,
-        lunarMonth: calendarInfo.lunar.month,
-        lunarDay: calendarInfo.lunar.day,
-        lunarHourBranch: calendarInfo.currentHourBranch.branch,
-        yearCanChi: calendarInfo.canChi.year,
-        monthCanChi: calendarInfo.canChi.month,
-        dayCanChi: calendarInfo.canChi.day,
-        hourCanChi: calendarInfo.canChi.hour,
-        solarTerm: calendarInfo.solarTerm?.name,
-        voidBranches,
-      };
+      const dt = mDt;
 
       const sixYaoRes = orchestrateSixYaoAnalysis({
         primaryHexagram: result.trio.primary.number,

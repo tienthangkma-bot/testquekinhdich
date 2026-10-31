@@ -358,7 +358,8 @@ export const App: React.FC = () => {
       const { stem, branch } = parseCanChiString(calendarInfo.canChi.day);
       const { voidBranches } = calculateVoidBranches(stem, branch);
 
-      const solarDateStr = `${calendarInfo.solar.year}-${String(calendarInfo.solar.month).padStart(2, '0')}-${String(calendarInfo.solar.day).padStart(2, '0')}T${String(calendarInfo.solar.hour).padStart(2, '0')}:${String(calendarInfo.solar.minute).padStart(2, '0')}:00.000Z`;
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const solarDateStr = `${calendarInfo.solar.year}-${pad(calendarInfo.solar.month)}-${pad(calendarInfo.solar.day)}T${pad(calendarInfo.solar.hour)}:${pad(calendarInfo.solar.minute)}:00+07:00`;
 
       const dt: DivinationDateTime = {
         solarDateTime: solarDateStr,

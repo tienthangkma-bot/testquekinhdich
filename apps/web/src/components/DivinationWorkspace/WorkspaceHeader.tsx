@@ -24,13 +24,42 @@ export const WorkspaceHeader: React.FC<WorkspaceHeaderProps> = ({
   const dt = dateTimeInfo;
   const solarDate = new Date(dt.solarDateTime);
 
-  // Định dạng giờ và ngày dương lịch
-  const hours = String(solarDate.getHours()).padStart(2, '0');
-  const minutes = String(solarDate.getMinutes()).padStart(2, '0');
-  const solarDay = String(solarDate.getDate()).padStart(2, '0');
-  const solarMonth = String(solarDate.getMonth() + 1).padStart(2, '0');
-  const solarYear = solarDate.getFullYear();
-  const timeFormatted = `${hours}:${minutes} - ${solarDay}/${solarMonth}/${solarYear}`;
+  // Định dạng giờ và ngày dương lịch chuẩn múi giờ Việt Nam (Asia/Ho_Chi_Minh)
+  const pad = (n: number | string) => String(n).padStart(2, '0');
+  let timeFormatted = '';
+
+  try {
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Ho_Chi_Minh',
+      hour: '2-digit',
+      minute: '2-digit',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(solarDate);
+    let hours = '';
+    let minutes = '';
+    let solarDay = '';
+    let solarMonth = '';
+    let solarYear = '';
+    for (const part of parts) {
+      if (part.type === 'hour') hours = part.value;
+      if (part.type === 'minute') minutes = part.value;
+      if (part.type === 'day') solarDay = part.value;
+      if (part.type === 'month') solarMonth = part.value;
+      if (part.type === 'year') solarYear = part.value;
+    }
+    timeFormatted = `${hours}:${minutes} - ${solarDay}/${solarMonth}/${solarYear}`;
+  } catch {
+    const hours = pad(solarDate.getHours());
+    const minutes = pad(solarDate.getMinutes());
+    const solarDay = pad(solarDate.getDate());
+    const solarMonth = pad(solarDate.getMonth() + 1);
+    const solarYear = solarDate.getFullYear();
+    timeFormatted = `${hours}:${minutes} - ${solarDay}/${solarMonth}/${solarYear}`;
+  }
 
   // Chuỗi giờ Âm lịch
   const hourBranch = dt.lunarHourBranch || 'Tý';

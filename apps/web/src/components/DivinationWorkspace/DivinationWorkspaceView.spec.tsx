@@ -17,7 +17,7 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
   // Quẻ Thủy Lôi Truân (#3) động hào 2 biến Thủy Trạch Tiết (#60)
   // Ngày Mậu Dần, Tháng Mậu Tuất, Giờ Đinh Tỵ, Năm Bính Ngọ, Tiết khí Sương Giáng
   const sampleDateTime: DivinationDateTime = {
-    solarDateTime: '2026-10-31T10:03:00.000Z',
+    solarDateTime: '2026-10-31T10:03:00+07:00',
     lunarYear: 2026,
     lunarMonth: 9,
     lunarDay: 22,
@@ -72,6 +72,7 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
     ).toBeInTheDocument();
 
     // 2. Kiểm tra thông tin thời gian & lịch pháp
+    expect(screen.getByText(/10:03 - 31\/10\/2026/i)).toBeInTheDocument();
     expect(screen.getByText(/22\/9\/2026 ÂD hợp lịch/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Mậu Dần/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/Sương giáng/i)).toBeInTheDocument();
