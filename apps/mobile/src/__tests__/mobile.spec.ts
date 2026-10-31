@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import {
   CastingMethod,
-  getHexagramByNumber,
+  getHexagramById,
 } from '@kindich/domain';
 import {
   castBySerial,
   castByMaiHua,
   orchestrateSixYaoAnalysis,
   getClassicalHexagramData,
-  DEFAULT_SIX_YAO_RULESET_ID,
+  SIX_YAO_DEFAULT_RULESET_ID,
 } from '@kindich/core';
 import { getFullCalendarInfo } from '@kindich/calendar';
 import { theme } from '../theme/colors';

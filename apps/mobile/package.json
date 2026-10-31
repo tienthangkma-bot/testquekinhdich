@@ -17,6 +17,7 @@
     "@kindich/domain": "workspace:*",
     "@kindich/shared": "workspace:*",
     "expo": "~52.0.37",
+    "expo-sqlite": "~15.0.6",
     "expo-status-bar": "~2.0.1",
     "react": "18.3.1",
     "react-native": "0.76.7",
@@ -25,7 +26,9 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@expo/metro-config": "~0.19.11",
+    "@types/better-sqlite3": "^9.6.0",
     "@types/react": "~18.3.12",
+    "better-sqlite3": "^13.0.3",
     "typescript": "^5.8.2",
     "vitest": "^5.0.5"
   }
