@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Kinh Dịch - Bắc Hà Tân An Phái",
+    "slug": "kindich-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kindich.mobile"
+    },
+    "android": {
+      "package": "com.kindich.mobile"
+    }
+  }
+}
