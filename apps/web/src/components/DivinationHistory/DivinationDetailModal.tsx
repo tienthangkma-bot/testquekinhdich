@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Button, Card, Modal } from '@kindich/shared';
 import {
   CastingMethod,
@@ -37,7 +37,7 @@ export const DivinationDetailModal: React.FC<DivinationDetailModalProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   // Tải thông tin chi tiết quẻ từ Repository
-  const loadDetail = async () => {
+  const loadDetail = useCallback(async () => {
     if (!divinationId) return;
     try {
       setLoading(true);
@@ -53,7 +53,7 @@ export const DivinationDetailModal: React.FC<DivinationDetailModalProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [divinationId, repo]);
 
   useEffect(() => {
     if (isOpen && divinationId) {
@@ -61,7 +61,7 @@ export const DivinationDetailModal: React.FC<DivinationDetailModalProps> = ({
     } else {
       setDetail(null);
     }
-  }, [isOpen, divinationId]);
+  }, [isOpen, divinationId, loadDetail]);
 
   if (!isOpen) return null;
 
