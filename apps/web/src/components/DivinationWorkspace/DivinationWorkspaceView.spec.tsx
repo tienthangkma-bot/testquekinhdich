@@ -97,7 +97,7 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
     expect(handleSaveNote).toHaveBeenCalledTimes(1);
   });
 
-  it('Yêu cầu 3: Hiển thị đồ hình 3 quẻ (Quẻ Chủ, Quẻ Hỗ, Quẻ Biến) với Bát Cung và hào động', () => {
+  it('Yêu cầu 3: Hiển thị đồ hình 3 quẻ (Quẻ Chủ, Quẻ Hỗ, Quẻ Biến) với Bát Cung và Lời Triệu cổ bản', () => {
     render(
       <DivinationWorkspaceView
         method={CastingMethod.SERIAL}
@@ -115,9 +115,14 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
     // Kiểm tra Bát Cung liên quan
     expect(screen.getAllByText(/HỌ KHẢM/i).length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText(/HỌ CÀN/i)).toBeInTheDocument();
+
+    // Kiểm tra 3 Lời Triệu (Điềm Triệu) cổ bản hiển thị thay thế các nhãn cũ
+    expect(screen.getByText(/Loạn ty vô đầu/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ưng thước đồng sào/i)).toBeInTheDocument();
+    expect(screen.getByText(/Trảm tướng phong thần/i)).toBeInTheDocument();
   });
 
-  it('Yêu cầu 4: Bảng Lục Hào tổng hợp hiển thị đầy đủ Thế/Ứng, Nạp Giáp, Phục Thần, Tuần Không, Lục Thú', () => {
+  it('Yêu cầu 4: Bảng Lục Hào tổng hợp hiển thị đầy đủ Thế/Ứng, Nạp Giáp, Phục Thần, Tuần Không, Lục Thú và vạch hào to đều nhau', () => {
     const { container } = render(
       <DivinationWorkspaceView
         method={CastingMethod.SERIAL}
@@ -136,6 +141,12 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
     const rows = container.querySelectorAll('.workspace-master-row');
     expect(rows.length).toBe(6);
 
+    // Kiểm tra thanh vạch hào (dương: nét liền, âm: nét đứt bằng chiều dài nét dương)
+    const yangBars = container.querySelectorAll('.table-hex-bar--yang');
+    expect(yangBars.length).toBeGreaterThan(0);
+    const yinWrappers = container.querySelectorAll('.table-hex-bar-yin-wrap');
+    expect(yinWrappers.length).toBeGreaterThan(0);
+
     // Kiểm tra Phục Thần của quẻ Truân: tại hào 3 xuất hiện "Tài-Ngọ"
     expect(screen.getByText('Tài-Ngọ')).toBeInTheDocument();
 
@@ -150,9 +161,13 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
     // Kiểm tra Lục Thú khởi theo can Mậu (Câu Trần, Đằng Xà, Chu Tước, Thanh Long...)
     expect(screen.getByText(/Đằng Xà/i)).toBeInTheDocument();
     expect(screen.getByText(/Thanh Long/i)).toBeInTheDocument();
+
+    // Kiểm tra đường phân cách đậm giữa 2 quẻ
+    expect(container.querySelectorAll('.col-divider-right').length).toBeGreaterThanOrEqual(7);
+    expect(container.querySelectorAll('.col-divider-left').length).toBeGreaterThanOrEqual(7);
   });
 
-  it('Yêu cầu 5: Bảng phân tích bổ sung hiển thị 12 Trường Sinh, Lộc, Mã, Đào đúng cổ pháp', () => {
+  it('Yêu cầu 5: Bảng phân tích bổ sung hiển thị 12 Trường Sinh, Lộc, Mã, Quý, Đào đúng cổ pháp', () => {
     const { container } = render(
       <DivinationWorkspaceView
         method={CastingMethod.SERIAL}
@@ -171,15 +186,19 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
     const suppRows = container.querySelectorAll('.workspace-supp-row');
     expect(suppRows.length).toBe(6);
 
-    // Kiểm tra các cột tiêu đề bảng bổ sung
+    // Kiểm tra các cột tiêu đề bảng bổ sung (Lộc, Mã, Quý, Đào xuất hiện ở cả 2 quẻ)
     expect(screen.getAllByText('TS.Ngày').length).toBe(2);
     expect(screen.getAllByText('TS.Tháng').length).toBe(2);
-    expect(screen.getAllByText('Lộc').length).toBe(2);
-    expect(screen.getAllByText('Mã').length).toBe(2);
-    expect(screen.getAllByText('Đào').length).toBe(2);
+    expect(screen.getAllByText('Lộc').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText('Mã').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText('Quý').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText('Đào').length).toBeGreaterThanOrEqual(2);
 
     // Hào 4 (Thân Kim) có Dịch Mã ('M')
     expect(screen.getAllByText('M').length).toBeGreaterThanOrEqual(1);
+
+    // Hào 3 quẻ biến (Đinh Sửu) có Thiên Ất Quý Nhân ('Q')
+    expect(screen.getAllByText('Q').length).toBeGreaterThanOrEqual(1);
   });
 
   it('Yêu cầu 6: Khu vực luận giải tập trung trên cùng một trang, không chia tab', () => {

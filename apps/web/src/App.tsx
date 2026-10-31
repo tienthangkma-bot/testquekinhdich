@@ -260,15 +260,22 @@ export const App: React.FC = () => {
     <div className="app-container">
       {/* Header */}
       <header className="app-header">
+        {/* Nút Cài đặt hệ thống ở góc trên bên phải */}
+        <button
+          type="button"
+          className={"app-header-settings-btn " + (activeMode === 'settings' ? 'active' : '')}
+          onClick={() => handleSelectMode('settings')}
+          title="Cài đặt hệ thống & giao diện"
+          data-testid="header-settings-btn"
+        >
+          <span className="settings-btn-icon">⚙️</span>
+          <span className="settings-btn-text">Cài đặt</span>
+        </button>
         <div className="brand-badge">
           <span>☯</span>
           <span>Bắc Hà Tân An Phái</span>
         </div>
         <h1 className="brand-title">Bắc Hà Tân An Phái</h1>
-        <p className="brand-subtitle">
-          Ứng dụng Kinh Dịch Lục Hào & Mai Hoa Dịch Số Toàn Diện • Chuẩn Cổ Pháp • Offline-First
-        </p>
-
         {/* Tiện ích PWA: Trạng thái kết nối mạng & Hướng dẫn cài đặt (Requirements 5 & 6) */}
         <PwaHeaderActions />
       </header>
@@ -306,14 +313,6 @@ export const App: React.FC = () => {
         >
           <span className="tab-icon">📜</span>
           <span>Lịch sử lập quẻ</span>
-        </button>
-        <button
-          type="button"
-          className={`mode-tab ${activeMode === 'settings' ? 'active' : ''}`}
-          onClick={() => handleSelectMode('settings')}
-        >
-          <span className="tab-icon">⚙️</span>
-          <span>Cài đặt</span>
         </button>
         <button
           type="button"

@@ -63,24 +63,45 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
     });
   }, [primaryHexagram.lines, changingHexagram?.lines, phucThanMap]);
 
+  // Hàm render thanh vạch hào (dương: nét liền, âm: 2 đoạn bằng tổng chiều dài nét dương)
+  const renderTableBar = (isYang: boolean, isMoving: boolean, titleText: string) => {
+    const movingClass = isMoving ? 'table-hex-bar--moving' : '';
+    return (
+      <div className="table-hex-bar-wrapper" title={titleText}>
+        {isYang ? (
+          <div className={`table-hex-bar table-hex-bar--yang ${movingClass}`} />
+        ) : (
+          <div className="table-hex-bar-yin-wrap">
+            <div className={`table-hex-bar-yin-seg ${movingClass}`} />
+            <div className="table-hex-bar-yin-gap" />
+            <div className={`table-hex-bar-yin-seg ${movingClass}`} />
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="workspace-table-card">
       <div className="workspace-table-scroll-container">
         <table className="workspace-master-table">
           <thead>
             <tr>
-              <th className="th-center" style={{ width: '48px' }}>Hào</th>
+              {/* Vế Quẻ Chủ */}
+              <th className="th-center" style={{ width: '56px' }}>Hào</th>
               <th className="th-center" style={{ width: '56px' }}>T/Ứ</th>
               <th className="th-left" style={{ minWidth: '95px' }}>Lục Thân</th>
               <th className="th-left" style={{ minWidth: '95px' }}>Can Chi</th>
               <th className="th-center" style={{ minWidth: '85px' }}>Phục thần</th>
-              <th className="th-center" style={{ width: '45px' }}>TK</th>
+              <th className="th-center col-divider-right" style={{ width: '45px' }}>TK</th>
+
+              {/* Vế Quẻ Biến: Cột Hào chuyển sang bên trái (sau TK quẻ chính) */}
+              <th className="th-center col-divider-left" style={{ width: '56px' }}>Hào</th>
+              <th className="th-center" style={{ width: '56px' }}>T/Ứ</th>
               <th className="th-left" style={{ minWidth: '95px' }}>Lục Thân</th>
               <th className="th-left" style={{ minWidth: '95px' }}>Can Chi</th>
               <th className="th-center" style={{ width: '45px' }}>TK</th>
               <th className="th-center" style={{ minWidth: '95px' }}>Lục Thú</th>
-              <th className="th-center" style={{ width: '56px' }}>T/Ứ</th>
-              <th className="th-center" style={{ width: '48px' }}>Hào</th>
             </tr>
           </thead>
           <tbody>
@@ -89,16 +110,13 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
 
               return (
                 <tr key={row.pos} className={`workspace-master-row ${movingClass}`}>
-                  {/* Cột 1: Vạch Hào Quẻ Chủ */}
+                  {/* Cột 1: Vạch Hào Quẻ Chủ (To, rõ, chiều dài âm dương bằng nhau) */}
                   <td className="cell-hex-mark cell-center">
-                    <span
-                      className={`hex-ascii-bar ${row.isYang ? 'bar--yang' : 'bar--yin'} ${
-                        row.isMoving ? 'text-red' : 'text-blue'
-                      }`}
-                      title={`Hào ${row.pos}: ${row.isYang ? 'Dương' : 'Âm'}${row.isMoving ? ' (Động)' : ''}`}
-                    >
-                      {row.isYang ? '━━━' : '━ ━'}
-                    </span>
+                    {renderTableBar(
+                      row.isYang,
+                      row.isMoving,
+                      `Hào ${row.pos}: ${row.isYang ? 'Dương' : 'Âm'}${row.isMoving ? ' (Động)' : ''}`
+                    )}
                   </td>
 
                   {/* Cột 2: Thế / Ứng Quẻ Chủ */}
@@ -118,54 +136,56 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
                   </td>
 
                   {/* Cột 5: Phục Thần */}
-                  <td className="cell-phucthan cell-center font-medium">
-                    {row.phucThanLabel || ''}
+                  <td className="cell-phuc-than cell-center">
+                    {row.phucThanLabel ? (
+                      <span className="tag-phuc-than font-bold">{row.phucThanLabel}</span>
+                    ) : (
+                      <span className="text-muted">-</span>
+                    )}
                   </td>
 
-                  {/* Cột 6: Tuần Không (TK) Quẻ Chủ */}
-                  <td className="cell-tk cell-center">
+                  {/* Cột 6: Tuần Không (TK) Quẻ Chủ (với đường phân cách mạnh mẽ bên phải) */}
+                  <td className="cell-tk cell-center col-divider-right">
                     {row.isVoid && <span className="tag-tk">K</span>}
                   </td>
 
-                  {/* Cột 7: Lục Thân Quẻ Biến */}
-                  <td className={`cell-relation cell-left ${row.isMoving ? 'text-red font-bold' : ''}`}>
-                    {row.changingRelation || '-'}
+                  {/* Cột 7: Vạch Hào Quẻ Biến (chuyển sang bên trái của Quẻ Biến, sau TK quẻ chính) */}
+                  <td className="cell-hex-mark cell-center col-divider-left">
+                    {row.changingIsYang !== null ? (
+                      renderTableBar(
+                        row.changingIsYang,
+                        row.isMoving,
+                        `Hào ${row.pos} biến: ${row.changingIsYang ? 'Dương' : 'Âm'}`
+                      )
+                    ) : (
+                      <span className="text-muted">-</span>
+                    )}
                   </td>
 
-                  {/* Cột 8: Can Chi Quẻ Biến */}
-                  <td className={`cell-canchi cell-left ${row.isMoving ? 'text-red font-bold' : ''}`}>
-                    {row.changingCanChi || '-'}
-                  </td>
-
-                  {/* Cột 9: Tuần Không (TK) Quẻ Biến */}
-                  <td className="cell-tk cell-center">
-                    {row.changingVoid && <span className="tag-tk">K</span>}
-                  </td>
-
-                  {/* Cột 10: Lục Thú */}
-                  <td className={`cell-spirit cell-center ${row.isMoving ? 'text-red font-bold' : ''}`}>
-                    {row.sixSpiritName}
-                  </td>
-
-                  {/* Cột 11: Thế / Ứng Quẻ Biến */}
+                  {/* Cột 8: Thế / Ứng Quẻ Biến */}
                   <td className="cell-world-response cell-center">
                     {row.changingIsWorld && <span className="tag-the-bold">Thế</span>}
                     {row.changingIsResponse && <span className="tag-ung-bold">Ứng</span>}
                   </td>
 
-                  {/* Cột 12: Vạch Hào Quẻ Biến */}
-                  <td className="cell-hex-mark cell-center">
-                    {row.changingIsYang !== null ? (
-                      <span
-                        className={`hex-ascii-bar ${row.changingIsYang ? 'bar--yang' : 'bar--yin'} ${
-                          row.isMoving ? 'text-red' : 'text-blue'
-                        }`}
-                      >
-                        {row.changingIsYang ? '━━━' : '━ ━'}
-                      </span>
-                    ) : (
-                      '-'
-                    )}
+                  {/* Cột 9: Lục Thân Quẻ Biến */}
+                  <td className={`cell-relation cell-left ${row.isMoving ? 'text-red font-bold' : ''}`}>
+                    {row.changingRelation || '-'}
+                  </td>
+
+                  {/* Cột 10: Can Chi Quẻ Biến */}
+                  <td className={`cell-canchi cell-left ${row.isMoving ? 'text-red font-bold' : ''}`}>
+                    {row.changingCanChi || '-'}
+                  </td>
+
+                  {/* Cột 11: Tuần Không (TK) Quẻ Biến */}
+                  <td className="cell-tk cell-center">
+                    {row.changingVoid && <span className="tag-tk">K</span>}
+                  </td>
+
+                  {/* Cột 12: Lục Thú */}
+                  <td className={`cell-spirit cell-center ${row.isMoving ? 'text-red font-bold' : ''}`}>
+                    {row.sixSpiritName}
                   </td>
                 </tr>
               );

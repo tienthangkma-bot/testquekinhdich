@@ -24,7 +24,7 @@ export interface TwelveLifeStageInfo {
 }
 
 /**
- * Thần Sát bổ trợ cho từng Hào
+ * Thần Sát bổ trợ cho từng Hào (Lộc, Mã, Quý, Đào, Quái Thần)
  */
 export interface AuxiliaryDeityInfo {
   readonly isLoc: boolean;
@@ -35,6 +35,7 @@ export interface AuxiliaryDeityInfo {
   readonly locLabel: string;
   readonly maLabel: string;
   readonly daoLabel: string;
+  readonly quyLabel: string;
   readonly quaiThanLabel: string;
 }
 

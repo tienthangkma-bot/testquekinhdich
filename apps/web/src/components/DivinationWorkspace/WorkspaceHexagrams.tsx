@@ -1,5 +1,10 @@
 import React from 'react';
-import { Hexagram, HexagramTrio, getPalaceInfoByHexagramNumber } from '@kindich/domain';
+import {
+  Hexagram,
+  HexagramTrio,
+  getPalaceInfoByHexagramNumber,
+  getHexagramOmen,
+} from '@kindich/domain';
 import { MaiHuaCastingResult } from '@kindich/core';
 
 interface WorkspaceHexagramsProps {
@@ -9,7 +14,6 @@ interface WorkspaceHexagramsProps {
 
 export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
   trio,
-  maiHuaResult,
 }) => {
   const { primary, transformed, nuclear, movingLineIndices } = trio;
 
@@ -21,6 +25,11 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
   const nuclearPalace = nuclear
     ? getPalaceInfoByHexagramNumber(nuclear.number)
     : null;
+
+  // Lấy Lời Triệu (Điềm Triệu) cổ bản của từng quẻ
+  const primaryOmen = getHexagramOmen(primary.number);
+  const nuclearOmen = nuclear ? getHexagramOmen(nuclear.number) : null;
+  const transformedOmen = transformed ? getHexagramOmen(transformed.number) : null;
 
   // Render 6 vạch của một quẻ (từ Hào 6 trên xuống Hào 1 dưới)
   const renderHexagramLines = (
@@ -52,7 +61,7 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
                   className={`hex-bar hex-bar--yang ${isHighlight ? 'hex-bar--moving' : ''}`}
                 />
               ) : (
-                // Hào Âm: Vạch đứt có khe giữa
+                // Hào Âm: Vạch đứt có khe giữa (chiều dài tổng thể bằng hào dương)
                 <div className="hex-bar-yin-wrapper">
                   <div
                     className={`hex-bar hex-bar--yin-half ${isHighlight ? 'hex-bar--moving' : ''}`}
@@ -80,13 +89,10 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
           <div className="hex-palace-label">
             HỌ {primaryPalace.palaceName.toUpperCase()}
           </div>
-          {maiHuaResult && (
-            <div className="mai-hua-badge">
-              {maiHuaResult.theDung.thePosition === 'UPPER'
-                ? 'Thượng: THỂ • Hạ: DỤNG'
-                : 'Thượng: DỤNG • Hạ: THỂ'}
-            </div>
-          )}
+          <div className="hex-omen-badge" title={primaryOmen.meaning}>
+            <span className="omen-label">Lời Triệu:</span>{' '}
+            <span className="omen-text">{primaryOmen.omen}</span>
+          </div>
         </div>
 
         {/* Cột 2: QUẺ HỖ */}
@@ -97,7 +103,12 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
             <div className="hex-palace-label">
               HỌ {nuclearPalace ? nuclearPalace.palaceName.toUpperCase() : ''}
             </div>
-            <div className="hex-role-badge">HỖ QUÁI (HÀO 2-3-4 & 3-4-5)</div>
+            {nuclearOmen && (
+              <div className="hex-omen-badge" title={nuclearOmen.meaning}>
+                <span className="omen-label">Lời Triệu:</span>{' '}
+                <span className="omen-text">{nuclearOmen.omen}</span>
+              </div>
+            )}
           </div>
         )}
 
@@ -111,7 +122,12 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
             <div className="hex-palace-label">
               HỌ {transformedPalace ? transformedPalace.palaceName.toUpperCase() : ''}
             </div>
-            <div className="hex-role-badge hex-role-badge--transformed">BIẾN QUÁI</div>
+            {transformedOmen && (
+              <div className="hex-omen-badge" title={transformedOmen.meaning}>
+                <span className="omen-label">Lời Triệu:</span>{' '}
+                <span className="omen-text">{transformedOmen.omen}</span>
+              </div>
+            )}
           </div>
         ) : (
           <div className="hexagram-figure-card hexagram-figure-card--static">

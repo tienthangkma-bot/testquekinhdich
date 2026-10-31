@@ -8,6 +8,54 @@
 }
 
 /* Header */
+
+.app-header-settings-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background-color: var(--bha-bg-surface);
+  border: 1px solid var(--bha-border-base);
+  border-radius: var(--bha-radius-md);
+  color: var(--bha-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--bha-shadow-sm);
+  z-index: 10;
+}
+
+.app-header-settings-btn:hover {
+  background-color: var(--bha-gold-50);
+  border-color: var(--bha-gold-400);
+  color: var(--bha-crimson-700);
+  transform: translateY(-1px);
+}
+
+.app-header-settings-btn.active {
+  background-color: var(--bha-gold-100);
+  border-color: var(--bha-crimson-700);
+  color: var(--bha-crimson-700);
+  font-weight: 700;
+}
+
+.settings-btn-icon {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 640px) {
+  .app-header-settings-btn {
+    top: 12px;
+    right: 12px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+}
+
 .app-header {
   text-align: center;
   padding: 16px 16px 24px 16px;

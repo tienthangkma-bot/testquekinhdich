@@ -239,6 +239,30 @@
   box-shadow: 0 0 4px rgba(211, 47, 47, 0.4);
 }
 
+
+.hex-omen-badge {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background-color: rgba(198, 40, 40, 0.08);
+  border: 1px solid rgba(198, 40, 40, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hex-omen-badge .omen-label {
+  font-weight: 600;
+  color: #8D1B1B;
+}
+
+.hex-omen-badge .omen-text {
+  font-weight: 700;
+  color: #B71C1C;
+  letter-spacing: 0.2px;
+}
+
 .hex-palace-label {
   font-size: 0.82rem;
   font-weight: 700;
@@ -363,6 +387,63 @@
 .text-muted { color: #9E9E9E; }
 .font-bold { font-weight: 700; }
 .font-medium { font-weight: 500; }
+
+
+/* Thanh hào trong bảng: To, đậm, nét âm và nét dương có chiều dài bằng nhau tuyệt đối */
+.table-hex-bar-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.table-hex-bar {
+  display: block;
+  width: 44px;
+  height: 8px;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.table-hex-bar--yang {
+  background-color: #1565C0;
+}
+
+.table-hex-bar-yin-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 44px;
+  height: 8px;
+}
+
+.table-hex-bar-yin-seg {
+  width: 19px;
+  height: 8px;
+  border-radius: 2px;
+  background-color: #1565C0;
+}
+
+.table-hex-bar-yin-gap {
+  width: 6px;
+  height: 8px;
+}
+
+/* Hào động trong bảng màu đỏ */
+.table-hex-bar--moving,
+.row--moving .table-hex-bar--yang,
+.row--moving .table-hex-bar-yin-seg {
+  background-color: #D32F2F !important;
+}
+
+/* Phân cách mạnh mẽ giữa Quẻ Chủ và Quẻ Biến */
+.col-divider-right {
+  border-right: 3px solid #8D1B1B !important;
+}
+
+.col-divider-left {
+  border-left: 1px solid rgba(141, 27, 27, 0.25) !important;
+}
 
 .hex-ascii-bar {
   font-family: monospace;

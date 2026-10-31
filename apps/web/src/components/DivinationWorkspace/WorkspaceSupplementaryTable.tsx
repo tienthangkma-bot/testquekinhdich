@@ -70,15 +70,17 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
               <th className="th-center" style={{ minWidth: '75px' }}>TS.Tháng</th>
               <th className="th-center" style={{ width: '45px' }}>Lộc</th>
               <th className="th-center" style={{ width: '45px' }}>Mã</th>
-              <th className="th-center" style={{ width: '45px' }}>Đào</th>
+              <th className="th-center" style={{ width: '45px' }}>Quý</th>
+              <th className="th-center col-divider-right" style={{ width: '45px' }}>Đào</th>
 
               {/* Vế Quẻ Biến */}
-              <th className="th-left" style={{ minWidth: '95px' }}>Hào</th>
+              <th className="th-left col-divider-left" style={{ minWidth: '95px' }}>Hào</th>
               <th className="th-center" style={{ width: '60px' }}>Q.Thần</th>
               <th className="th-center" style={{ minWidth: '75px' }}>TS.Ngày</th>
               <th className="th-center" style={{ minWidth: '75px' }}>TS.Tháng</th>
               <th className="th-center" style={{ width: '45px' }}>Lộc</th>
               <th className="th-center" style={{ width: '45px' }}>Mã</th>
+              <th className="th-center" style={{ width: '45px' }}>Quý</th>
               <th className="th-center" style={{ width: '45px' }}>Đào</th>
             </tr>
           </thead>
@@ -104,25 +106,29 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
                     {pRow.monthLifeStage.shortName}
                   </td>
                   {/* Quẻ Chủ: Lộc */}
-                  <td className="cell-center font-bold">
+                  <td className={`cell-center ${pRow.deities.isLoc ? 'text-red font-bold' : 'text-muted'}`}>
                     {pRow.deities.locLabel}
                   </td>
                   {/* Quẻ Chủ: Mã */}
-                  <td className="cell-center font-bold">
+                  <td className={`cell-center ${pRow.deities.isMa ? 'text-red font-bold' : 'text-muted'}`}>
                     {pRow.deities.maLabel}
                   </td>
-                  {/* Quẻ Chủ: Đào */}
-                  <td className="cell-center font-bold">
+                  {/* Quẻ Chủ: Quý */}
+                  <td className={`cell-center ${pRow.deities.isQuyNhan ? 'text-red font-bold' : 'text-muted'}`}>
+                    {pRow.deities.quyLabel}
+                  </td>
+                  {/* Quẻ Chủ: Đào (với đường phân cách mạnh mẽ bên phải) */}
+                  <td className={`cell-center col-divider-right ${pRow.deities.isDao ? 'text-red font-bold' : 'text-muted'}`}>
                     {pRow.deities.daoLabel}
                   </td>
 
-                  {/* Quẻ Biến: Can Chi */}
-                  <td className={`cell-canchi cell-left ${cRow?.isMoving ? 'text-red font-bold' : ''}`}>
+                  {/* Quẻ Biến: Can Chi (với đường phân cách mạnh mẽ bên trái) */}
+                  <td className={`cell-canchi cell-left col-divider-left ${cRow?.isMoving ? 'text-red font-bold' : ''}`}>
                     {cRow ? cRow.canChi : '-'}
                   </td>
                   {/* Quẻ Biến: Quái Thần */}
                   <td className="cell-center text-muted">
-                    {cRow ? '-' : '-'}
+                    {cRow ? (cRow.position === 5 ? 'QT' : '-') : '-'}
                   </td>
                   {/* Quẻ Biến: Tràng Sinh Ngày */}
                   <td className={`cell-center ${cRow?.isMoving ? 'text-red font-bold' : ''}`}>
@@ -133,15 +139,19 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
                     {cRow ? cRow.monthLifeStage.shortName : '-'}
                   </td>
                   {/* Quẻ Biến: Lộc */}
-                  <td className="cell-center font-bold">
+                  <td className={`cell-center ${cRow?.deities.isLoc ? 'text-red font-bold' : 'text-muted'}`}>
                     {cRow ? cRow.deities.locLabel : '-'}
                   </td>
                   {/* Quẻ Biến: Mã */}
-                  <td className="cell-center font-bold">
+                  <td className={`cell-center ${cRow?.deities.isMa ? 'text-red font-bold' : 'text-muted'}`}>
                     {cRow ? cRow.deities.maLabel : '-'}
                   </td>
+                  {/* Quẻ Biến: Quý */}
+                  <td className={`cell-center ${cRow?.deities.isQuyNhan ? 'text-red font-bold' : 'text-muted'}`}>
+                    {cRow ? cRow.deities.quyLabel : '-'}
+                  </td>
                   {/* Quẻ Biến: Đào */}
-                  <td className="cell-center font-bold">
+                  <td className={`cell-center ${cRow?.deities.isDao ? 'text-red font-bold' : 'text-muted'}`}>
                     {cRow ? cRow.deities.daoLabel : '-'}
                   </td>
                 </tr>
@@ -151,25 +161,32 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
         </table>
       </div>
 
-      {/* Dải Tóm Lược Tương Quan & Vượng Suy Cốt Lõi */}
+      {/* Chú giải nhanh các thông số thần sát bổ trợ */}
       <div className="workspace-supp-footer-chips">
-        <span className="supp-chip supp-chip--day">
-          Nhật Thần: <strong>{dt.dayMaster.branch} ({dt.dayMaster.elementName})</strong>
+        <span className="supp-chip">
+          <strong>TS.Ngày:</strong> Tràng Sinh theo Nhật Thần
         </span>
-        <span className="supp-chip supp-chip--month">
-          Nguyệt Kiến: <strong>{dt.monthCommander.branch} ({dt.monthCommander.elementName})</strong>
+        <span className="supp-chip">
+          <strong>TS.Tháng:</strong> Tràng Sinh theo Nguyệt Lệnh
         </span>
-        <span className="supp-chip supp-chip--void">
-          Tuần Không: <strong>{dt.dayMaster.voidBranches.join(', ')}</strong>
+        <span className="supp-chip">
+          <strong>Lộc:</strong> Lộc Thần (L)
         </span>
-        <span className="supp-chip supp-chip--break">
-          Nguyệt Phá: <strong>{dt.monthCommander.monthlyBreakBranch}</strong>
+        <span className="supp-chip">
+          <strong>Mã:</strong> Dịch Mã (M)
         </span>
-        {primaryHexagram.lines.some((l) => l.strength.isAmDong) && (
-          <span className="supp-chip supp-chip--am-dong">
-            ⚡ Xuất hiện Hào Ám Động
-          </span>
-        )}
+        <span className="supp-chip">
+          <strong>Quý:</strong> Thiên Ất Quý Nhân (Q)
+        </span>
+        <span className="supp-chip">
+          <strong>Đào:</strong> Đào Hoa Sát (Đ)
+        </span>
+        <span className="supp-chip">
+          <strong>Q.Thần:</strong> Quái Thần (QT)
+        </span>
+        <span className="supp-chip supp-chip--am-dong">
+          <strong>Ghi chú:</strong> Chữ màu đỏ biểu thị Hào Động phát động biến hoá
+        </span>
       </div>
     </div>
   );

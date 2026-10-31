@@ -1,7 +1,7 @@
 /**
  * Động Cơ Tính Toán Bổ Trợ (Auxiliary Analysis Engine)
  *
- * Tính toán Phục Thần, 12 Vận Trường Sinh và Thần Sát (Lộc, Mã, Đào, Quý Nhân)
+ * Tính toán Phục Thần, 12 Vận Trường Sinh và Thần Sát (Lộc, Mã, Quý, Đào, Quái Thần)
  * theo chuẩn cổ pháp "Bốc Phệ Chính Tông" và "Tăng San Bốc Dịch".
  */
 
@@ -144,6 +144,26 @@ const DAO_MAP: Record<string, string> = {
 };
 
 /**
+ * Bảng Thiên Ất Quý Nhân theo Thiên Can ngày (Cổ bản Lục Hào: Bốc Phệ Chính Tông)
+ * Khẩu quyết:
+ * "Giáp Mậu Canh ngưu dương, Ất Kỷ thử hầu hương,
+ *  Bính Đinh trư kê vị, Lục Tân mã hổ phương,
+ *  Nhâm Quý xà thố tàng, Thử thị Quý nhân phương."
+ */
+const QUI_NHAN_MAP: Record<string, readonly string[]> = {
+  Giáp: ['Sửu', 'Mùi'],
+  Ất: ['Tý', 'Thân'],
+  Bính: ['Hợi', 'Dậu'],
+  Đinh: ['Hợi', 'Dậu'],
+  Mậu: ['Sửu', 'Mùi'],
+  Kỷ: ['Tý', 'Thân'],
+  Canh: ['Sửu', 'Mùi'],
+  Tân: ['Ngọ', 'Dần'],
+  Nhâm: ['Tỵ', 'Mão'],
+  Quý: ['Tỵ', 'Mão'],
+};
+
+/**
  * Tính vận Trường Sinh của một Ngũ Hành đối với một Địa Chi (Ngày hoặc Tháng)
  */
 export function calculateLifeStage(element: Element, targetBranch: string): TwelveLifeStageInfo {
@@ -171,7 +191,7 @@ export function calculateLifeStage(element: Element, targetBranch: string): Twel
 }
 
 /**
- * Tính Thần Sát (Lộc, Mã, Đào) cho một Hào
+ * Tính Thần Sát (Lộc, Mã, Quý, Đào) cho một Hào
  */
 export function calculateAuxiliaryDeities(
   dayStem: string,
@@ -181,20 +201,23 @@ export function calculateAuxiliaryDeities(
   const locBranch = LOC_MAP[dayStem];
   const maBranch = MA_MAP[dayBranch];
   const daoBranch = DAO_MAP[dayBranch];
+  const quiBranches: readonly string[] = QUI_NHAN_MAP[dayStem] ?? [];
 
   const isLoc = locBranch === lineBranch;
   const isMa = maBranch === lineBranch;
   const isDao = daoBranch === lineBranch;
+  const isQuyNhan = quiBranches.includes(lineBranch);
 
   return {
     isLoc,
     isMa,
     isDao,
-    isQuyNhan: false,
+    isQuyNhan,
     isQuaiThan: false,
     locLabel: isLoc ? 'L' : '-',
     maLabel: isMa ? 'M' : '-',
     daoLabel: isDao ? 'Đ' : '-',
+    quyLabel: isQuyNhan ? 'Q' : '-',
     quaiThanLabel: '-',
   };
 }

@@ -54,27 +54,55 @@ describe('Auxiliary Analysis Engine (Phục Thần, Trường Sinh & Thần Sát
     });
   });
 
-  describe('calculateAuxiliaryDeities (Thần Sát: Lộc, Mã, Đào)', () => {
-    it('tính chính xác Lộc, Dịch Mã, Đào Hoa cho ngày Mậu Dần', () => {
-      // Can Mậu -> Lộc tại Tỵ
+  describe('calculateAuxiliaryDeities (Thần Sát: Lộc, Mã, Quý, Đào)', () => {
+    it('tính chính xác Lộc, Dịch Mã, Quý Nhân, Đào Hoa cho ngày Mậu Dần', () => {
+      // Can Mậu -> Lộc tại Tỵ, Quý Nhân tại Sửu & Mùi
       // Chi Dần -> Dịch Mã tại Thân, Đào Hoa tại Mão
       const tyDeities = calculateAuxiliaryDeities('Mậu', 'Dần', 'Tỵ');
       expect(tyDeities.isLoc).toBe(true);
       expect(tyDeities.locLabel).toBe('L');
       expect(tyDeities.isMa).toBe(false);
       expect(tyDeities.isDao).toBe(false);
+      expect(tyDeities.isQuyNhan).toBe(false);
+      expect(tyDeities.quyLabel).toBe('-');
 
       const thanDeities = calculateAuxiliaryDeities('Mậu', 'Dần', 'Thân');
       expect(thanDeities.isLoc).toBe(false);
       expect(thanDeities.isMa).toBe(true);
       expect(thanDeities.maLabel).toBe('M');
       expect(thanDeities.isDao).toBe(false);
+      expect(thanDeities.isQuyNhan).toBe(false);
 
       const maoDeities = calculateAuxiliaryDeities('Mậu', 'Dần', 'Mão');
       expect(maoDeities.isLoc).toBe(false);
       expect(maoDeities.isMa).toBe(false);
       expect(maoDeities.isDao).toBe(true);
       expect(maoDeities.daoLabel).toBe('Đ');
+      expect(maoDeities.isQuyNhan).toBe(false);
+
+      // Quý Nhân: Sửu và Mùi
+      const suuDeities = calculateAuxiliaryDeities('Mậu', 'Dần', 'Sửu');
+      expect(suuDeities.isQuyNhan).toBe(true);
+      expect(suuDeities.quyLabel).toBe('Q');
+
+      const muiDeities = calculateAuxiliaryDeities('Mậu', 'Dần', 'Mùi');
+      expect(muiDeities.isQuyNhan).toBe(true);
+      expect(muiDeities.quyLabel).toBe('Q');
+    });
+
+    it('tính chính xác Quý Nhân cho các Can khác', () => {
+      // Canh -> Sửu, Mùi
+      expect(calculateAuxiliaryDeities('Canh', 'Tý', 'Sửu').quyLabel).toBe('Q');
+      // Ất -> Tý, Thân
+      expect(calculateAuxiliaryDeities('Ất', 'Tỵ', 'Tý').quyLabel).toBe('Q');
+      expect(calculateAuxiliaryDeities('Ất', 'Tỵ', 'Thân').quyLabel).toBe('Q');
+      // Bính -> Hợi, Dậu
+      expect(calculateAuxiliaryDeities('Bính', 'Thìn', 'Hợi').quyLabel).toBe('Q');
+      expect(calculateAuxiliaryDeities('Bính', 'Thìn', 'Dậu').quyLabel).toBe('Q');
+      // Tân -> Ngọ, Dần
+      expect(calculateAuxiliaryDeities('Tân', 'Mão', 'Ngọ').quyLabel).toBe('Q');
+      // Nhâm -> Tỵ, Mão
+      expect(calculateAuxiliaryDeities('Nhâm', 'Tuất', 'Mão').quyLabel).toBe('Q');
     });
   });
 
@@ -99,7 +127,7 @@ describe('Auxiliary Analysis Engine (Phục Thần, Trường Sinh & Thần Sát
       expect(lineData.monthLifeStage.shortName).toBe('Suy');
       expect(lineData.deities.isMa).toBe(true);
       expect(lineData.deities.maLabel).toBe('M');
-      expect(lineData.isVoid).toBe(true);
+      expect(lineData.deities.quyLabel).toBe('-');
     });
   });
 });

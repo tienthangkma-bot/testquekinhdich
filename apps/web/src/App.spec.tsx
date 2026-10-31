@@ -155,4 +155,24 @@ describe('App Integration - Database Auto-Save & History Flow', () => {
       expect(screen.getByText(/Quản Lý Nguồn Tri Thức Kinh Điển/i)).toBeInTheDocument();
     });
   });
+  it('loại bỏ dòng subtitle cũ và có nút Cài đặt ở góc trên bên phải header', async () => {
+    render(<App />);
+
+    // Kiểm tra dòng phụ cũ đã bị loại bỏ hoàn toàn
+    expect(
+      screen.queryByText(/Ứng dụng Kinh Dịch Lục Hào & Mai Hoa Dịch Số Toàn Diện • Chuẩn Cổ Pháp • Offline-First/i)
+    ).not.toBeInTheDocument();
+
+    // Kiểm tra nút cài đặt ở header
+    const headerSettingsBtn = screen.getByTestId('header-settings-btn');
+    expect(headerSettingsBtn).toBeInTheDocument();
+
+    // Bấm nút cài đặt
+    fireEvent.click(headerSettingsBtn);
+
+    // Màn hình cài đặt hiển thị
+    await waitFor(() => {
+      expect(screen.getByText(/Cài Đặt & Cấu Hình/i)).toBeInTheDocument();
+    });
+  });
 });
