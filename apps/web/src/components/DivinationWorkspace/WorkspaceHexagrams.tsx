@@ -44,30 +44,7 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
     }
   };
 
-  // Quản lý trạng thái diễn họa biến quẻ (Morph Animation)
-  const [isMorphing, setIsMorphing] = useState<boolean>(false);
-  const [morphStep, setMorphStep] = useState<'idle' | 'ignite' | 'flip' | 'done'>('idle');
 
-  const startMorphAnimation = () => {
-    if (isMorphing) {
-      setIsMorphing(false);
-      setMorphStep('idle');
-      return;
-    }
-    setIsMorphing(true);
-    setMorphStep('ignite');
-
-    setTimeout(() => {
-      setMorphStep('flip');
-      setTimeout(() => {
-        setMorphStep('done');
-        setTimeout(() => {
-          setIsMorphing(false);
-          setMorphStep('idle');
-        }, 3000);
-      }, 1200);
-    }, 1000);
-  };
 
   // Lấy Cung Bát Cung của từng quẻ
   const primaryPalace = getPalaceInfoByHexagramNumber(primary.number);
@@ -100,9 +77,6 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
             (options?.isPrimary && isMoving) || (options?.isTransformed && isMoving);
           const isSelected = activeSelectedLine === pos;
 
-          // Hiệu ứng biến hình động
-          const isMorphingLine = isMorphing && isMoving;
-          const morphClass = isMorphingLine ? `hex-line--morph-${morphStep}` : '';
 
           return (
             <div
@@ -116,7 +90,7 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
                   handleLineClick(pos);
                 }
               }}
-              className={`hex-line-row ${isHighlight ? 'hex-line-row--moving' : ''} ${isSelected ? 'hex-line-row--selected' : ''} ${morphClass}`}
+              className={`hex-line-row ${isHighlight ? 'hex-line-row--moving' : ''} ${isSelected ? 'hex-line-row--selected' : ''}`}
               title={`${LINE_POSITION_NAMES[pos]}: ${isYang ? 'Dương hào (——)' : 'Âm hào (— —)'}${isMoving ? ' [HÀO ĐỘNG ⭕]' : ''} • Bấm để xem chi tiết`}
             >
               {isYang ? (
@@ -151,22 +125,6 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
 
   return (
     <div className="workspace-hexagrams-section">
-      {/* Thanh công cụ phụ trợ trải nghiệm quẻ động */}
-      {transformed && movingLineIndices.length > 0 && (
-        <div className="hex-interactive-toolbar no-print">
-          <button
-            type="button"
-            className={`hex-morph-btn ${isMorphing ? 'active' : ''}`}
-            onClick={startMorphAnimation}
-            title="Kích hoạt hiệu ứng biến dịch trực quan từ Quẻ Chủ sang Quẻ Biến"
-          >
-            <span>{isMorphing ? '⏸ Đang diễn họa...' : '⚡ Diễn Họa Biến Quẻ (Chủ ➔ Biến)'}</span>
-          </button>
-          <span className="hex-morph-hint">
-            💡 Mẹo: Bấm vào từng hào bất kỳ để xem phân tích chi tiết biến hóa
-          </span>
-        </div>
-      )}
 
       <div className="workspace-hexagrams-grid">
         {/* Cột 1: QUẺ CHỦ */}
