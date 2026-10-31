@@ -12,6 +12,7 @@ import { CastingMethod } from '@kindich/domain';
 import { theme } from '../theme/colors';
 import { Header } from '../components/Header';
 import { MobileDivinationRecord, QuestionCategory } from '../types/navigation';
+import { normalizeVietnamese } from '../database';
 
 export interface HistoryScreenProps {
   history: MobileDivinationRecord[];
@@ -41,21 +42,22 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
 
-  // Lọc lịch sử theo từ khóa tìm kiếm và danh mục
+  // Lọc lịch sử theo từ khóa tìm kiếm và danh mục (hỗ trợ tiếng Việt không dấu)
   const filteredHistory = useMemo(() => {
     return history.filter((item) => {
       // Lọc theo danh mục
       if (selectedCategory !== 'ALL' && item.category !== selectedCategory) {
         return false;
       }
-      // Lọc theo từ khóa
+      // Lọc theo từ khóa tiếng Việt không dấu
       if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchQuestion = item.question?.toLowerCase().includes(q);
-        const matchPrimary = item.trio.primary.name.toLowerCase().includes(q);
-        const matchTrans = item.trio.transformed.name.toLowerCase().includes(q);
+        const q = normalizeVietnamese(searchQuery);
+        const matchQuestion = normalizeVietnamese(item.question ?? '').includes(q);
+        const matchPrimary = normalizeVietnamese(item.trio.primary.name).includes(q);
+        const matchTrans = normalizeVietnamese(item.trio.transformed.name).includes(q);
+        const matchPrimarySino = normalizeVietnamese(item.trio.primary.sinoVietnameseName ?? '').includes(q);
         const matchSerial = item.serialNumber?.includes(q);
-        return matchQuestion || matchPrimary || matchTrans || matchSerial;
+        return matchQuestion || matchPrimary || matchTrans || matchPrimarySino || matchSerial;
       }
       return true;
     });

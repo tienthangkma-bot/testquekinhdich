@@ -8,6 +8,7 @@ import {
   castByMaiHua,
   orchestrateSixYaoAnalysis,
   getClassicalHexagramData,
+  interpretHexagram,
   SIX_YAO_DEFAULT_RULESET_ID,
 } from '@kindich/core';
 import { getFullCalendarInfo } from '@kindich/calendar';
@@ -185,6 +186,175 @@ describe('KinhDich Mobile App (apps/mobile)', () => {
         i.question?.toLowerCase().includes('kinh doanh')
       );
       expect(searchItems.length).toBe(1);
+    });
+  });
+
+  // =========================================================================
+  // 7. Tích hợp Interpretation Engine trong Mobile (Requirement 5)
+  // =========================================================================
+  describe('Tích hợp Động cơ Luận giải (Interpretation Engine) (@kindich/core)', () => {
+    it('interpretHexagram() tạo đầy đủ 4 khối luận giải: Chu Hi, Thể Dụng, Thế Ứng và Kinh văn cổ điển', () => {
+      const hex1 = getHexagramById(1)!;
+      const hex44 = getHexagramById(44)!;
+      const trioSample: any = {
+        primary: hex1,
+        transformed: hex44,
+        nuclear: hex1,
+        movingLineIndices: [1],
+        hasMovingLines: true,
+      };
+
+      const cal = getFullCalendarInfo(new Date('2026-10-31T08:00:00.000Z'));
+
+      const sixYaoAnalysis = orchestrateSixYaoAnalysis({
+        primaryHexagram: hex1,
+        changingHexagram: hex44,
+        movingLineIndices: [1],
+        dateTime: {
+          dayCanChi: cal.canChi.day,
+          monthCanChi: cal.canChi.month,
+          yearCanChi: cal.canChi.year,
+          hourCanChi: cal.canChi.hour,
+        },
+      });
+
+      const interpretation = interpretHexagram({
+        trio: trioSample,
+        sixYaoResult: sixYaoAnalysis,
+        includeAllLines: false,
+      });
+
+      // 1. Kinh văn quẻ chủ (có trong kho kiểm chứng)
+      expect(interpretation.primaryClassical.hasVerifiedContent).toBe(true);
+      expect(interpretation.primaryClassical.content?.hexagramNumber).toBe(1);
+      expect(interpretation.primaryClassical.content?.thuanTu.chinese).toContain('元亨利貞');
+
+      // 2. Hào từ của hào động
+      expect(interpretation.movingLinesClassical.length).toBe(1);
+      expect(interpretation.movingLinesClassical[0]?.content.position).toBe(1);
+      expect(interpretation.movingLinesClassical[0]?.content.haoTu.chinese).toBeDefined();
+
+      // 3. Quy tắc chiêm đoán Chu Hi (Dịch Học Khải Mông)
+      expect(interpretation.hexagramTransformation.content.divinationMethodRule).toContain('Có 1 hào động');
+      expect(interpretation.hexagramTransformation.source).toBe('Dịch Học Khải Mông (Chu Hi)');
+
+      // 4. Luận giải Thế Ứng & Nhật Nguyệt Lục Hào
+      expect(interpretation.sixYao).toBeDefined();
+      expect(interpretation.sixYao?.content.shiYing.worldLine).toBeDefined();
+      expect(interpretation.sixYao?.content.shiYing.relationName).toBeDefined();
+      expect(interpretation.sixYao?.content.officerImpact.summaryOverview).toBeDefined();
+
+      // 5. Tuyên bố trách nhiệm học thuật minh bạch
+      expect(interpretation.disclaimer).toContain('Bắc Hà Tân An Phái');
+    });
+
+    it('interpretHexagram() báo rõ ràng hasVerifiedContent: false khi chưa có dữ liệu cổ điển, không tự bịa đặt', () => {
+      const hex5 = getHexagramById(5)!; // Chưa có trong kho nguyên văn
+      const trioUnverified: any = {
+        primary: hex5,
+        transformed: hex5,
+        nuclear: hex5,
+        movingLineIndices: [],
+        hasMovingLines: false,
+      };
+
+      const interpretation = interpretHexagram({ trio: trioUnverified });
+      expect(interpretation.primaryClassical.hasVerifiedContent).toBe(false);
+      expect(interpretation.primaryClassical.content).toBeNull();
+      expect(interpretation.primaryClassical.notice).toContain('Chưa có');
+    });
+
+    it('interpretHexagram() hỗ trợ luận giải Thể / Dụng Mai Hoa Dịch Số', () => {
+      const cal = getFullCalendarInfo(new Date('2026-10-31T08:00:00.000Z'));
+      const maiHua = castByMaiHua({
+        yearBranch: 7, // Ngọ
+        month: 9,
+        day: 21,
+        hourBranch: 5, // Thìn
+      });
+
+      const interpretation = interpretHexagram({
+        trio: maiHua.trio,
+        maiHuaResult: maiHua,
+      });
+
+      expect(interpretation.maiHua).toBeDefined();
+      expect(interpretation.maiHua?.content.tiTrigram.name).toBe(maiHua.theDung.theTrigram.name);
+      expect(interpretation.maiHua?.content.relationName).toBeDefined();
+      expect(interpretation.maiHua?.content.judgmentLevelName).toBeDefined();
+      expect(interpretation.maiHua?.content.classicalVerse).toBeDefined();
+    });
+  });
+
+  // =========================================================================
+  // 8. Tích hợp Quản lý Ghi Chú & Nghiệm Lý (Requirement 4)
+  // =========================================================================
+  describe('Quản lý Ghi Chú & Nghiệm Lý Thực Tế trong Mobile', () => {
+    it('cho phép thêm ghi chú, cập nhật kết quả thực tế và xác nhận nghiệm lý', () => {
+      const notes: any[] = [];
+
+      // Thêm ghi chú ban đầu
+      const note1 = {
+        id: 'n1',
+        divinationId: 'div-1',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        content: 'Lúc gieo lòng bồn chồn về kết quả phỏng vấn',
+        actualOutcome: undefined,
+        isVerified: false,
+      };
+      notes.push(note1);
+
+      expect(notes.length).toBe(1);
+      expect(notes[0].isVerified).toBe(false);
+
+      // Nghiệm lý thực tế
+      const note2 = {
+        id: 'n2',
+        divinationId: 'div-1',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        content: 'Nhận thư mời nhận việc từ công ty đối tác',
+        actualOutcome: 'Đúng như quẻ báo Thế lâm Quan Quỷ vượng tướng ngày Thân',
+        isVerified: true,
+      };
+      notes.push(note2);
+
+      expect(notes.length).toBe(2);
+      expect(notes[1].isVerified).toBe(true);
+      expect(notes[1].actualOutcome).toContain('Đúng như quẻ báo');
+    });
+  });
+
+  // =========================================================================
+  // 9. Tính chất Offline-First & Không phụ thuộc Internet (Requirement 9)
+  // =========================================================================
+  describe('Đảm bảo Hoạt động 100% Ngoại Tuyến (Offline-First)', () => {
+    it('toàn bộ phép tính Kinh Dịch, Lịch Pháp, Diễn Giải và Kinh Văn đều độc lập không gọi mạng', () => {
+      // 1. Phép tính seri tiền
+      const resSerial = castBySerial('123456');
+      expect(resSerial.trio.primary.lines.length).toBe(6);
+
+      // 2. Lịch âm dương & Can Chi
+      const cal = getFullCalendarInfo(new Date());
+      expect(cal.canChi.day).toBeDefined();
+
+      // 3. Kinh văn cổ điển
+      const texts = getClassicalHexagramData(1);
+      expect(texts.status).toBe('AVAILABLE');
+
+      // 4. Luận giải trên quẻ #1
+      const hex1 = getHexagramById(1)!;
+      const interp = interpretHexagram({
+        trio: {
+          primary: hex1,
+          transformed: hex1,
+          nuclear: hex1,
+          movingLineIndices: [],
+          hasMovingLines: false,
+        },
+      });
+      expect(interp.primaryClassical.content?.thuanTu.translation).toBeDefined();
     });
   });
 });

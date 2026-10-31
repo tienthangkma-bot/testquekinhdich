@@ -1,16 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  Linking,
   TouchableOpacity,
 } from 'react-native';
 import { theme } from '../theme/colors';
 import { Header } from '../components/Header';
+import { BackupRestoreModal } from '../components/BackupRestoreModal';
+import { ISqliteDatabase } from '../database';
 
-export const SettingsScreen: React.FC = () => {
+export interface SettingsScreenProps {
+  db?: ISqliteDatabase | null;
+  onRestoreSuccess?: () => void;
+}
+
+export const SettingsScreen: React.FC<SettingsScreenProps> = ({
+  db = null,
+  onRestoreSuccess = () => {},
+}) => {
+  const [showBackupModal, setShowBackupModal] = useState<boolean>(false);
+
   return (
     <View style={styles.container}>
       <Header
@@ -22,6 +33,25 @@ export const SettingsScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* Card Quản lý Dữ liệu & Sao lưu Offline */}
+        <View style={[styles.card, styles.highlightCard]}>
+          <Text style={[styles.cardHeader, { color: theme.colors.primary }]}>
+            QUẢN LÝ DỮ LIỆU & SAO LƯU OFFLINE
+          </Text>
+          <Text style={styles.sourceDesc}>
+            Dữ liệu của bạn được lưu trữ an toàn trong SQLite cục bộ trên thiết bị. Bạn có thể xuất file
+            sao lưu JSON hoặc nhập lại dữ liệu để khôi phục hoàn toàn ngoại tuyến.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.backupActionBtn}
+            onPress={() => setShowBackupModal(true)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.backupActionBtnText}>📦 Mở Trung Tâm Sao Lưu & Phục Hồi</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Card Phiên Bản Hệ Thống */}
         <View style={styles.card}>
           <Text style={styles.cardHeader}>THÔNG TIN PHIÊN BẢN HỆ THỐNG</Text>
@@ -33,6 +63,10 @@ export const SettingsScreen: React.FC = () => {
           <View style={styles.row}>
             <Text style={styles.label}>Nền Tảng Công Nghệ:</Text>
             <Text style={styles.value}>React Native + Expo SDK 52</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Cơ Sở Dữ Liệu:</Text>
+            <Text style={styles.value}>SQLite (Expo SQLite / better-sqlite3)</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Bộ Quy Tắc (RuleSet):</Text>
@@ -108,6 +142,14 @@ export const SettingsScreen: React.FC = () => {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Modal Sao lưu & Phục hồi */}
+      <BackupRestoreModal
+        visible={showBackupModal}
+        db={db}
+        onClose={() => setShowBackupModal(false)}
+        onRestoreSuccess={onRestoreSuccess}
+      />
     </View>
   );
 };
@@ -134,6 +176,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 2,
   },
+  highlightCard: {
+    borderColor: theme.colors.borderGold,
+    backgroundColor: '#FFFDF9',
+  },
   cardHeader: {
     fontSize: 12,
     fontWeight: '700',
@@ -143,6 +189,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
     paddingBottom: 6,
+  },
+  backupActionBtn: {
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  backupActionBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   row: {
     flexDirection: 'row',
@@ -160,22 +218,22 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   sourceItem: {
-    marginBottom: 10,
+    marginBottom: 12,
   },
   sourceTitle: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
     color: theme.colors.text,
     marginBottom: 2,
   },
   sourceDesc: {
-    fontSize: 11,
+    fontSize: 12,
     color: theme.colors.textSecondary,
-    lineHeight: 16,
+    lineHeight: 17,
   },
   creedCard: {
-    borderColor: theme.colors.crimson[300],
-    backgroundColor: '#FFFDFD',
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.primary,
   },
   creedText: {
     fontSize: 12,
@@ -187,9 +245,9 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
   },
   guideStep: {
-    fontSize: 11,
+    fontSize: 12,
     color: theme.colors.textSecondary,
-    lineHeight: 18,
     marginBottom: 6,
+    lineHeight: 17,
   },
 });

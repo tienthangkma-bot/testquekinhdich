@@ -13,8 +13,8 @@ import {
   SIX_YAO_ORCHESTRATOR_VERSION,
 } from '@kindich/core';
 import { getFullCalendarInfo } from '@kindich/calendar';
+import { createBetterSqliteDriver } from '../sqlite-test.driver';
 import {
-  createBetterSqliteDriver,
   ISqliteDatabase,
   SqliteDivinationRepository,
   runMigrations,
@@ -22,6 +22,10 @@ import {
   getAppliedMigrationVersions,
   LATEST_DATABASE_VERSION,
   normalizeVietnamese,
+  exportSqliteBackup,
+  validateSqliteBackupData,
+  checkSqliteImportConflicts,
+  importSqliteBackup,
 } from '../index';
 
 describe('SQLite Database Layer & Repository Adapter (@apps/mobile)', () => {
@@ -476,6 +480,112 @@ describe('SQLite Database Layer & Repository Adapter (@apps/mobile)', () => {
       // Tìm tag "thi-cu"
       const resTag = await repository.search('thi-cu');
       expect(resTag.totalCount).toBe(1);
+    });
+  });
+
+  // =========================================================================
+  // 6. SQLite Backup & Restore Services (Local Offline)
+  // =========================================================================
+  describe('SQLite Backup & Restore Services', () => {
+    it('exportSqliteBackup() xuất dữ liệu chuẩn format KINDICH_BACKUP kèm metadata đầy đủ', async () => {
+      await repository.initialize();
+      const backup = await exportSqliteBackup(db);
+
+      expect(backup.format).toBe('KINDICH_BACKUP');
+      expect(backup.version).toBe(1);
+      expect(backup.metadata.schemaVersion).toBe(LATEST_DATABASE_VERSION);
+      expect(backup.metadata.exportedAt).toBeDefined();
+      expect(backup.data.divinations).toBeDefined();
+      expect(backup.data.divination_results).toBeDefined();
+      expect(backup.data.divination_analyses).toBeDefined();
+      expect(backup.data.divination_notes).toBeDefined();
+    });
+
+    it('validateSqliteBackupData() kiểm tra tính hợp lệ và phát hiện file không đúng định dạng', () => {
+      // Dữ liệu rỗng
+      const invalidNull = validateSqliteBackupData(null);
+      expect(invalidNull.isValid).toBe(false);
+
+      // Sai format
+      const invalidFormat = validateSqliteBackupData({ format: 'WRONG_FORMAT' });
+      expect(invalidFormat.isValid).toBe(false);
+      expect(invalidFormat.errors[0]).toContain('WRONG_FORMAT');
+
+      // Dữ liệu chuẩn
+      const validBackup = {
+        format: 'KINDICH_BACKUP',
+        version: 1,
+        metadata: {
+          exportedAt: new Date().toISOString(),
+          appVersion: '0.1.0',
+          schemaVersion: 2,
+          ruleSetId: 'SIX-YAO-STANDARD-V1',
+          algorithmVersion: 'SERIAL-MOD8-V1',
+          totalDivinations: 1,
+          totalNotes: 0,
+        },
+        data: {
+          divinations: [],
+          divination_results: [],
+          divination_analyses: [],
+          divination_notes: [],
+        },
+      };
+      const validRes = validateSqliteBackupData(validBackup);
+      expect(validRes.isValid).toBe(true);
+      expect(validRes.summary?.schemaVersion).toBe(2);
+    });
+
+    it('checkSqliteImportConflicts() và importSqliteBackup() khôi phục dữ liệu chính xác', async () => {
+      // Tạo 1 bản ghi trong db nguồn
+      const serialRes = castBySerial('654321');
+      const created = await repository.create({
+        method: CastingMethod.SERIAL,
+        algorithmVersion: 'SERIAL-MOD8-V1',
+        ruleSetId: SIX_YAO_DEFAULT_RULESET_ID,
+        input: { method: CastingMethod.SERIAL, serialNumber: '654321' },
+        dateTimeInfo: {
+          solarDateTime: '2026-10-31T08:00:00.000Z',
+          lunarYear: 2026,
+          lunarMonth: 9,
+          lunarDay: 21,
+          lunarHourBranch: 'Thìn',
+          yearCanChi: 'Bính Ngọ',
+          monthCanChi: 'Mậu Tuất',
+          dayCanChi: 'Canh Tý',
+          hourCanChi: 'Canh Thìn',
+        },
+        trio: serialRes.trio,
+        question: 'Sao lưu phục hồi hoạt động tốt không?',
+        initialNote: 'Ghi chú thử nghiệm backup',
+      });
+
+      // Xuất backup
+      const backupData = await exportSqliteBackup(db);
+      expect(backupData.metadata.totalDivinations).toBeGreaterThanOrEqual(1);
+
+      // Tạo một DB mới hoàn toàn (in-memory)
+      const targetRaw = new Database(':memory:');
+      const targetDb = createBetterSqliteDriver(targetRaw);
+      await runMigrations(targetDb);
+
+      // Kiểm tra xung đột trước khi nhập vào DB mới (kết quả mong đợi: 0 trùng)
+      const conflicts = await checkSqliteImportConflicts(targetDb, backupData);
+      expect(conflicts.hasConflicts).toBe(false);
+      expect(conflicts.newDivinationsCount).toBe(backupData.data.divinations.length);
+
+      // Thực hiện import
+      const summary = await importSqliteBackup(targetDb, backupData, { mode: 'overwrite' });
+      expect(summary.importedDivinations).toBe(backupData.data.divinations.length);
+
+      // Kiểm tra DB đích
+      const targetRepo = new SqliteDivinationRepository(targetDb);
+      const restored = await targetRepo.getById(created.divination.id);
+      expect(restored).not.toBeNull();
+      expect(restored?.divination.question).toBe('Sao lưu phục hồi hoạt động tốt không?');
+      expect(restored?.notes[0]?.content).toBe('Ghi chú thử nghiệm backup');
+
+      targetRaw.close();
     });
   });
 });

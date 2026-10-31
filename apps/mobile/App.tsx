@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -18,13 +18,58 @@ import { HexagramResultScreen } from './src/screens/HexagramResultScreen';
 import { HistoryScreen } from './src/screens/HistoryScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { BottomTabBar } from './src/components/BottomTabBar';
-import { openMobileSqliteDatabase, SqliteDivinationRepository } from './src/database';
+import { openMobileSqliteDatabase, SqliteDivinationRepository, ISqliteDatabase } from './src/database';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('home');
   const [activeRecord, setActiveRecord] = useState<MobileDivinationRecord | null>(null);
   const [history, setHistory] = useState<MobileDivinationRecord[]>([]);
+  const [dbInstance, setDbInstance] = useState<ISqliteDatabase | null>(null);
   const repoRef = useRef<SqliteDivinationRepository | null>(null);
+
+  // Tải danh sách lịch sử từ SQLite
+  const loadHistoryFromDb = useCallback(async (repo: SqliteDivinationRepository) => {
+    try {
+      const result = await repo.list(undefined, { page: 1, pageSize: 50 });
+      if (result.items.length > 0) {
+        const loadedRecords: MobileDivinationRecord[] = [];
+        for (const item of result.items) {
+          const detail = await repo.getById(item.id);
+          if (detail) {
+            const movingLines = (detail.result?.movingLines ??
+              detail.resultSnapshot?.trio.movingLineIndices ??
+              []) as readonly LinePosition[];
+
+            loadedRecords.push({
+              id: detail.divination.id,
+              method: detail.divination.method,
+              createdAt: detail.divination.createdAt,
+              question: detail.divination.question,
+              category: detail.divination.inquiryType as QuestionCategory,
+              trio: detail.result?.trio ?? detail.resultSnapshot?.trio!,
+              movingLines,
+              sixYaoAnalysis: detail.analysis?.details as any,
+              dateTimeInfo: {
+                solarDateStr: new Date(detail.divination.dateTimeInfo.solarDateTime).toLocaleDateString('vi-VN'),
+                lunarDateStr: `Ngày ${detail.divination.dateTimeInfo.lunarDay} tháng ${detail.divination.dateTimeInfo.lunarMonth}`,
+                yearCanChi: detail.divination.dateTimeInfo.yearCanChi,
+                monthCanChi: detail.divination.dateTimeInfo.monthCanChi,
+                dayCanChi: detail.divination.dateTimeInfo.dayCanChi,
+                hourCanChi: detail.divination.dateTimeInfo.hourCanChi,
+              },
+              serialNumber: (detail.divination.input as any)?.serialNumber,
+              notes: detail.notes ? [...detail.notes] : [],
+            });
+          }
+        }
+        setHistory(loadedRecords);
+      } else {
+        setHistory([]);
+      }
+    } catch (err) {
+      console.warn('Lỗi tải lịch sử:', err);
+    }
+  }, []);
 
   // Khởi tạo SQLite Repository khi ứng dụng khởi chạy
   useEffect(() => {
@@ -34,43 +79,10 @@ export default function App() {
         const db = await openMobileSqliteDatabase('kindich_mobile.db');
         const repo = new SqliteDivinationRepository(db);
         await repo.initialize();
-        repoRef.current = repo;
-
-        // Tải lịch sử đã lưu trước đó từ SQLite
-        const result = await repo.list(undefined, { page: 1, pageSize: 50 });
-        if (isMounted && result.items.length > 0) {
-          const loadedRecords: MobileDivinationRecord[] = [];
-          for (const item of result.items) {
-            const detail = await repo.getById(item.id);
-            if (detail) {
-              const movingLines = (detail.result?.movingLines ??
-                detail.resultSnapshot?.trio.movingLineIndices ??
-                []) as readonly LinePosition[];
-
-              loadedRecords.push({
-                id: detail.divination.id,
-                method: detail.divination.method,
-                createdAt: detail.divination.createdAt,
-                question: detail.divination.question,
-                category: detail.divination.inquiryType as QuestionCategory,
-                trio: detail.result?.trio ?? detail.resultSnapshot?.trio!,
-                movingLines,
-                sixYaoAnalysis: detail.analysis?.details as any,
-                dateTimeInfo: {
-                  solarDateStr: new Date(detail.divination.dateTimeInfo.solarDateTime).toLocaleDateString('vi-VN'),
-                  lunarDateStr: `Ngày ${detail.divination.dateTimeInfo.lunarDay} tháng ${detail.divination.dateTimeInfo.lunarMonth}`,
-                  yearCanChi: detail.divination.dateTimeInfo.yearCanChi,
-                  monthCanChi: detail.divination.dateTimeInfo.monthCanChi,
-                  dayCanChi: detail.divination.dateTimeInfo.dayCanChi,
-                  hourCanChi: detail.divination.dateTimeInfo.hourCanChi,
-                },
-                serialNumber: (detail.divination.input as any)?.serialNumber,
-              });
-            }
-          }
-          if (isMounted) {
-            setHistory(loadedRecords);
-          }
+        if (isMounted) {
+          repoRef.current = repo;
+          setDbInstance(db);
+          await loadHistoryFromDb(repo);
         }
       } catch (err) {
         console.warn('Lỗi khởi tạo SQLite Repository:', err);
@@ -80,7 +92,7 @@ export default function App() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [loadHistoryFromDb]);
 
   // Khi lập quẻ thành công (Seri tiền hoặc Mai Hoa) -> tự động lưu vào SQLite
   const handleCastSuccess = async (record: MobileDivinationRecord) => {
@@ -139,6 +151,18 @@ export default function App() {
         });
       } catch (err) {
         console.warn('Lỗi lưu quẻ vào SQLite:', err);
+      }
+    }
+  };
+
+  // Thêm ghi chú cho một quẻ
+  const handleAddNote = async (divinationId: string, content: string, actualOutcome?: string) => {
+    if (repoRef.current) {
+      try {
+        await repoRef.current.addNote(divinationId, content, actualOutcome);
+        await loadHistoryFromDb(repoRef.current);
+      } catch (err) {
+        console.warn('Lỗi thêm ghi chú trong SQLite:', err);
       }
     }
   };
@@ -210,6 +234,7 @@ export default function App() {
               record={activeRecord}
               onBack={() => setCurrentScreen('home')}
               onNewCast={() => setCurrentScreen('serial')}
+              onAddNote={handleAddNote}
             />
           )}
 
@@ -223,7 +248,16 @@ export default function App() {
             />
           )}
 
-          {currentScreen === 'settings' && <SettingsScreen />}
+          {currentScreen === 'settings' && (
+            <SettingsScreen
+              db={dbInstance}
+              onRestoreSuccess={() => {
+                if (repoRef.current) {
+                  loadHistoryFromDb(repoRef.current);
+                }
+              }}
+            />
+          )}
 
           {/* Thanh điều hướng dưới đáy */}
           <BottomTabBar

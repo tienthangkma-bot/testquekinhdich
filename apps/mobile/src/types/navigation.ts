@@ -2,6 +2,7 @@ import {
   CastingMethod,
   HexagramTrio,
   LinePosition,
+  DivinationNoteEntity,
 } from '@kindich/domain';
 import { SixYaoAnalysisResult } from '@kindich/core';
 
@@ -47,6 +48,7 @@ export interface MobileDivinationRecord {
     hourCanChi: string;
   };
   serialNumber?: string;
+  notes?: readonly DivinationNoteEntity[];
 }
 
 export interface NavigationState {

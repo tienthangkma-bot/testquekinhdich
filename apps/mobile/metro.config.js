@@ -15,7 +15,4 @@ config.resolver.nodeModulesPaths = [
   path.resolve(monorepoRoot, 'node_modules'),
 ];
 
-// 3. Tắt tìm kiếm phân cấp để phù hợp với cơ chế symlinks của pnpm
-config.resolver.disableHierarchicalLookup = true;
-
 module.exports = config;

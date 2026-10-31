@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@babel/runtime": "^8.0.10",
     "@expo/metro-config": "~0.19.11",
     "@types/better-sqlite3": "^9.6.0",
     "@types/react": "~18.3.12",
