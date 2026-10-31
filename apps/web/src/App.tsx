@@ -20,6 +20,7 @@ import { MaiHuaCastingForm, MaiHuaCastingResultView } from './components/MaiHuaC
 import { SixYaoAnalysisView } from './components/SixYaoAnalysis';
 import { DivinationHistoryView } from './components/DivinationHistory';
 import { QuestionCategorySelector, QuestionCategory } from './components/NotesAndQuestions';
+import { PwaHeaderActions } from './pwa';
 import './App.css';
 
 type CastingMode = 'serial' | 'time' | 'six-yao' | 'history';
@@ -197,6 +198,9 @@ export const App: React.FC = () => {
         <p className="brand-subtitle">
           Ứng dụng Kinh Dịch Lục Hào & Mai Hoa Dịch Số Toàn Diện • Chuẩn Cổ Pháp • Offline-First
         </p>
+
+        {/* Tiện ích PWA: Trạng thái kết nối mạng & Hướng dẫn cài đặt (Requirements 5 & 6) */}
+        <PwaHeaderActions />
       </header>
 
       {/* Mode Switcher */}

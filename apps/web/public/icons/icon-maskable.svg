@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="goldGradMask" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F3E5AB"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#AA7C11"/>
+    </linearGradient>
+    <radialGradient id="crimsonBgMask" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#9E1B1B"/>
+      <stop offset="70%" stop-color="#8B0000"/>
+      <stop offset="100%" stop-color="#5A0000"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Full Bleed Background for Safe Zone -->
+  <rect width="512" height="512" fill="url(#crimsonBgMask)"/>
+
+  <!-- Inner Safe Zone Content (Fits within 400x400 safe area) -->
+  <circle cx="256" cy="256" r="160" fill="none" stroke="url(#goldGradMask)" stroke-width="8"/>
+  <circle cx="256" cy="256" r="148" fill="#121212"/>
+
+  <!-- Taiji Symbol inside Safe Zone -->
+  <path d="M 256 108 A 148 148 0 0 1 256 404 A 74 74 0 0 1 256 256 A 74 74 0 0 0 256 108 Z" fill="#F8F8F8"/>
+
+  <!-- Yin eye -->
+  <circle cx="256" cy="182" r="22" fill="#1A1A1A"/>
+  <!-- Yang eye -->
+  <circle cx="256" cy="330" r="22" fill="#F8F8F8"/>
+</svg>
