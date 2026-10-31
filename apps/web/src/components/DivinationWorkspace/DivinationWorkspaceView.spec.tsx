@@ -155,9 +155,14 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
     const tkTags = container.querySelectorAll('.tag-tk');
     expect(tkTags.length).toBeGreaterThanOrEqual(1);
 
-    // Kiểm tra Thế (màu đỏ) và Ứng
+    // Kiểm tra Thế viết tắt là 'T' (màu đỏ) và Ứng viết tắt là 'Ư'
+    expect(screen.getAllByText('T').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Ư').length).toBeGreaterThanOrEqual(1);
     expect(container.querySelectorAll('.tag-the-bold').length).toBeGreaterThanOrEqual(1);
     expect(container.querySelectorAll('.tag-ung-bold').length).toBeGreaterThanOrEqual(1);
+
+    // Kiểm tra các cột Can Chi được căn lề trái
+    expect(container.querySelectorAll('.cell-canchi.cell-left').length).toBeGreaterThan(0);
 
     // Kiểm tra Lục Thú khởi theo can Mậu (Câu Trần, Đằng Xà, Chu Tước, Thanh Long...)
     expect(screen.getByText(/Đằng Xà/i)).toBeInTheDocument();
@@ -200,6 +205,10 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
 
     // Hào 3 quẻ biến (Đinh Sửu) có Thiên Ất Quý Nhân ('Q')
     expect(screen.getAllByText('Q').length).toBeGreaterThanOrEqual(1);
+
+    // Kiểm tra cột Hào viết tắt Thiên can theo bảng GABDMKCTNQ (Mậu Dần -> M.Dần, Đinh Sửu -> D.Sửu)
+    expect(screen.getAllByText('C.Tý').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('D.Sửu').length).toBeGreaterThanOrEqual(1);
   });
 
   it('Yêu cầu 6: Tách trang riêng cho Luận giải quẻ toàn diện với thanh điều hướng trực quan', () => {

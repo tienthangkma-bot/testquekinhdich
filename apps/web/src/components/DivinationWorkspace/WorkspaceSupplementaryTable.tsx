@@ -6,6 +6,32 @@ interface WorkspaceSupplementaryTableProps {
   sixYaoResult: SixYaoAnalysisResult;
 }
 
+// Bảng viết tắt 10 Thiên Can theo chuẩn GABDMKCTNQ
+const STEM_ABBR_MAP: Record<string, string> = {
+  'Giáp': 'G',
+  'Ất': 'A',
+  'Bính': 'B',
+  'Đinh': 'D',
+  'Mậu': 'M',
+  'Kỷ': 'K',
+  'Canh': 'C',
+  'Tân': 'T',
+  'Nhâm': 'N',
+  'Quý': 'Q',
+};
+
+function formatLineCanChiAbbr(canChi: string): string {
+  if (!canChi || canChi === '-') return '-';
+  const parts = canChi.trim().split(/\s+/);
+  if (parts.length >= 2 && parts[0] && parts[1]) {
+    const stem = parts[0];
+    const branch = parts[1];
+    const abbr = STEM_ABBR_MAP[stem] || stem;
+    return `${abbr}.${branch}`;
+  }
+  return canChi;
+}
+
 export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTableProps> = ({
   sixYaoResult,
 }) => {
@@ -82,7 +108,7 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
           <thead>
             <tr>
               {/* Vế Quẻ Chủ */}
-              <th className="th-canchi th-right">Hào</th>
+              <th className="th-canchi th-left">Hào</th>
               <th className="th-center">Q.Thần</th>
               <th className="th-center">TS.Ngày</th>
               <th className="th-center">TS.Tháng</th>
@@ -92,7 +118,7 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
               <th className="th-center col-divider-right">Đào</th>
 
               {/* Vế Quẻ Biến */}
-              <th className="th-canchi th-right col-divider-left">Hào</th>
+              <th className="th-canchi th-left col-divider-left">Hào</th>
               <th className="th-center">Q.Thần</th>
               <th className="th-center">TS.Ngày</th>
               <th className="th-center">TS.Tháng</th>
@@ -110,8 +136,8 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
               return (
                 <tr key={pRow.position} className={`workspace-supp-row ${movingClass}`}>
                   {/* Quẻ Chủ: Can Chi */}
-                  <td className={`cell-canchi cell-right ${pRow.isMoving ? 'text-red font-bold' : ''}`}>
-                    {pRow.canChi}
+                  <td className={`cell-canchi cell-left ${pRow.isMoving ? 'text-red font-bold' : ''}`} title={`Hào ${pRow.position}: ${pRow.canChi}`}>
+                    {formatLineCanChiAbbr(pRow.canChi)}
                   </td>
                   {/* Quẻ Chủ: Quái Thần */}
                   <td className="cell-center text-muted">-</td>
@@ -141,8 +167,8 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
                   </td>
 
                   {/* Quẻ Biến: Can Chi (với đường phân cách mạnh mẽ bên trái) */}
-                  <td className={`cell-canchi cell-right col-divider-left ${cRow?.isMoving ? 'text-red font-bold' : ''}`}>
-                    {cRow ? cRow.canChi : '-'}
+                  <td className={`cell-canchi cell-left col-divider-left ${cRow?.isMoving ? 'text-red font-bold' : ''}`} title={cRow ? `Hào ${cRow.position}: ${cRow.canChi}` : undefined}>
+                    {cRow ? formatLineCanChiAbbr(cRow.canChi) : '-'}
                   </td>
                   {/* Quẻ Biến: Quái Thần */}
                   <td className="cell-center text-muted">

@@ -86,18 +86,18 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
       <div className="workspace-table-scroll-container">
         <table className="workspace-master-table">
           <colgroup>
-            <col style={{ width: '7%' }} />
-            <col style={{ width: '6%' }} />
-            <col style={{ width: '13%' }} />
-            <col style={{ width: '14%' }} />
-            <col style={{ width: '6%' }} />
+            <col style={{ width: '8%' }} />
             <col style={{ width: '4%' }} />
-            <col style={{ width: '7%' }} />
-            <col style={{ width: '6%' }} />
-            <col style={{ width: '13%' }} />
-            <col style={{ width: '14%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '10%' }} />
             <col style={{ width: '4%' }} />
-            <col style={{ width: '6%' }} />
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '4%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '4%' }} />
+            <col style={{ width: '10%' }} />
           </colgroup>
           <thead>
             <tr>
@@ -105,15 +105,15 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
               <th className="th-center">Hào</th>
               <th className="th-center">T/Ứ</th>
               <th className="th-left">Lục Thân</th>
-              <th className="th-canchi th-right">Can Chi</th>
-              <th className="th-center">Phục thần</th>
+              <th className="th-canchi th-left">Can Chi</th>
+              <th className="th-center" title="Phục thần">Phục</th>
               <th className="th-center col-divider-right">TK</th>
 
               {/* Vế Quẻ Biến: Cột Hào chuyển sang bên trái (sau TK quẻ chính) */}
               <th className="th-center col-divider-left">Hào</th>
               <th className="th-center">T/Ứ</th>
               <th className="th-left">Lục Thân</th>
-              <th className="th-canchi th-right">Can Chi</th>
+              <th className="th-canchi th-left">Can Chi</th>
               <th className="th-center">TK</th>
               <th className="th-center">Lục Thú</th>
             </tr>
@@ -133,10 +133,10 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
                     )}
                   </td>
 
-                  {/* Cột 2: Thế / Ứng Quẻ Chủ */}
+                  {/* Cột 2: Thế / Ứng Quẻ Chủ (viết tắt T / Ư) */}
                   <td className="cell-world-response cell-center">
-                    {row.isWorld && <span className="tag-the-bold">Thế</span>}
-                    {row.isResponse && <span className="tag-ung-bold">Ứng</span>}
+                    {row.isWorld && <span className="tag-the-bold" title="Thế">T</span>}
+                    {row.isResponse && <span className="tag-ung-bold" title="Ứng">Ư</span>}
                   </td>
 
                   {/* Cột 3: Lục Thân Quẻ Chủ */}
@@ -145,7 +145,7 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
                   </td>
 
                   {/* Cột 4: Can Chi Quẻ Chủ */}
-                  <td className={`cell-canchi cell-right ${row.isMoving ? 'text-red font-bold' : ''}`}>
+                  <td className={`cell-canchi cell-left ${row.isMoving ? 'text-red font-bold' : ''}`}>
                     {row.canChiDisplay}
                   </td>
 
@@ -176,10 +176,10 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
                     )}
                   </td>
 
-                  {/* Cột 8: Thế / Ứng Quẻ Biến */}
+                  {/* Cột 8: Thế / Ứng Quẻ Biến (viết tắt T / Ư) */}
                   <td className="cell-world-response cell-center">
-                    {row.changingIsWorld && <span className="tag-the-bold">Thế</span>}
-                    {row.changingIsResponse && <span className="tag-ung-bold">Ứng</span>}
+                    {row.changingIsWorld && <span className="tag-the-bold" title="Thế">T</span>}
+                    {row.changingIsResponse && <span className="tag-ung-bold" title="Ứng">Ư</span>}
                   </td>
 
                   {/* Cột 9: Lục Thân Quẻ Biến */}
@@ -188,7 +188,7 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
                   </td>
 
                   {/* Cột 10: Can Chi Quẻ Biến */}
-                  <td className={`cell-canchi cell-right ${row.isMoving ? 'text-red font-bold' : ''}`}>
+                  <td className={`cell-canchi cell-left ${row.isMoving ? 'text-red font-bold' : ''}`}>
                     {row.changingCanChi || '-'}
                   </td>
 

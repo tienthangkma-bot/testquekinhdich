@@ -451,10 +451,10 @@
   background-color: #F5F5F5;
   color: #212121;
   font-weight: 700;
-  padding: 8px 6px;
+  padding: 7px 3px;
   border-bottom: 1.5px solid #BDBDBD;
   border-right: 1px solid #E0E0E0;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
 }
 
 .workspace-supp-table th {
@@ -473,9 +473,10 @@
 }
 
 .workspace-master-table td {
-  padding: 7px 6px;
+  padding: 6px 3px;
   border-bottom: 1px solid #EEEEEE;
   border-right: 1px solid #EEEEEE;
+  font-size: 0.88rem;
 }
 
 .workspace-supp-table td {
@@ -503,8 +504,9 @@
 .th-left, .cell-left { text-align: left; }
 .th-right, .cell-right { text-align: right; }
 .cell-canchi, .th-canchi {
-  text-align: right !important;
-  padding-right: 10px !important;
+  text-align: left !important;
+  padding-left: 6px !important;
+  padding-right: 4px !important;
 }
 
 .text-red { color: #C62828 !important; }
@@ -524,7 +526,7 @@
 
 .table-hex-bar {
   display: block;
-  width: 44px;
+  width: 36px;
   height: 8px;
   border-radius: 2px;
   transition: all 0.2s ease;
@@ -538,12 +540,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 44px;
+  width: 36px;
   height: 8px;
 }
 
 .table-hex-bar-yin-seg {
-  width: 19px;
+  width: 15px;
   height: 8px;
   border-radius: 2px;
   background-color: #1565C0;
