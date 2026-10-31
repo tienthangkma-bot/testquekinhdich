@@ -1,0 +1,61 @@
+@import '@kindich/shared/theme.css';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--bha-font-sans);
+  background-color: var(--bha-bg-base);
+  color: var(--bha-text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* Cho phép bôi đen chọn văn bản trong các vùng nội dung */
+p, span, h1, h2, h3, h4, h5, h6, td, th, blockquote, pre, code, input, textarea {
+  user-select: text;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--bha-font-serif);
+  color: var(--bha-crimson-700);
+}
+
+a {
+  color: var(--bha-crimson-700);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--bha-crimson-800);
+  text-decoration: underline;
+}
+
+/* Custom scrollbar cho ứng dụng Desktop */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 0, 0, 0.25);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 0, 0, 0.45);
+}
