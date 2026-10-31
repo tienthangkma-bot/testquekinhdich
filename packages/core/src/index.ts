@@ -7,3 +7,4 @@ export * from './calendar-analysis';
 export * from './yao-strength';
 export * from './six-yao';
 export * from './interpretation';
+export * from './golden/golden-dataset';
