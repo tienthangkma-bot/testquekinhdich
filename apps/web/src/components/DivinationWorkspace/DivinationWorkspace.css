@@ -151,6 +151,104 @@
 .coin-character.left { left: -16px; top: 50%; transform: translateY(-50%); }
 .coin-character.right { right: -16px; top: 50%; transform: translateY(-50%); }
 
+
+/* --------------------------------------------------------------------------
+   1.1 View Tabs (Tách trang Bảng An Quẻ & Luận Giải Quẻ Toàn Diện)
+   -------------------------------------------------------------------------- */
+
+.workspace-view-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 16px 0 20px 0;
+  padding: 6px;
+  background-color: #F5F3EF;
+  border: 1px solid #E0D8CB;
+  border-radius: 8px;
+}
+
+.workspace-view-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #554F48;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.workspace-view-tab-btn:hover {
+  background-color: #EAE5DC;
+  color: #1F1916;
+}
+
+.workspace-view-tab-btn.active {
+  background-color: #851616;
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(133, 22, 22, 0.3);
+}
+
+.workspace-tab-page--hidden {
+  display: none !important;
+}
+
+.workspace-tab-page--active {
+  display: block;
+}
+
+.workspace-switch-page-footer,
+.workspace-switch-page-header {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.btn-switch-to-interpretation,
+.btn-switch-back-to-an-que {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-switch-to-interpretation {
+  background-color: #851616;
+  color: #FFFFFF;
+  border: 1px solid #6E1212;
+  box-shadow: 0 2px 6px rgba(133, 22, 22, 0.25);
+}
+
+.btn-switch-to-interpretation:hover {
+  background-color: #9B1B1B;
+}
+
+.btn-switch-back-to-an-que {
+  background-color: #FFFFFF;
+  color: #851616;
+  border: 1.5px solid #851616;
+}
+
+.btn-switch-back-to-an-que:hover {
+  background-color: #FDF2F2;
+}
+
+.workspace-tables-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Kéo 2 bảng sát lại nhau */
+  margin-bottom: 24px;
+}
+
 /* --------------------------------------------------------------------------
    2. Hexagram Imagery (3 Quẻ)
    -------------------------------------------------------------------------- */
@@ -336,20 +434,37 @@
 .workspace-master-table,
 .workspace-supp-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
-  font-size: 0.92rem;
   white-space: nowrap;
 }
 
-.workspace-master-table th,
+.workspace-master-table {
+  font-size: 0.92rem;
+}
+
+.workspace-supp-table {
+  font-size: 0.84rem;
+}
+
+.workspace-master-table th {
+  background-color: #F5F5F5;
+  color: #212121;
+  font-weight: 700;
+  padding: 8px 6px;
+  border-bottom: 1.5px solid #BDBDBD;
+  border-right: 1px solid #E0E0E0;
+  font-size: 0.88rem;
+}
+
 .workspace-supp-table th {
   background-color: #F5F5F5;
   color: #212121;
   font-weight: 700;
-  padding: 8px 10px;
+  padding: 7px 2px;
   border-bottom: 1.5px solid #BDBDBD;
   border-right: 1px solid #E0E0E0;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
 }
 
 .workspace-master-table th:last-child,
@@ -357,9 +472,14 @@
   border-right: none;
 }
 
-.workspace-master-table td,
+.workspace-master-table td {
+  padding: 7px 6px;
+  border-bottom: 1px solid #EEEEEE;
+  border-right: 1px solid #EEEEEE;
+}
+
 .workspace-supp-table td {
-  padding: 7px 10px;
+  padding: 6px 2px;
   border-bottom: 1px solid #EEEEEE;
   border-right: 1px solid #EEEEEE;
 }
@@ -381,6 +501,11 @@
 
 .th-center, .cell-center { text-align: center; }
 .th-left, .cell-left { text-align: left; }
+.th-right, .cell-right { text-align: right; }
+.cell-canchi, .th-canchi {
+  text-align: right !important;
+  padding-right: 10px !important;
+}
 
 .text-red { color: #C62828 !important; }
 .text-blue { color: #1565C0 !important; }
@@ -899,5 +1024,16 @@
     color: #B71C1C !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+}
+
+@media print {
+  .workspace-view-tabs,
+  .workspace-switch-page-footer,
+  .workspace-switch-page-header {
+    display: none !important;
+  }
+  .workspace-tab-page--hidden {
+    display: block !important;
   }
 }

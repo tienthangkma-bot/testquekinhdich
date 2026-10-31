@@ -261,7 +261,7 @@ export const App: React.FC = () => {
           <span>☯</span>
           <span>Bắc Hà Tân An Phái</span>
         </div>
-        <h1 className="brand-title">Bắc Hà Tân An Phái</h1>
+        <h1 className="brand-title">Kinh Dịch Tân An Phái</h1>
         {/* Tiện ích PWA: Trạng thái kết nối mạng & Hướng dẫn cài đặt (Requirements 5 & 6) */}
         <PwaHeaderActions />
       </header>

@@ -133,10 +133,10 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
       />
     );
 
-    // Kiểm tra tiêu đề bảng
+    // Kiểm tra tiêu đề bảng đã được loại bỏ theo yêu cầu người dùng
     expect(
-      screen.getByText(/BẢNG LỤC HÀO TỔNG HỢP CỔ PHÁP/i)
-    ).toBeInTheDocument();
+      screen.queryByText(/BẢNG LỤC HÀO TỔNG HỢP CỔ PHÁP/i)
+    ).not.toBeInTheDocument();
 
     // Bảng phải có 6 hàng dữ liệu tương ứng 6 hào
     const rows = container.querySelectorAll('.workspace-master-row');
@@ -178,10 +178,10 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
       />
     );
 
-    // Kiểm tra tiêu đề bảng phân tích bổ sung
+    // Kiểm tra tiêu đề bảng phân tích bổ sung đã được loại bỏ theo yêu cầu người dùng
     expect(
-      screen.getByText(/BẢNG PHÂN TÍCH BỔ SUNG/i)
-    ).toBeInTheDocument();
+      screen.queryByText(/BẢNG PHÂN TÍCH BỔ SUNG/i)
+    ).not.toBeInTheDocument();
 
     // 6 hàng phân tích bổ sung
     const suppRows = container.querySelectorAll('.workspace-supp-row');
@@ -202,7 +202,7 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
     expect(screen.getAllByText('Q').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('Yêu cầu 6: Khu vực luận giải tập trung trên cùng một trang, không chia tab', () => {
+  it('Yêu cầu 6: Tách trang riêng cho Luận giải quẻ toàn diện với thanh điều hướng trực quan', () => {
     render(
       <DivinationWorkspaceView
         method={CastingMethod.SERIAL}
@@ -213,6 +213,19 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
         sixYaoResult={sampleSixYaoResult}
       />
     );
+
+    // Kiểm tra có thanh điều hướng chuyển trang
+    const tabAnQue = screen.getByTestId('tab-an-que');
+    const tabLuanGiai = screen.getByTestId('tab-luan-giai');
+    expect(tabAnQue).toBeInTheDocument();
+    expect(tabLuanGiai).toBeInTheDocument();
+
+    // Mặc định ở trang An Quẻ
+    expect(screen.getByTestId('page-an-que')).not.toHaveClass('workspace-tab-page--hidden');
+
+    // Chuyển sang trang Luận Giải Toàn Diện
+    fireEvent.click(tabLuanGiai);
+    expect(screen.getByTestId('page-luan-giai')).not.toHaveClass('workspace-tab-page--hidden');
 
     // Kiểm tra các phần luận giải chính
     expect(screen.getByText(/Tổng Quan Tượng Quẻ & Thoán Từ/i)).toBeInTheDocument();
@@ -225,6 +238,10 @@ describe('DivinationWorkspaceView Component (Single Divination Workspace)', () =
     expect(
       screen.getAllByText(/phân định rạch ròi giữa nguyên văn cổ điển/i).length
     ).toBeGreaterThan(0);
+
+    // Chuyển ngược lại trang An Quẻ
+    fireEvent.click(tabAnQue);
+    expect(screen.getByTestId('page-an-que')).not.toHaveClass('workspace-tab-page--hidden');
   });
 
   it('Hỗ trợ phương pháp Mai Hoa Dịch Số với đầy đủ thông số Thể / Dụng', () => {

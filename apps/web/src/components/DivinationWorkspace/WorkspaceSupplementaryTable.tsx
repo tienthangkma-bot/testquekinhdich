@@ -61,27 +61,45 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
     <div className="workspace-supplementary-card">
       <div className="workspace-table-scroll-container">
         <table className="workspace-supp-table">
+          <colgroup>
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '5%' }} />
+            <col style={{ width: '9%' }} />
+            <col style={{ width: '9%' }} />
+            <col style={{ width: '3.25%' }} />
+            <col style={{ width: '3.25%' }} />
+            <col style={{ width: '3.25%' }} />
+            <col style={{ width: '3.25%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '5%' }} />
+            <col style={{ width: '9%' }} />
+            <col style={{ width: '9%' }} />
+            <col style={{ width: '3.25%' }} />
+            <col style={{ width: '3.25%' }} />
+            <col style={{ width: '3.25%' }} />
+            <col style={{ width: '3.25%' }} />
+          </colgroup>
           <thead>
             <tr>
               {/* Vế Quẻ Chủ */}
-              <th className="th-left" style={{ minWidth: '95px' }}>Hào</th>
-              <th className="th-center" style={{ width: '60px' }}>Q.Thần</th>
-              <th className="th-center" style={{ minWidth: '75px' }}>TS.Ngày</th>
-              <th className="th-center" style={{ minWidth: '75px' }}>TS.Tháng</th>
-              <th className="th-center" style={{ width: '45px' }}>Lộc</th>
-              <th className="th-center" style={{ width: '45px' }}>Mã</th>
-              <th className="th-center" style={{ width: '45px' }}>Quý</th>
-              <th className="th-center col-divider-right" style={{ width: '45px' }}>Đào</th>
+              <th className="th-canchi th-right">Hào</th>
+              <th className="th-center">Q.Thần</th>
+              <th className="th-center">TS.Ngày</th>
+              <th className="th-center">TS.Tháng</th>
+              <th className="th-center">Lộc</th>
+              <th className="th-center">Mã</th>
+              <th className="th-center">Quý</th>
+              <th className="th-center col-divider-right">Đào</th>
 
               {/* Vế Quẻ Biến */}
-              <th className="th-left col-divider-left" style={{ minWidth: '95px' }}>Hào</th>
-              <th className="th-center" style={{ width: '60px' }}>Q.Thần</th>
-              <th className="th-center" style={{ minWidth: '75px' }}>TS.Ngày</th>
-              <th className="th-center" style={{ minWidth: '75px' }}>TS.Tháng</th>
-              <th className="th-center" style={{ width: '45px' }}>Lộc</th>
-              <th className="th-center" style={{ width: '45px' }}>Mã</th>
-              <th className="th-center" style={{ width: '45px' }}>Quý</th>
-              <th className="th-center" style={{ width: '45px' }}>Đào</th>
+              <th className="th-canchi th-right col-divider-left">Hào</th>
+              <th className="th-center">Q.Thần</th>
+              <th className="th-center">TS.Ngày</th>
+              <th className="th-center">TS.Tháng</th>
+              <th className="th-center">Lộc</th>
+              <th className="th-center">Mã</th>
+              <th className="th-center">Quý</th>
+              <th className="th-center">Đào</th>
             </tr>
           </thead>
           <tbody>
@@ -92,7 +110,7 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
               return (
                 <tr key={pRow.position} className={`workspace-supp-row ${movingClass}`}>
                   {/* Quẻ Chủ: Can Chi */}
-                  <td className={`cell-canchi cell-left ${pRow.isMoving ? 'text-red font-bold' : ''}`}>
+                  <td className={`cell-canchi cell-right ${pRow.isMoving ? 'text-red font-bold' : ''}`}>
                     {pRow.canChi}
                   </td>
                   {/* Quẻ Chủ: Quái Thần */}
@@ -123,7 +141,7 @@ export const WorkspaceSupplementaryTable: React.FC<WorkspaceSupplementaryTablePr
                   </td>
 
                   {/* Quẻ Biến: Can Chi (với đường phân cách mạnh mẽ bên trái) */}
-                  <td className={`cell-canchi cell-left col-divider-left ${cRow?.isMoving ? 'text-red font-bold' : ''}`}>
+                  <td className={`cell-canchi cell-right col-divider-left ${cRow?.isMoving ? 'text-red font-bold' : ''}`}>
                     {cRow ? cRow.canChi : '-'}
                   </td>
                   {/* Quẻ Biến: Quái Thần */}

@@ -4,6 +4,9 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* Đảm bảo dấu tiếng Việt sắc/huyền/hỏi/ngã/nặng neo chính xác trên đầu ký tự, không bị nhảy sang bên cạnh */
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1, "calt" 1, "kern" 1, "mark" 1, "mkmk" 1;
 }
 
 body {
@@ -13,6 +16,7 @@ body {
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,

@@ -38,4 +38,6 @@ export interface SingleDivinationWorkspaceProps {
   onSaveNote?: () => void;
   /** Đã lưu vào CSDL chưa */
   isSaved?: boolean;
+  /** Tab màn hình khởi tạo ('an-que' hoặc 'luan-giai') */
+  initialTab?: 'an-que' | 'luan-giai';
 }

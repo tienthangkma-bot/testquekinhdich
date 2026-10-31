@@ -85,23 +85,37 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
     <div className="workspace-table-card">
       <div className="workspace-table-scroll-container">
         <table className="workspace-master-table">
+          <colgroup>
+            <col style={{ width: '7%' }} />
+            <col style={{ width: '6%' }} />
+            <col style={{ width: '13%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '6%' }} />
+            <col style={{ width: '4%' }} />
+            <col style={{ width: '7%' }} />
+            <col style={{ width: '6%' }} />
+            <col style={{ width: '13%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '4%' }} />
+            <col style={{ width: '6%' }} />
+          </colgroup>
           <thead>
             <tr>
               {/* Vế Quẻ Chủ */}
-              <th className="th-center" style={{ width: '56px' }}>Hào</th>
-              <th className="th-center" style={{ width: '56px' }}>T/Ứ</th>
-              <th className="th-left" style={{ minWidth: '95px' }}>Lục Thân</th>
-              <th className="th-left" style={{ minWidth: '95px' }}>Can Chi</th>
-              <th className="th-center" style={{ minWidth: '85px' }}>Phục thần</th>
-              <th className="th-center col-divider-right" style={{ width: '45px' }}>TK</th>
+              <th className="th-center">Hào</th>
+              <th className="th-center">T/Ứ</th>
+              <th className="th-left">Lục Thân</th>
+              <th className="th-canchi th-right">Can Chi</th>
+              <th className="th-center">Phục thần</th>
+              <th className="th-center col-divider-right">TK</th>
 
               {/* Vế Quẻ Biến: Cột Hào chuyển sang bên trái (sau TK quẻ chính) */}
-              <th className="th-center col-divider-left" style={{ width: '56px' }}>Hào</th>
-              <th className="th-center" style={{ width: '56px' }}>T/Ứ</th>
-              <th className="th-left" style={{ minWidth: '95px' }}>Lục Thân</th>
-              <th className="th-left" style={{ minWidth: '95px' }}>Can Chi</th>
-              <th className="th-center" style={{ width: '45px' }}>TK</th>
-              <th className="th-center" style={{ minWidth: '95px' }}>Lục Thú</th>
+              <th className="th-center col-divider-left">Hào</th>
+              <th className="th-center">T/Ứ</th>
+              <th className="th-left">Lục Thân</th>
+              <th className="th-canchi th-right">Can Chi</th>
+              <th className="th-center">TK</th>
+              <th className="th-center">Lục Thú</th>
             </tr>
           </thead>
           <tbody>
@@ -131,7 +145,7 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
                   </td>
 
                   {/* Cột 4: Can Chi Quẻ Chủ */}
-                  <td className={`cell-canchi cell-left ${row.isMoving ? 'text-red font-bold' : ''}`}>
+                  <td className={`cell-canchi cell-right ${row.isMoving ? 'text-red font-bold' : ''}`}>
                     {row.canChiDisplay}
                   </td>
 
@@ -174,7 +188,7 @@ export const WorkspaceMasterTable: React.FC<WorkspaceMasterTableProps> = ({
                   </td>
 
                   {/* Cột 10: Can Chi Quẻ Biến */}
-                  <td className={`cell-canchi cell-left ${row.isMoving ? 'text-red font-bold' : ''}`}>
+                  <td className={`cell-canchi cell-right ${row.isMoving ? 'text-red font-bold' : ''}`}>
                     {row.changingCanChi || '-'}
                   </td>
 
