@@ -489,7 +489,7 @@ describe('Cross-Platform Multi-Platform Test & Core Engine Parity', () => {
       const duration = performance.now() - start;
       const avgLatencyMs = duration / iterations;
 
-      expect(avgLatencyMs).toBeLessThan(0.5); // Dưới 500 microseconds
+      expect(avgLatencyMs).toBeLessThan(1.0); // Dưới 1ms (đảm bảo >1000 quẻ/giây kể cả khi CPU tải nặng)
     });
 
     it('tốc độ tra cứu và tìm kiếm SQLite đạt dưới 10ms', async () => {

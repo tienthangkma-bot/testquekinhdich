@@ -18,6 +18,7 @@ import {
   HEXAGRAMS,
   HexagramTrio,
   LinePosition,
+  LocalStorageSettingsRepository,
 } from '@kindich/domain';
 import { getDivinationRepository } from './services/repository.service';
 import { SerialCastingForm, SerialCastingResultView } from './components/SerialCasting';
@@ -94,6 +95,19 @@ export const App: React.FC = () => {
     updateTime();
     const interval = setInterval(updateTime, 60000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Khởi tạo cài đặt hệ thống (Theme, Font Size)
+  useEffect(() => {
+    const repo = new LocalStorageSettingsRepository();
+    repo.getSettings().then((s) => {
+      if (s.appearance.theme !== 'light') {
+        document.documentElement.setAttribute('data-theme', s.appearance.theme);
+      }
+      if (s.appearance.fontSize !== 'medium') {
+        document.documentElement.setAttribute('data-font-size', s.appearance.fontSize);
+      }
+    });
   }, []);
 
   // Xử lý zoom giao diện

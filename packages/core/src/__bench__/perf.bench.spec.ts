@@ -1,5 +1,5 @@
 import { describe, it } from 'vitest';
-import { parseToVietnamDateTime, getFullCalendarInfo } from '@kindich/calendar';
+import { parseToVietnamDateTime } from '@kindich/calendar';
 import { getHexagramByName, HEXAGRAMS } from '@kindich/domain';
 import { orchestrateSixYaoAnalysis } from '../six-yao/six-yao.orchestrator';
 

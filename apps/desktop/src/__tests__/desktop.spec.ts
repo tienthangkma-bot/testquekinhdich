@@ -236,4 +236,67 @@ describe('Desktop App - Core Integration & Desktop Specifications', () => {
       expect(res.trio.primary).toBeDefined();
     });
   });
+
+  describe('9. Desktop Settings Module (Cài Đặt & Cấu Hình Desktop)', () => {
+    it('khởi tạo cài đặt mặc định và lưu trữ offline', async () => {
+      const { LocalStorageSettingsRepository, InMemoryStorage } = await import('@kindich/domain');
+      const storage = new InMemoryStorage();
+      const repo = new LocalStorageSettingsRepository(storage);
+
+      const settings = await repo.getSettings();
+      expect(settings.appearance.theme).toBe('light');
+      expect(settings.appearance.language).toBe('vi');
+      expect(settings.appearance.fontSize).toBe('medium');
+      expect(settings.divination.defaultMethod).toBe('serial');
+      expect(settings.divination.ruleSetId).toBe('BO_PHE_CHINH_TONG_V1');
+      expect(settings.calendar.timeZone).toBe('Asia/Ho_Chi_Minh');
+      expect(settings.calendar.dayTransitionRule).toBe('23:00');
+      expect(settings.calendar.leapMonthRule).toBe('TIET_KHI');
+    });
+
+    it('cho phép lưu các tùy chỉnh giao diện, lập quẻ và lịch pháp', async () => {
+      const { LocalStorageSettingsRepository, InMemoryStorage } = await import('@kindich/domain');
+      const storage = new InMemoryStorage();
+      const repo = new LocalStorageSettingsRepository(storage);
+
+      const updated = await repo.saveSettings({
+        appearance: { theme: 'dark', language: 'zh', fontSize: 'large' },
+        divination: { defaultMethod: 'time', ruleSetId: 'BO_PHE_CHINH_TONG_V1', algorithmVersion: 'MAI-HUA-V1' },
+        calendar: { timeZone: 'Asia/Tokyo', dayTransitionRule: '00:00', leapMonthRule: 'TRUYEN_THONG' },
+      });
+
+      expect(updated.appearance.theme).toBe('dark');
+      expect(updated.appearance.fontSize).toBe('large');
+      expect(updated.divination.defaultMethod).toBe('time');
+      expect(updated.calendar.timeZone).toBe('Asia/Tokyo');
+      expect(updated.calendar.dayTransitionRule).toBe('00:00');
+
+      // Khôi phục cài đặt gốc
+      const reset = await repo.resetSettings();
+      expect(reset.appearance.theme).toBe('light');
+      expect(reset.appearance.fontSize).toBe('medium');
+      expect(reset.divination.defaultMethod).toBe('serial');
+      expect(reset.calendar.timeZone).toBe('Asia/Ho_Chi_Minh');
+      expect(reset.calendar.dayTransitionRule).toBe('23:00');
+    });
+
+    it('tính toán chính xác dung lượng lưu trữ và số quẻ/ghi chú', async () => {
+      const { LocalStorageSettingsRepository, InMemoryStorage } = await import('@kindich/domain');
+      const storage = new InMemoryStorage();
+      const mockRepo = {
+        list: async () => ({
+          items: [{ id: '1', noteCount: 3 } as any, { id: '2', noteCount: 2 } as any],
+          totalCount: 2,
+          page: 1,
+          pageSize: 5000,
+          totalPages: 1,
+        }),
+      };
+      const repo = new LocalStorageSettingsRepository(storage, mockRepo as any);
+      const stats = await repo.getStorageStats();
+      expect(stats.divinationCount).toBe(2);
+      expect(stats.noteCount).toBe(5);
+      expect(stats.totalSizeEstimateBytes).toBeGreaterThan(0);
+    });
+  });
 });

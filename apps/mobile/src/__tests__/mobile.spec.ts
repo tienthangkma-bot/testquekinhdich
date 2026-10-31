@@ -357,4 +357,37 @@ describe('KinhDich Mobile App (apps/mobile)', () => {
       expect(interp.primaryClassical.content?.thuanTu.translation).toBeDefined();
     });
   });
+
+  // =========================================================================
+  // 10. Settings Module (Cài Đặt & Cấu Hình Mobile)
+  // =========================================================================
+  describe('Settings Module cho Mobile', () => {
+    it('khởi tạo cài đặt mặc định và cho phép lưu tùy chỉnh giao diện, lập quẻ, lịch pháp', async () => {
+      const { LocalStorageSettingsRepository, InMemoryStorage } = await import('@kindich/domain');
+      const storage = new InMemoryStorage();
+      const settingsRepo = new LocalStorageSettingsRepository(storage);
+
+      const defaults = await settingsRepo.getSettings();
+      expect(defaults.appearance.theme).toBe('light');
+      expect(defaults.appearance.language).toBe('vi');
+      expect(defaults.calendar.timeZone).toBe('Asia/Ho_Chi_Minh');
+      expect(defaults.calendar.dayTransitionRule).toBe('23:00');
+
+      // Cập nhật cài đặt mobile
+      const updated = await settingsRepo.saveSettings({
+        appearance: { theme: 'dark', language: 'vi', fontSize: 'large' },
+        divination: { defaultMethod: 'time', ruleSetId: 'BO_PHE_CHINH_TONG_V1', algorithmVersion: 'MAI-HUA-V1' },
+        calendar: { timeZone: 'Asia/Ho_Chi_Minh', dayTransitionRule: '23:00', leapMonthRule: 'TIET_KHI' },
+      });
+
+      expect(updated.appearance.theme).toBe('dark');
+      expect(updated.appearance.fontSize).toBe('large');
+      expect(updated.divination.defaultMethod).toBe('time');
+
+      // Khôi phục cài đặt gốc
+      const reset = await settingsRepo.resetSettings();
+      expect(reset.appearance.theme).toBe('light');
+      expect(reset.divination.defaultMethod).toBe('serial');
+    });
+  });
 });

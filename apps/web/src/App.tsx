@@ -19,17 +19,22 @@ import { SerialCastingForm, SerialCastingResultView } from './components/SerialC
 import { MaiHuaCastingForm, MaiHuaCastingResultView } from './components/MaiHuaCasting';
 import { SixYaoAnalysisView } from './components/SixYaoAnalysis';
 import { QuestionCategorySelector, QuestionCategory } from './components/NotesAndQuestions';
+import { LocalStorageSettingsRepository } from '@kindich/database';
 import { PwaHeaderActions } from './pwa';
 import './App.css';
 
 const DivinationHistoryView = React.lazy(() =>
   import('./components/DivinationHistory').then((m) => ({ default: m.DivinationHistoryView }))
 );
+const SettingsView = React.lazy(() =>
+  import('./components/Settings').then((m) => ({ default: m.SettingsView }))
+);
 
-type CastingMode = 'serial' | 'time' | 'six-yao' | 'history';
+type CastingMode = 'serial' | 'time' | 'six-yao' | 'history' | 'settings';
 
 export const App: React.FC = () => {
   const [activeMode, setActiveMode] = useState<CastingMode>('serial');
+  const hasUserNavigated = React.useRef(false);
   const [question, setQuestion] = useState<string>('');
   const [inquiryType, setInquiryType] = useState<QuestionCategory>('work');
   const [serialResult, setSerialResult] = useState<SerialCastingResult | null>(null);
@@ -50,6 +55,27 @@ export const App: React.FC = () => {
     value: h.number.toString(),
     label: `#${h.number} - ${h.name} (${h.sinoVietnameseName})`,
   }));
+
+  // Khởi tạo cấu hình hệ thống (Theme, Font Size, Default Casting Method)
+  React.useEffect(() => {
+    const settingsRepo = new LocalStorageSettingsRepository();
+    settingsRepo.getSettings().then((s) => {
+      if (s.appearance.theme !== 'light') {
+        document.documentElement.setAttribute('data-theme', s.appearance.theme);
+      }
+      if (s.appearance.fontSize !== 'medium') {
+        document.documentElement.setAttribute('data-font-size', s.appearance.fontSize);
+      }
+      if (!hasUserNavigated.current && s.divination.defaultMethod && s.divination.defaultMethod !== 'serial') {
+        setActiveMode(s.divination.defaultMethod);
+      }
+    });
+  }, []);
+
+  const handleSelectMode = (mode: CastingMode) => {
+    hasUserNavigated.current = true;
+    setActiveMode(mode);
+  };
 
   /**
    * Tự động lưu lịch sử khi lập quẻ Seri tiền thành công (Requirement 1)
@@ -211,7 +237,7 @@ export const App: React.FC = () => {
         <button
           type="button"
           className={`mode-tab ${activeMode === 'serial' ? 'active' : ''}`}
-          onClick={() => setActiveMode('serial')}
+          onClick={() => handleSelectMode('serial')}
         >
           <span className="tab-icon">🔢</span>
           <span>Lập quẻ seri tiền</span>
@@ -219,7 +245,7 @@ export const App: React.FC = () => {
         <button
           type="button"
           className={`mode-tab ${activeMode === 'time' ? 'active' : ''}`}
-          onClick={() => setActiveMode('time')}
+          onClick={() => handleSelectMode('time')}
         >
           <span className="tab-icon">⏳</span>
           <span>Giờ động tâm</span>
@@ -227,7 +253,7 @@ export const App: React.FC = () => {
         <button
           type="button"
           className={`mode-tab ${activeMode === 'six-yao' ? 'active' : ''}`}
-          onClick={() => setActiveMode('six-yao')}
+          onClick={() => handleSelectMode('six-yao')}
         >
           <span className="tab-icon">☯</span>
           <span>Phân tích Lục Hào</span>
@@ -235,10 +261,18 @@ export const App: React.FC = () => {
         <button
           type="button"
           className={`mode-tab ${activeMode === 'history' ? 'active' : ''}`}
-          onClick={() => setActiveMode('history')}
+          onClick={() => handleSelectMode('history')}
         >
           <span className="tab-icon">📜</span>
           <span>Lịch sử lập quẻ</span>
+        </button>
+        <button
+          type="button"
+          className={`mode-tab ${activeMode === 'settings' ? 'active' : ''}`}
+          onClick={() => handleSelectMode('settings')}
+        >
+          <span className="tab-icon">⚙️</span>
+          <span>Cài đặt</span>
         </button>
       </nav>
 
@@ -499,7 +533,7 @@ export const App: React.FC = () => {
               />
             </Card>
           </div>
-        ) : (
+        ) : activeMode === 'history' ? (
           /* Màn hình Lịch Sử Lập Quẻ (Requirement 2) */
           <div className="history-mode-section">
             <React.Suspense
@@ -510,6 +544,19 @@ export const App: React.FC = () => {
               }
             >
               <DivinationHistoryView />
+            </React.Suspense>
+          </div>
+        ) : (
+          /* Màn hình Cài Đặt Hệ Thống (Settings Module) */
+          <div className="settings-mode-section">
+            <React.Suspense
+              fallback={
+                <div style={{ textAlign: 'center', padding: '32px', color: 'var(--bha-text-muted)' }}>
+                  Đang tải cài đặt hệ thống...
+                </div>
+              }
+            >
+              <SettingsView />
             </React.Suspense>
           </div>
         )}
