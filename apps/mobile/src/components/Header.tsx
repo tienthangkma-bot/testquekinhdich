@@ -1,5 +1,14 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, StatusBar } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  StatusBar,
+  Animated,
+  Easing,
+} from 'react-native';
 import { theme } from '../theme/colors';
 
 export interface HeaderProps {
@@ -17,6 +26,26 @@ export const Header: React.FC<HeaderProps> = ({
   onBack,
   rightAction,
 }) => {
+  const spinAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.timing(spinAnim, {
+        toValue: 1,
+        duration: 24000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [spinAnim]);
+
+  const spin = spinAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -31,7 +60,9 @@ export const Header: React.FC<HeaderProps> = ({
           </TouchableOpacity>
         ) : (
           <View style={styles.emblemContainer}>
-            <Text style={styles.emblem}>☯</Text>
+            <Animated.Text style={[styles.emblem, { transform: [{ rotate: spin }] }]}>
+              ☯
+            </Animated.Text>
           </View>
         )}
 
@@ -58,15 +89,15 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+    borderBottomColor: theme.colors.borderGold,
     paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 24) + 6 : 10,
     paddingBottom: 10,
     paddingHorizontal: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 3,
   },
   content: {
     flexDirection: 'row',
@@ -82,6 +113,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.borderGold,
   },
   backText: {
     fontSize: 28,
@@ -97,6 +130,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.borderGold,
   },
   emblem: {
     fontSize: 20,

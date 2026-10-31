@@ -48,6 +48,44 @@ export const App: React.FC = () => {
   } | null>(null);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [saveSuccessNotice, setSaveSuccessNotice] = useState<string | null>(null);
+
+  // Quản lý chủ đề giao diện Premium (Dark Mystic / Imperial Ivory)
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  React.useEffect(() => {
+    try {
+      const repo = new LocalStorageSettingsRepository(undefined, getDivinationRepository());
+      repo.getSettings().then((s) => {
+        let mode: 'light' | 'dark' = 'light';
+        if (s.appearance.theme === 'dark') {
+          mode = 'dark';
+        } else if (s.appearance.theme === 'system') {
+          mode = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        setTheme(mode);
+        document.documentElement.setAttribute('data-theme', mode);
+      }).catch(() => {
+        document.documentElement.setAttribute('data-theme', 'light');
+      });
+    } catch {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  }, []);
+
+  const toggleTheme = async () => {
+    const nextTheme: 'light' | 'dark' = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    try {
+      const repo = new LocalStorageSettingsRepository(undefined, getDivinationRepository());
+      const current = await repo.getSettings();
+      await repo.saveSettings({
+        appearance: { ...current.appearance, theme: nextTheme },
+      });
+    } catch {
+      // ignore
+    }
+  };
   const [serialDateTimeInfo, setSerialDateTimeInfo] = useState<DivinationDateTime | null>(null);
   const [maiHuaDateTimeInfo, setMaiHuaDateTimeInfo] = useState<DivinationDateTime | null>(null);
 
@@ -243,22 +281,38 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="app-container">
+    <div className="bha-ambient-background app-wrapper" data-theme={theme}>
+      <div className="app-container">
       {/* Header */}
       <header className="app-header">
-        {/* Nút Cài đặt hệ thống ở góc trên bên phải */}
-        <button
-          type="button"
-          className={"app-header-settings-btn " + (activeMode === 'settings' ? 'active' : '')}
-          onClick={() => handleSelectMode('settings')}
-          title="Cài đặt hệ thống & giao diện"
-          data-testid="header-settings-btn"
-        >
-          <span className="settings-btn-icon">⚙️</span>
-          <span className="settings-btn-text">Cài đặt</span>
-        </button>
+        <div className="app-header-actions-right">
+          {/* Nút chuyển đổi Theme Cao Cấp (Dark Mystic ⇋ Imperial Ivory) */}
+          <button
+            type="button"
+            className="app-header-theme-btn"
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Chuyển sang chủ đề Hoàng Triều (Sáng)' : 'Chuyển sang chủ đề Dạ Thần (Tối)'}
+            data-testid="header-theme-toggle"
+          >
+            <span className="theme-btn-icon">{theme === 'dark' ? '🌙' : '☀️'}</span>
+            <span className="theme-btn-text">{theme === 'dark' ? 'Dạ Thần' : 'Hoàng Triều'}</span>
+          </button>
+
+          {/* Nút Cài đặt hệ thống ở góc trên bên phải */}
+          <button
+            type="button"
+            className={"app-header-settings-btn " + (activeMode === 'settings' ? 'active' : '')}
+            onClick={() => handleSelectMode('settings')}
+            title="Cài đặt hệ thống & giao diện"
+            data-testid="header-settings-btn"
+          >
+            <span className="settings-btn-icon">⚙️</span>
+            <span className="settings-btn-text">Cài đặt</span>
+          </button>
+        </div>
+
         <div className="brand-badge">
-          <span>☯</span>
+          <span className="bha-taiji-spinner">☯</span>
           <span>Bắc Hà Tân An Phái</span>
         </div>
         <h1 className="brand-title">Kinh Dịch Tân An Phái</h1>
@@ -761,6 +815,7 @@ export const App: React.FC = () => {
           </div>
         )}
       </Modal>
+      </div>
     </div>
   );
 };

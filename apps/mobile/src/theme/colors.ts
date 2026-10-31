@@ -1,6 +1,6 @@
 import { colors as baseColors } from '@kindich/shared';
 
-export const theme = {
+export const imperialIvoryTheme = {
   colors: {
     ...baseColors,
     primary: baseColors.crimson[700],      // #851616 Đỏ sẫm chủ đạo
@@ -37,3 +37,31 @@ export const theme = {
     full: 9999,
   },
 };
+
+export const darkMysticTheme = {
+  colors: {
+    ...baseColors,
+    primary: baseColors.darkMystic.text.gold,
+    primaryLight: 'rgba(212, 160, 23, 0.15)',
+    accent: baseColors.darkMystic.border.gold,
+    accentLight: 'rgba(212, 160, 23, 0.1)',
+    background: baseColors.darkMystic.background.base,
+    backgroundSubtle: baseColors.darkMystic.background.surface,
+    backgroundMuted: baseColors.darkMystic.background.muted,
+    card: baseColors.darkMystic.background.surface,
+    border: baseColors.darkMystic.border.base,
+    borderGold: baseColors.darkMystic.border.gold,
+    text: baseColors.darkMystic.text.primary,
+    textSecondary: baseColors.darkMystic.text.secondary,
+    textMuted: baseColors.darkMystic.text.muted,
+    white: '#FFFFFF',
+    dark: '#0A0D14',
+    success: '#10B981',
+    warning: '#FFA726',
+    danger: baseColors.crimson[500],
+  },
+  spacing: imperialIvoryTheme.spacing,
+  radius: imperialIvoryTheme.radius,
+};
+
+export const theme = imperialIvoryTheme;

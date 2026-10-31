@@ -1,14 +1,16 @@
 /**
  * Bắc Hà Tân An Phái - Color Palette Tokens
  * Hệ màu sáng kết hợp Đỏ sẫm (Crimson) và Vàng đồng (Antique Gold)
+ * Hỗ trợ đồng thời 2 chủ đề: Dark Mystic Theme & Imperial Ivory Theme
  */
 export const colors = {
-  // Nền sáng (Parchment / Ivory)
+  // Nền sáng (Imperial Ivory / Parchment)
   background: {
     base: '#FAF8F5',       // Nền chính toàn ứng dụng (ấm áp như giấy xuyến chỉ)
     surface: '#FFFFFF',    // Nền thẻ card / bề mặt nổi
     subtle: '#F2EFE9',     // Nền phụ / tab không chọn
     muted: '#EAE5DC',      // Nền nhấn nhẹ / placeholder
+    glass: 'rgba(255, 255, 255, 0.85)',
   },
 
   // Đường viền
@@ -18,6 +20,7 @@ export const colors = {
     hover: '#C5BAA9',
     focus: '#851616',      // Viền khi focus (đỏ sẫm)
     gold: '#D6B462',       // Viền vàng đồng
+    glass: 'rgba(214, 180, 98, 0.25)',
   },
 
   // Màu chữ
@@ -26,6 +29,8 @@ export const colors = {
     secondary: '#594F48',  // Chữ phụ / nhãn
     muted: '#8C8178',      // Chữ mờ / ghi chú
     inverse: '#FFFFFF',    // Chữ trắng trên nền tối
+    gold: '#B5871D',       // Chữ màu vàng kim
+    jade: '#059669',       // Chữ ngọc bích
   },
 
   // Màu chủ đạo: Đỏ sẫm (Crimson / Chu Sa cổ truyền)
@@ -54,6 +59,48 @@ export const colors = {
     700: '#946B12',
     800: '#73510C',
     900: '#543906',
+  },
+
+  // Xanh Ngọc Bích (Celestial Jade)
+  jade: {
+    50: '#ECFDF5',
+    100: '#D1FAE5',
+    300: '#6EE7B7',
+    500: '#10B981',
+    600: '#059669',
+    700: '#047857',
+    800: '#065F46',
+  },
+
+  // Dark Mystic Palette (Huyền Học Dạ Thần)
+  darkMystic: {
+    background: {
+      base: '#0A0D14',     // Mực huyền vũ sâu thẳm
+      surface: '#121722',  // Đen than phiến ngọc
+      subtle: '#182030',   // Nền tương phản nhẹ
+      muted: '#202A3D',    // Nền card/panel mờ
+      glass: 'rgba(18, 23, 34, 0.82)',
+    },
+    border: {
+      light: 'rgba(214, 180, 98, 0.12)',
+      base: 'rgba(214, 180, 98, 0.22)',
+      hover: 'rgba(229, 192, 88, 0.5)',
+      gold: '#E5C058',
+      focus: '#D32F2F',
+    },
+    text: {
+      primary: '#F5EFEB',  // Trắng xuyến chỉ sáng
+      secondary: '#C5B79D',// Vàng lụa nhạt
+      muted: '#7E8B9E',    // Bạc xám cổ phong
+      inverse: '#0A0D14',  // Chữ trên nền sáng
+      gold: '#F0D278',     // Hoàng kim phát quang
+      jade: '#34D399',     // Ngọc bích phát quang
+    },
+    glow: {
+      gold: 'rgba(229, 192, 88, 0.35)',
+      crimson: 'rgba(215, 60, 60, 0.35)',
+      jade: 'rgba(16, 185, 129, 0.35)',
+    },
   },
 
   // Trạng thái hệ thống

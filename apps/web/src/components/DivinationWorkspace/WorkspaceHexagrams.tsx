@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Hexagram,
   HexagramTrio,
+  LinePosition,
   getPalaceInfoByHexagramNumber,
   getHexagramOmen,
 } from '@kindich/domain';
@@ -10,12 +11,63 @@ import { MaiHuaCastingResult } from '@kindich/core';
 interface WorkspaceHexagramsProps {
   trio: HexagramTrio;
   maiHuaResult?: MaiHuaCastingResult;
+  selectedLine?: LinePosition | null;
+  onSelectLine?: (pos: LinePosition | null) => void;
 }
+
+const LINE_POSITION_NAMES: Record<number, string> = {
+  1: 'Hào Sơ (Hào 1)',
+  2: 'Hào Nhị (Hào 2)',
+  3: 'Hào Tam (Hào 3)',
+  4: 'Hào Tứ (Hào 4)',
+  5: 'Hào Ngũ (Hào 5)',
+  6: 'Hào Thượng (Hào 6)',
+};
 
 export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
   trio,
+  selectedLine: externalSelectedLine,
+  onSelectLine: externalOnSelectLine,
 }) => {
   const { primary, transformed, nuclear, movingLineIndices } = trio;
+
+  // Quản lý hào được chọn để hiển thị chi tiết (Line Inspection)
+  const [internalSelectedLine, setInternalSelectedLine] = useState<LinePosition | null>(null);
+  const activeSelectedLine = externalSelectedLine !== undefined ? externalSelectedLine : internalSelectedLine;
+
+  const handleLineClick = (pos: LinePosition) => {
+    const next = activeSelectedLine === pos ? null : pos;
+    if (externalOnSelectLine) {
+      externalOnSelectLine(next);
+    } else {
+      setInternalSelectedLine(next);
+    }
+  };
+
+  // Quản lý trạng thái diễn họa biến quẻ (Morph Animation)
+  const [isMorphing, setIsMorphing] = useState<boolean>(false);
+  const [morphStep, setMorphStep] = useState<'idle' | 'ignite' | 'flip' | 'done'>('idle');
+
+  const startMorphAnimation = () => {
+    if (isMorphing) {
+      setIsMorphing(false);
+      setMorphStep('idle');
+      return;
+    }
+    setIsMorphing(true);
+    setMorphStep('ignite');
+
+    setTimeout(() => {
+      setMorphStep('flip');
+      setTimeout(() => {
+        setMorphStep('done');
+        setTimeout(() => {
+          setIsMorphing(false);
+          setMorphStep('idle');
+        }, 3000);
+      }, 1200);
+    }, 1000);
+  };
 
   // Lấy Cung Bát Cung của từng quẻ
   const primaryPalace = getPalaceInfoByHexagramNumber(primary.number);
@@ -36,8 +88,6 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
     hex: Hexagram,
     options?: { isPrimary?: boolean; isTransformed?: boolean }
   ) => {
-    // hex.lines có 6 phần tử (index 0 = hào 1, index 5 = hào 6)
-    // Hiển thị từ hào 6 xuống hào 1:
     const reversed = [...hex.lines].reverse();
 
     return (
@@ -48,12 +98,26 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
           const isMoving = movingLineIndices.includes(pos);
           const isHighlight =
             (options?.isPrimary && isMoving) || (options?.isTransformed && isMoving);
+          const isSelected = activeSelectedLine === pos;
+
+          // Hiệu ứng biến hình động
+          const isMorphingLine = isMorphing && isMoving;
+          const morphClass = isMorphingLine ? `hex-line--morph-${morphStep}` : '';
 
           return (
             <div
               key={pos}
-              className={`hex-line-row ${isHighlight ? 'hex-line-row--moving' : ''}`}
-              title={`Hào ${pos}: ${isYang ? 'Dương' : 'Âm'}${isMoving ? ' (Hào Động)' : ''}`}
+              role="button"
+              tabIndex={0}
+              onClick={() => handleLineClick(pos)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleLineClick(pos);
+                }
+              }}
+              className={`hex-line-row ${isHighlight ? 'hex-line-row--moving' : ''} ${isSelected ? 'hex-line-row--selected' : ''} ${morphClass}`}
+              title={`${LINE_POSITION_NAMES[pos]}: ${isYang ? 'Dương hào (——)' : 'Âm hào (— —)'}${isMoving ? ' [HÀO ĐỘNG ⭕]' : ''} • Bấm để xem chi tiết`}
             >
               {isYang ? (
                 // Hào Dương: Vạch liền
@@ -79,11 +143,39 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
     );
   };
 
+  // Thông tin hào đang được chọn để soi chiếu
+  const selectedPrimaryLine = activeSelectedLine
+    ? primary.lines.find((l) => l.position === activeSelectedLine)
+    : null;
+  const isSelectedMoving = activeSelectedLine ? movingLineIndices.includes(activeSelectedLine) : false;
+
   return (
     <div className="workspace-hexagrams-section">
+      {/* Thanh công cụ phụ trợ trải nghiệm quẻ động */}
+      {transformed && movingLineIndices.length > 0 && (
+        <div className="hex-interactive-toolbar no-print">
+          <button
+            type="button"
+            className={`hex-morph-btn ${isMorphing ? 'active' : ''}`}
+            onClick={startMorphAnimation}
+            title="Kích hoạt hiệu ứng biến dịch trực quan từ Quẻ Chủ sang Quẻ Biến"
+          >
+            <span>{isMorphing ? '⏸ Đang diễn họa...' : '⚡ Diễn Họa Biến Quẻ (Chủ ➔ Biến)'}</span>
+          </button>
+          <span className="hex-morph-hint">
+            💡 Mẹo: Bấm vào từng hào bất kỳ để xem phân tích chi tiết biến hóa
+          </span>
+        </div>
+      )}
+
       <div className="workspace-hexagrams-grid">
         {/* Cột 1: QUẺ CHỦ */}
-        <div className="hexagram-figure-card hexagram-figure-card--primary">
+        <div className="hexagram-figure-card hexagram-figure-card--primary bha-glass-card">
+          <div className="bha-corner-accent bha-corner-accent--tl" />
+          <div className="bha-corner-accent bha-corner-accent--tr" />
+          <div className="bha-corner-accent bha-corner-accent--bl" />
+          <div className="bha-corner-accent bha-corner-accent--br" />
+
           <h3 className="hex-title hex-title--primary">{primary.sinoVietnameseName || primary.name}</h3>
           {renderHexagramLines(primary, { isPrimary: true })}
           <div className="hex-palace-label">
@@ -97,7 +189,12 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
 
         {/* Cột 2: QUẺ HỖ */}
         {nuclear && (
-          <div className="hexagram-figure-card hexagram-figure-card--nuclear">
+          <div className="hexagram-figure-card hexagram-figure-card--nuclear bha-glass-card">
+            <div className="bha-corner-accent bha-corner-accent--tl" />
+            <div className="bha-corner-accent bha-corner-accent--tr" />
+            <div className="bha-corner-accent bha-corner-accent--bl" />
+            <div className="bha-corner-accent bha-corner-accent--br" />
+
             <h3 className="hex-title hex-title--nuclear">{nuclear.sinoVietnameseName || nuclear.name}</h3>
             {renderHexagramLines(nuclear)}
             <div className="hex-palace-label">
@@ -114,7 +211,12 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
 
         {/* Cột 3: QUẺ BIẾN */}
         {transformed ? (
-          <div className="hexagram-figure-card hexagram-figure-card--transformed">
+          <div className="hexagram-figure-card hexagram-figure-card--transformed bha-glass-card">
+            <div className="bha-corner-accent bha-corner-accent--tl" />
+            <div className="bha-corner-accent bha-corner-accent--tr" />
+            <div className="bha-corner-accent bha-corner-accent--bl" />
+            <div className="bha-corner-accent bha-corner-accent--br" />
+
             <h3 className="hex-title hex-title--transformed">
               {transformed.sinoVietnameseName || transformed.name}
             </h3>
@@ -130,15 +232,73 @@ export const WorkspaceHexagrams: React.FC<WorkspaceHexagramsProps> = ({
             )}
           </div>
         ) : (
-          <div className="hexagram-figure-card hexagram-figure-card--static">
+          <div className="hexagram-figure-card hexagram-figure-card--static bha-glass-card">
+            <div className="bha-corner-accent bha-corner-accent--tl" />
+            <div className="bha-corner-accent bha-corner-accent--tr" />
+            <div className="bha-corner-accent bha-corner-accent--bl" />
+            <div className="bha-corner-accent bha-corner-accent--br" />
+
             <h3 className="hex-title">QUẺ TĨNH</h3>
             <div className="static-hex-box">
-              <span className="static-icon">☯</span>
+              <span className="static-icon bha-taiji-spinner">☯</span>
               <p>Quẻ không có hào động, giữ nguyên khí tượng quẻ chủ.</p>
             </div>
           </div>
         )}
       </div>
+
+      {/* Panel Soi Chiếu Chi Tiết Hào (Interactive Line Inspection Drawer) */}
+      {activeSelectedLine && selectedPrimaryLine && (
+        <div className="hex-line-inspector-card bha-glass-card no-print">
+          <div className="inspector-header">
+            <div className="inspector-title-wrap">
+              <span className="inspector-badge">
+                {LINE_POSITION_NAMES[activeSelectedLine]}
+              </span>
+              <span className="inspector-nature">
+                {selectedPrimaryLine.value === 1 ? 'Dương Hào (——)' : 'Âm Hào (— —)'}
+                {isSelectedMoving ? ' • [HÀO ĐỘNG PHÁT KHỞI ⭕]' : ' • [Hào Tĩnh]'}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="inspector-close-btn"
+              onClick={() => handleLineClick(activeSelectedLine)}
+              title="Đóng bảng chi tiết"
+            >
+              ✕ Đóng
+            </button>
+          </div>
+          <div className="inspector-body">
+            <div className="inspector-grid">
+              <div className="inspector-item">
+                <span className="item-label">Vị trí:</span>
+                <span className="item-val">
+                  {activeSelectedLine <= 3 ? 'Nội Quái (Hạ Quái)' : 'Ngoại Quái (Thượng Quái)'}
+                </span>
+              </div>
+              <div className="inspector-item">
+                <span className="item-label">Trạng thái:</span>
+                <span className={`item-val ${isSelectedMoving ? 'text-red font-bold' : ''}`}>
+                  {isSelectedMoving
+                    ? selectedPrimaryLine.value === 1
+                      ? 'Dương Động biến Âm (Lão Dương biến Thiếu Âm)'
+                      : 'Âm Động biến Dương (Lão Âm biến Thiếu Dương)'
+                    : 'Tĩnh định (Không biến)'}
+                </span>
+              </div>
+              {isSelectedMoving && transformed && (
+                <div className="inspector-item inspector-item--full">
+                  <span className="item-label">Biến hóa:</span>
+                  <span className="item-val text-red">
+                    Hào {activeSelectedLine} quẻ {primary.name} chuyển hóa thành Hào {activeSelectedLine} quẻ {transformed.name}.
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

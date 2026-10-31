@@ -1,24 +1,38 @@
-:root {
-  /* Backgrounds */
-  --bha-bg-base: #FAF8F5;
-  --bha-bg-surface: #FFFFFF;
-  --bha-bg-subtle: #F2EFE9;
-  --bha-bg-muted: #EAE5DC;
+/* ==========================================================================
+   BẮC HÀ TÂN AN PHÁI — PREMIUM DESIGN SYSTEM V3
+   Art Direction: Premium Oriental Mystic + Modern Luxury + Dynamic Interface
+   ========================================================================== */
 
-  /* Borders */
-  --bha-border-light: #ECE8E0;
-  --bha-border-base: #E0D8CB;
-  --bha-border-hover: #C5BAA9;
+:root,
+[data-theme="light"],
+.theme-imperial-ivory {
+  /* 1. Backgrounds — Imperial Ivory / Giấy Xuyến Chỉ */
+  --bha-bg-base: #FAF6EE;
+  --bha-bg-surface: #FFFFFF;
+  --bha-bg-subtle: #F3ECE1;
+  --bha-bg-muted: #E8DFC8;
+  --bha-bg-glass: rgba(255, 255, 255, 0.88);
+  --bha-bg-overlay: rgba(250, 246, 238, 0.95);
+  --bha-bg-gradient: radial-gradient(circle at 50% 15%, #FFFDF9 0%, #FAF6EE 60%, #EFE5D3 100%);
+
+  /* 2. Borders & Dividers */
+  --bha-border-light: #ECE4D6;
+  --bha-border-base: #DECBB6;
+  --bha-border-hover: #C5B095;
   --bha-border-focus: #851616;
   --bha-border-gold: #D6B462;
+  --bha-border-glass: rgba(214, 180, 98, 0.35);
 
-  /* Texts */
-  --bha-text-primary: #1F1916;
-  --bha-text-secondary: #594F48;
-  --bha-text-muted: #8C8178;
+  /* 3. Texts */
+  --bha-text-primary: #1C1714;
+  --bha-text-secondary: #56483E;
+  --bha-text-muted: #8C7B70;
   --bha-text-inverse: #FFFFFF;
+  --bha-text-gold: #B5871D;
+  --bha-text-crimson: #851616;
+  --bha-text-jade: #059669;
 
-  /* Crimson (Đỏ sẫm) */
+  /* 4. Crimson & Gold */
   --bha-crimson-50: #FDF2F2;
   --bha-crimson-100: #FBE4E4;
   --bha-crimson-200: #F5C2C2;
@@ -28,7 +42,6 @@
   --bha-crimson-700: #851616;
   --bha-crimson-800: #6E1212;
 
-  /* Gold (Vàng đồng) */
   --bha-gold-50: #FCF9EE;
   --bha-gold-100: #F8F1D5;
   --bha-gold-200: #EFE1A7;
@@ -38,7 +51,7 @@
   --bha-gold-700: #946B12;
   --bha-gold-800: #73510C;
 
-  /* Feedback */
+  /* 5. Feedback */
   --bha-success: #1B7340;
   --bha-success-bg: #E8F5E9;
   --bha-warning: #C27803;
@@ -48,7 +61,20 @@
   --bha-info: #1D64B2;
   --bha-info-bg: #EFF6FF;
 
-  /* Typography - Ưu tiên các font hỗ trợ đầy đủ bộ ký tự và dấu tiếng Việt chuẩn xác (tránh lỗi nhảy dấu) */
+  /* 6. Shadows & Glows */
+  --bha-shadow-sm: 0 1px 3px 0 rgba(31, 23, 20, 0.05);
+  --bha-shadow-md: 0 4px 12px -2px rgba(31, 23, 20, 0.08), 0 2px 4px -1px rgba(31, 23, 20, 0.04);
+  --bha-shadow-lg: 0 12px 24px -4px rgba(31, 23, 20, 0.12), 0 4px 8px -2px rgba(31, 23, 20, 0.06);
+  --bha-shadow-crimson: 0 6px 20px 0 rgba(133, 22, 22, 0.22);
+  --bha-shadow-gold: 0 6px 20px 0 rgba(181, 135, 29, 0.22);
+  --bha-glow-gold: 0 0 15px rgba(214, 180, 98, 0.35);
+  --bha-glow-moving-line: 0 0 14px rgba(198, 40, 40, 0.45);
+
+  /* 7. Ambient Pattern Overlay */
+  --bha-pattern-opacity: 0.045;
+  --bha-ambient-glow-color: rgba(214, 180, 98, 0.15);
+
+  /* Typography */
   --bha-font-serif: 'Noto Serif', 'Playfair Display', 'Merriweather', 'Times New Roman', Georgia, serif;
   --bha-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
   --bha-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -59,11 +85,210 @@
   --bha-radius-lg: 12px;
   --bha-radius-xl: 16px;
   --bha-radius-full: 9999px;
+}
 
-  /* Shadows */
-  --bha-shadow-sm: 0 1px 2px 0 rgba(31, 25, 22, 0.05);
-  --bha-shadow-md: 0 4px 6px -1px rgba(31, 25, 22, 0.08), 0 2px 4px -2px rgba(31, 25, 22, 0.05);
-  --bha-shadow-lg: 0 10px 15px -3px rgba(31, 25, 22, 0.08), 0 4px 6px -4px rgba(31, 25, 22, 0.04);
-  --bha-shadow-crimson: 0 4px 14px 0 rgba(133, 22, 22, 0.25);
-  --bha-shadow-gold: 0 4px 14px 0 rgba(181, 135, 29, 0.25);
+/* ==========================================================================
+   DARK MYSTIC THEME (Huyền Học Dạ Thần — Cực Phẩm Cổ Phong Hiện Đại)
+   ========================================================================== */
+
+[data-theme="dark"],
+.theme-dark-mystic {
+  /* 1. Backgrounds — Mực Tàu & Than Đêm Huyền Vũ */
+  --bha-bg-base: #0B0E14;
+  --bha-bg-surface: #121722;
+  --bha-bg-subtle: #171E2C;
+  --bha-bg-muted: #1F283A;
+  --bha-bg-glass: rgba(18, 23, 34, 0.85);
+  --bha-bg-overlay: rgba(11, 14, 20, 0.96);
+  --bha-bg-gradient: radial-gradient(circle at 50% 15%, #182030 0%, #0E131D 50%, #080A0F 100%);
+
+  /* 2. Borders & Dividers */
+  --bha-border-light: rgba(229, 192, 88, 0.12);
+  --bha-border-base: rgba(229, 192, 88, 0.22);
+  --bha-border-hover: rgba(240, 210, 120, 0.45);
+  --bha-border-focus: #D32F2F;
+  --bha-border-gold: #E5C058;
+  --bha-border-glass: rgba(229, 192, 88, 0.28);
+
+  /* 3. Texts */
+  --bha-text-primary: #F7F3EB;
+  --bha-text-secondary: #C8BAA0;
+  --bha-text-muted: #828F9F;
+  --bha-text-inverse: #0B0E14;
+  --bha-text-gold: #F0D278;
+  --bha-text-crimson: #EF5350;
+  --bha-text-jade: #34D399;
+
+  /* 4. Crimson & Gold */
+  --bha-crimson-50: #2C1212;
+  --bha-crimson-100: #3E1616;
+  --bha-crimson-200: #5D1C1C;
+  --bha-crimson-300: #852222;
+  --bha-crimson-500: #D32F2F;
+  --bha-crimson-600: #E53935;
+  --bha-crimson-700: #EF5350;
+  --bha-crimson-800: #FF6659;
+
+  --bha-gold-50: #262114;
+  --bha-gold-100: #3D331A;
+  --bha-gold-200: #574820;
+  --bha-gold-300: #8C732E;
+  --bha-gold-500: #C99E28;
+  --bha-gold-600: #E5C058;
+  --bha-gold-700: #F0D278;
+  --bha-gold-800: #F8E4A0;
+
+  /* 5. Feedback */
+  --bha-success: #34D399;
+  --bha-success-bg: rgba(16, 185, 129, 0.15);
+  --bha-warning: #FBBF24;
+  --bha-warning-bg: rgba(245, 158, 11, 0.15);
+  --bha-error: #F87171;
+  --bha-error-bg: rgba(239, 68, 68, 0.15);
+  --bha-info: #60A5FA;
+  --bha-info-bg: rgba(59, 130, 246, 0.15);
+
+  /* 6. Shadows & Glows */
+  --bha-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --bha-shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.6), 0 2px 6px -1px rgba(0, 0, 0, 0.4);
+  --bha-shadow-lg: 0 16px 32px -4px rgba(0, 0, 0, 0.75), 0 6px 12px -2px rgba(0, 0, 0, 0.5);
+  --bha-shadow-crimson: 0 6px 24px 0 rgba(211, 47, 47, 0.35);
+  --bha-shadow-gold: 0 6px 24px 0 rgba(229, 192, 88, 0.3);
+  --bha-glow-gold: 0 0 20px rgba(240, 210, 120, 0.4);
+  --bha-glow-moving-line: 0 0 18px rgba(239, 83, 80, 0.6);
+
+  /* 7. Ambient Pattern Overlay */
+  --bha-pattern-opacity: 0.08;
+  --bha-ambient-glow-color: rgba(229, 192, 88, 0.12);
+}
+
+/* ==========================================================================
+   PREMIUM VISUAL & DYNAMIC UTILITIES
+   ========================================================================== */
+
+/* 1. Ambient Background Layer */
+.bha-ambient-background {
+  position: relative;
+  min-height: 100vh;
+  background: var(--bha-bg-gradient);
+  color: var(--bha-text-primary);
+  transition: background 0.4s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* Họa tiết Thái Cực & Hà Đồ chìm mờ phía sau */
+.bha-ambient-background::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, var(--bha-ambient-glow-color) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, var(--bha-ambient-glow-color) 0%, transparent 45%),
+    url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23D4AF37' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='60' cy='60' r='58' stroke='%23D4AF37' stroke-width='1' fill='none'/%3E%3Ccircle cx='60' cy='60' r='42' stroke='%23D4AF37' stroke-width='0.75' fill='none' stroke-dasharray='4,4'/%3E%3Ccircle cx='60' cy='60' r='24' stroke='%23D4AF37' stroke-width='0.75' fill='none'/%3E%3Cpath d='M60 18 A42 42 0 0 1 60 102 A21 21 0 0 1 60 60 A21 21 0 0 0 60 18'/%3E%3Ccircle cx='60' cy='39' r='4'/%3E%3Ccircle cx='60' cy='81' r='4' fill='%23FAF8F5' fill-opacity='0.15'/%3E%3C/g%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: repeat;
+  opacity: var(--bha-pattern-opacity);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 2. Glassmorphism Card Cao Cấp */
+.bha-glass-card {
+  position: relative;
+  background: var(--bha-bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--bha-border-glass);
+  border-radius: var(--bha-radius-lg);
+  box-shadow: var(--bha-shadow-md);
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.bha-glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--bha-shadow-lg), var(--bha-glow-gold);
+  border-color: var(--bha-border-gold);
+}
+
+/* Đường viền trang trí góc cổ phong */
+.bha-corner-accent {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--bha-border-gold);
+  border-style: solid;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.bha-corner-accent--tl { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
+.bha-corner-accent--tr { top: 6px; right: 6px; border-width: 2px 2px 0 0; }
+.bha-corner-accent--bl { bottom: 6px; left: 6px; border-width: 0 0 2px 2px; }
+.bha-corner-accent--br { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
+
+/* 3. Nút chuyển đổi Theme (Theme Switcher Pill) */
+.bha-theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--bha-bg-surface);
+  border: 1px solid var(--bha-border-base);
+  border-radius: var(--bha-radius-full);
+  color: var(--bha-text-secondary);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: var(--bha-shadow-sm);
+}
+
+.bha-theme-toggle-btn:hover {
+  border-color: var(--bha-border-gold);
+  color: var(--bha-text-primary);
+  box-shadow: var(--bha-glow-gold);
+  transform: scale(1.02);
+}
+
+.bha-theme-toggle-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* 4. Taiji Animated Spinner & Crest */
+.bha-taiji-spinner {
+  display: inline-block;
+  animation: taijiSpin 18s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes taijiSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes movingLinePulse {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(211, 47, 47, 0.4);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 14px rgba(211, 47, 47, 0.85);
+    filter: brightness(1.25);
+  }
+}
+
+/* Tắt chuyển động đối với người dùng chọn reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .bha-taiji-spinner,
+  .hex-bar--moving,
+  .row--moving,
+  .bha-ambient-background::before {
+    animation: none !important;
+    transition: none !important;
+  }
 }
