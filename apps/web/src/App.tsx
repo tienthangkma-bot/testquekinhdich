@@ -15,9 +15,10 @@ import {
   LinePosition,
 } from '@kindich/domain';
 import { getDivinationRepository } from './services/repository.service';
-import { SerialCastingForm, SerialCastingResultView } from './components/SerialCasting';
-import { MaiHuaCastingForm, MaiHuaCastingResultView } from './components/MaiHuaCasting';
+import { SerialCastingForm } from './components/SerialCasting';
+import { MaiHuaCastingForm } from './components/MaiHuaCasting';
 import { SixYaoAnalysisView } from './components/SixYaoAnalysis';
+import { DivinationWorkspaceView } from './components/DivinationWorkspace';
 import { QuestionCategorySelector, QuestionCategory } from './components/NotesAndQuestions';
 import { LocalStorageSettingsRepository } from '@kindich/database';
 import { PwaHeaderActions } from './pwa';
@@ -47,12 +48,14 @@ export const App: React.FC = () => {
   } | null>(null);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [saveSuccessNotice, setSaveSuccessNotice] = useState<string | null>(null);
+  const [serialDateTimeInfo, setSerialDateTimeInfo] = useState<DivinationDateTime | null>(null);
+  const [maiHuaDateTimeInfo, setMaiHuaDateTimeInfo] = useState<DivinationDateTime | null>(null);
 
   // Trạng thái cho tab Phân Tích Lục Hào Chuyên Sâu
   const [selectedHexNumber, setSelectedHexNumber] = useState<number>(1);
   const [selectedMovingLines, setSelectedMovingLines] = useState<number[]>([1]);
-  const [showSerialSixYao, setShowSerialSixYao] = useState(false);
-  const [showMaiHuaSixYao, setShowMaiHuaSixYao] = useState(false);
+
+
 
   const hexagramOptions = HEXAGRAMS.map((h) => ({
     value: h.number.toString(),
@@ -85,6 +88,24 @@ export const App: React.FC = () => {
    */
   const handleSerialCastSuccess = async (result: SerialCastingResult) => {
     setSerialResult(result);
+    const now = new Date();
+    const calInfo = getFullCalendarInfo(now.toISOString());
+    const { stem, branch } = parseCanChiString(calInfo.canChi.day);
+    const { voidBranches } = calculateVoidBranches(stem, branch);
+    const dt: DivinationDateTime = {
+      solarDateTime: now.toISOString(),
+      lunarYear: calInfo.lunar.year,
+      lunarMonth: calInfo.lunar.month,
+      lunarDay: calInfo.lunar.day,
+      lunarHourBranch: calInfo.currentHourBranch.branch,
+      yearCanChi: calInfo.canChi.year,
+      monthCanChi: calInfo.canChi.month,
+      dayCanChi: calInfo.canChi.day,
+      hourCanChi: calInfo.canChi.hour,
+      solarTerm: calInfo.solarTerm?.name,
+      voidBranches,
+    };
+    setSerialDateTimeInfo(dt);
     try {
       const repo = getDivinationRepository();
       const now = new Date();
@@ -156,6 +177,23 @@ export const App: React.FC = () => {
     calendarInfo: CalendarConversionResult
   ) => {
     setMaiHuaData({ result, calendarInfo });
+    const { stem: mStem, branch: mBranch } = parseCanChiString(calendarInfo.canChi.day);
+    const { voidBranches: mVoidBranches } = calculateVoidBranches(mStem, mBranch);
+    const mSolarDateStr = `${calendarInfo.solar.year}-${String(calendarInfo.solar.month).padStart(2, '0')}-${String(calendarInfo.solar.day).padStart(2, '0')}T${String(calendarInfo.solar.hour).padStart(2, '0')}:${String(calendarInfo.solar.minute).padStart(2, '0')}:00.000Z`;
+    const mDt: DivinationDateTime = {
+      solarDateTime: mSolarDateStr,
+      lunarYear: calendarInfo.lunar.year,
+      lunarMonth: calendarInfo.lunar.month,
+      lunarDay: calendarInfo.lunar.day,
+      lunarHourBranch: calendarInfo.currentHourBranch.branch,
+      yearCanChi: calendarInfo.canChi.year,
+      monthCanChi: calendarInfo.canChi.month,
+      dayCanChi: calendarInfo.canChi.day,
+      hourCanChi: calendarInfo.canChi.hour,
+      solarTerm: calendarInfo.solarTerm?.name,
+      voidBranches: mVoidBranches,
+    };
+    setMaiHuaDateTimeInfo(mDt);
     try {
       const repo = getDivinationRepository();
       const { stem, branch } = parseCanChiString(calendarInfo.canChi.day);
@@ -317,61 +355,55 @@ export const App: React.FC = () => {
       <main className="main-content">
         {activeMode === 'serial' ? (
           <div className="serial-mode-section">
-            <Card
-              title="Lập Quẻ Theo Số Seri Tiền (SERIAL-MOD8-V1)"
-              subtitle="Thuật toán chuẩn vị trí lẻ thượng quái, chẵn hạ quái và tổng xác định hào động"
-              borderVariant="gold"
-              hoverable
-              extra={
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsHelpModalOpen(true)}
-                >
-                  Quy tắc thuật toán
-                </Button>
-              }
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <QuestionCategorySelector
-                  question={question}
-                  onQuestionChange={setQuestion}
-                  category={inquiryType}
-                  onCategoryChange={setInquiryType}
-                  inputPlaceholder="Ví dụ: Kỳ thi công chức tháng 11 có thuận lợi không?"
-                />
+            {serialResult && serialDateTimeInfo ? (
+              <DivinationWorkspaceView
+                method={CastingMethod.SERIAL}
+                trio={serialResult.trio}
+                dateTimeInfo={serialDateTimeInfo}
+                question={question}
+                inquiryType={inquiryType}
+                serialResult={serialResult}
+                onBackToCasting={() => {
+                  setSerialResult(null);
+                  setSerialDateTimeInfo(null);
+                }}
+                onSaveNote={() => setActiveMode('history')}
+              />
+            ) : (
+              <Card
+                title="Lập Quẻ Theo Số Seri Tiền (SERIAL-MOD8-V1)"
+                subtitle="Thuật toán chuẩn vị trí lẻ thượng quái, chẵn hạ quái và tổng xác định hào động"
+                borderVariant="gold"
+                hoverable
+                extra={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsHelpModalOpen(true)}
+                  >
+                    Quy tắc thuật toán
+                  </Button>
+                }
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <QuestionCategorySelector
+                    question={question}
+                    onQuestionChange={setQuestion}
+                    category={inquiryType}
+                    onCategoryChange={setInquiryType}
+                    inputPlaceholder="Ví dụ: Kỳ thi công chức tháng 11 có thuận lợi không?"
+                  />
 
-                <SerialCastingForm
-                  onCastSuccess={handleSerialCastSuccess}
-                  onReset={() => setSerialResult(null)}
-                />
-              </div>
+                  <SerialCastingForm
+                    onCastSuccess={handleSerialCastSuccess}
+                    onReset={() => {
+                      setSerialResult(null);
+                      setSerialDateTimeInfo(null);
+                    }}
+                  />
+                </div>
 
-              {/* Khu vực hiển thị kết quả hoặc thông báo chờ */}
-              <div style={{ marginTop: '28px' }}>
-                {serialResult ? (
-                  <>
-                    <SerialCastingResultView result={serialResult} />
-                    <div style={{ marginTop: '24px', textAlign: 'center' }}>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowSerialSixYao(!showSerialSixYao)}
-                      >
-                        {showSerialSixYao
-                          ? '▲ Thu gọn đồ bản Lục Hào'
-                          : '☯ Xem bảng phân tích Lục Hào chi tiết'}
-                      </Button>
-                    </div>
-                    {showSerialSixYao && (
-                      <div style={{ marginTop: '24px' }}>
-                        <SixYaoAnalysisView
-                          primaryHexagram={serialResult.trio.primary.number}
-                          movingLineIndices={[serialResult.movingLine as LinePosition]}
-                        />
-                      </div>
-                    )}
-                  </>
-                ) : (
+                <div style={{ marginTop: '28px' }}>
                   <div className="placeholder-box">
                     <div className="placeholder-icon">☯</div>
                     <h4 className="placeholder-text">Chưa khởi quẻ</h4>
@@ -380,76 +412,62 @@ export const App: React.FC = () => {
                       <strong>"Lập quẻ"</strong> để xem đồ hình Quẻ Chủ, Quẻ Biến và Quẻ Hỗ.
                     </p>
                   </div>
-                )}
-              </div>
-            </Card>
+                </div>
+              </Card>
+            )}
           </div>
         ) : activeMode === 'time' ? (
           <div className="mai-hua-mode-section">
-            <Card
-              title="Lập Quẻ Theo Giờ Động Tâm (Mai Hoa Dịch Số)"
-              subtitle="Phương pháp khởi quẻ căn cứ theo thời khắc khởi tâm, phối hợp Can Chi, Lịch Âm và Thể/Dụng"
-              borderVariant="gold"
-              hoverable
-              extra={
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsHelpModalOpen(true)}
-                >
-                  Quy tắc Mai Hoa
-                </Button>
-              }
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <QuestionCategorySelector
-                  question={question}
-                  onQuestionChange={setQuestion}
-                  category={inquiryType}
-                  onCategoryChange={setInquiryType}
-                  inputPlaceholder="Ví dụ: Việc hợp tác kinh doanh sắp tới diễn biến ra sao?"
-                />
+            {maiHuaData && maiHuaDateTimeInfo ? (
+              <DivinationWorkspaceView
+                method={CastingMethod.MAI_HUA}
+                trio={maiHuaData.result.trio}
+                dateTimeInfo={maiHuaDateTimeInfo}
+                question={question}
+                inquiryType={inquiryType}
+                maiHuaResult={maiHuaData.result}
+                calendarInfo={maiHuaData.calendarInfo}
+                onBackToCasting={() => {
+                  setMaiHuaData(null);
+                  setMaiHuaDateTimeInfo(null);
+                }}
+                onSaveNote={() => setActiveMode('history')}
+              />
+            ) : (
+              <Card
+                title="Lập Quẻ Theo Giờ Động Tâm (Mai Hoa Dịch Số)"
+                subtitle="Phương pháp khởi quẻ căn cứ theo thời khắc khởi tâm, phối hợp Can Chi, Lịch Âm và Thể/Dụng"
+                borderVariant="gold"
+                hoverable
+                extra={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsHelpModalOpen(true)}
+                  >
+                    Quy tắc Mai Hoa
+                  </Button>
+                }
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <QuestionCategorySelector
+                    question={question}
+                    onQuestionChange={setQuestion}
+                    category={inquiryType}
+                    onCategoryChange={setInquiryType}
+                    inputPlaceholder="Ví dụ: Việc hợp tác kinh doanh sắp tới diễn biến ra sao?"
+                  />
 
-                <MaiHuaCastingForm
-                  onCastSuccess={handleMaiHuaCastSuccess}
-                  onReset={() => setMaiHuaData(null)}
-                />
-              </div>
+                  <MaiHuaCastingForm
+                    onCastSuccess={handleMaiHuaCastSuccess}
+                    onReset={() => {
+                      setMaiHuaData(null);
+                      setMaiHuaDateTimeInfo(null);
+                    }}
+                  />
+                </div>
 
-              {/* Khu vực hiển thị kết quả Mai Hoa hoặc thông báo chờ */}
-              <div style={{ marginTop: '28px' }}>
-                {maiHuaData ? (
-                  <>
-                    <MaiHuaCastingResultView
-                      result={maiHuaData.result}
-                      calendarInfo={maiHuaData.calendarInfo}
-                    />
-                    <div style={{ marginTop: '24px', textAlign: 'center' }}>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowMaiHuaSixYao(!showMaiHuaSixYao)}
-                      >
-                        {showMaiHuaSixYao
-                          ? '▲ Thu gọn đồ bản Lục Hào'
-                          : '☯ Xem bảng phân tích Lục Hào chi tiết'}
-                      </Button>
-                    </div>
-                    {showMaiHuaSixYao && (
-                      <div style={{ marginTop: '24px' }}>
-                        <SixYaoAnalysisView
-                          primaryHexagram={maiHuaData.result.trio.primary.number}
-                          movingLineIndices={[maiHuaData.result.movingLine as LinePosition]}
-                          dateTime={{
-                            dayCanChi: maiHuaData.calendarInfo.canChi.day,
-                            monthCanChi: maiHuaData.calendarInfo.canChi.month,
-                            yearCanChi: maiHuaData.calendarInfo.canChi.year,
-                            hourCanChi: maiHuaData.calendarInfo.canChi.hour,
-                          }}
-                        />
-                      </div>
-                    )}
-                  </>
-                ) : (
+                <div style={{ marginTop: '28px' }}>
                   <div className="placeholder-box">
                     <div className="placeholder-icon">⌛</div>
                     <h4 className="placeholder-text">Chưa khởi quẻ giờ động tâm</h4>
@@ -458,9 +476,9 @@ export const App: React.FC = () => {
                       <strong>"Lập quẻ Mai Hoa"</strong> để phân tích Quẻ Chủ, Quẻ Biến, Quẻ Hỗ và quan hệ Thể/Dụng.
                     </p>
                   </div>
-                )}
-              </div>
-            </Card>
+                </div>
+              </Card>
+            )}
           </div>
         ) : activeMode === 'six-yao' ? (
           <div className="six-yao-mode-section">

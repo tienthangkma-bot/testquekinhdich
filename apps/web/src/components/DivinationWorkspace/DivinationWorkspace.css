@@ -1,0 +1,822 @@
+/* ==========================================================================
+   Single Divination Workspace (Màn hình kết quả luận quẻ tập trung)
+   Phong cách chuẩn mực cổ điển, trang trọng, lấy cảm hứng từ ảnh sớ Dịch học
+   ========================================================================== */
+
+.single-divination-workspace {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 16px 20px 48px;
+  background-color: var(--color-bg-primary, #FFFFFF);
+  color: var(--color-text-primary, #1A1A1A);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   1. Toolbar & Header
+   -------------------------------------------------------------------------- */
+
+.workspace-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--color-bg-secondary, #F9F9F9);
+  border: 1px solid var(--color-border-subtle, #E4E4E4);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.workspace-toolbar-left,
+.workspace-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.workspace-status-badge {
+  font-size: 0.85rem;
+  color: #2E7D32;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.workspace-brand-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 20px;
+  border: 1.5px solid #C62828;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%);
+  margin-bottom: 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.workspace-brand-text {
+  flex: 1;
+}
+
+.workspace-app-title {
+  margin: 0 0 12px 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #B71C1C;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.workspace-meta-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.92rem;
+}
+
+.meta-row--multi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.meta-row--multi > div {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.meta-label {
+  color: var(--color-text-secondary, #555555);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.meta-value {
+  color: var(--color-text-primary, #1A1A1A);
+}
+
+.meta-value--question {
+  color: #B71C1C;
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+/* Đồng tiền cổ biểu trưng */
+.workspace-coin-emblem {
+  flex-shrink: 0;
+  margin-left: 20px;
+}
+
+.coin-outer-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #D84315 0%, #8D1B1B 100%);
+  border: 3px solid #FFD54F;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coin-inner-square {
+  width: 32px;
+  height: 32px;
+  background-color: #5D1010;
+  border: 1.5px solid #FFD54F;
+  position: relative;
+}
+
+.coin-character {
+  position: absolute;
+  color: #FFE082;
+  font-size: 9px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.coin-character.top { top: -14px; left: 50%; transform: translateX(-50%); }
+.coin-character.bottom { bottom: -14px; left: 50%; transform: translateX(-50%); }
+.coin-character.left { left: -16px; top: 50%; transform: translateY(-50%); }
+.coin-character.right { right: -16px; top: 50%; transform: translateY(-50%); }
+
+/* --------------------------------------------------------------------------
+   2. Hexagram Imagery (3 Quẻ)
+   -------------------------------------------------------------------------- */
+
+.workspace-hexagrams-section {
+  margin-bottom: 24px;
+}
+
+.workspace-hexagrams-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.hexagram-figure-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 10px;
+  background-color: var(--color-bg-secondary, #FCFCFC);
+  border: 1px solid var(--color-border-subtle, #E0E0E0);
+  border-radius: 8px;
+}
+
+.hex-title {
+  margin: 0 0 12px 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.hex-title--primary { color: #C62828; }
+.hex-title--nuclear { color: #D84315; }
+.hex-title--transformed { color: #C62828; }
+
+.hex-lines-vertical-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 140px;
+  margin-bottom: 12px;
+}
+
+.hex-line-row {
+  height: 12px;
+  width: 100%;
+}
+
+.hex-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.hex-bar--yang {
+  width: 100%;
+  background-color: #1565C0;
+}
+
+.hex-bar-yin-wrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+}
+
+.hex-bar--yin-half {
+  flex: 1;
+  height: 100%;
+  background-color: #1565C0;
+  border-radius: 2px;
+}
+
+.hex-bar-gap {
+  width: 18px;
+  flex-shrink: 0;
+}
+
+/* Hào động tô màu đỏ nổi bật */
+.hex-bar--moving,
+.hex-line-row--moving .hex-bar--yang,
+.hex-line-row--moving .hex-bar--yin-half {
+  background-color: #D32F2F !important;
+  box-shadow: 0 0 4px rgba(211, 47, 47, 0.4);
+}
+
+.hex-palace-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #757575;
+  letter-spacing: 1px;
+}
+
+.mai-hua-badge,
+.hex-role-badge {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555555;
+  background-color: #EEEEEE;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.hex-role-badge--transformed {
+  color: #C62828;
+  background-color: #FFEBEE;
+}
+
+.static-hex-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  color: #757575;
+  font-size: 0.88rem;
+  text-align: center;
+  padding: 0 10px;
+}
+
+.static-icon {
+  font-size: 1.8rem;
+  margin-bottom: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   3. Tables (Master & Supplementary)
+   -------------------------------------------------------------------------- */
+
+.workspace-section-wrapper {
+  margin-bottom: 28px;
+}
+
+.workspace-section-caption {
+  margin: 0 0 8px 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #B71C1C;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.workspace-table-card {
+  border: 1px solid #D0D0D0;
+  border-radius: 6px;
+  background-color: #FFFFFF;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.workspace-table-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.workspace-master-table,
+.workspace-supp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.workspace-master-table th,
+.workspace-supp-table th {
+  background-color: #F5F5F5;
+  color: #212121;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-bottom: 1.5px solid #BDBDBD;
+  border-right: 1px solid #E0E0E0;
+  font-size: 0.88rem;
+}
+
+.workspace-master-table th:last-child,
+.workspace-supp-table th:last-child {
+  border-right: none;
+}
+
+.workspace-master-table td,
+.workspace-supp-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #EEEEEE;
+  border-right: 1px solid #EEEEEE;
+}
+
+.workspace-master-table td:last-child,
+.workspace-supp-table td:last-child {
+  border-right: none;
+}
+
+.workspace-master-row:hover,
+.workspace-supp-row:hover {
+  background-color: #FFFDE7;
+}
+
+/* Dòng hào động nền nhẹ */
+.row--moving {
+  background-color: #FFF5F5 !important;
+}
+
+.th-center, .cell-center { text-align: center; }
+.th-left, .cell-left { text-align: left; }
+
+.text-red { color: #C62828 !important; }
+.text-blue { color: #1565C0 !important; }
+.text-muted { color: #9E9E9E; }
+.font-bold { font-weight: 700; }
+.font-medium { font-weight: 500; }
+
+.hex-ascii-bar {
+  font-family: monospace;
+  font-size: 1.1rem;
+  letter-spacing: -1px;
+  font-weight: 900;
+  display: inline-block;
+  line-height: 1;
+}
+
+.tag-the-bold {
+  color: #C62828;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.tag-ung-bold {
+  color: #1565C0;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.tag-tk {
+  display: inline-block;
+  color: #C62828;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+/* Supplementary Card */
+.workspace-supplementary-card {
+  border: 1px solid #D0D0D0;
+  border-radius: 6px;
+  background-color: #FFFFFF;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.workspace-supp-footer-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 14px;
+  background-color: #F9F9F9;
+  border-top: 1px solid #E0E0E0;
+}
+
+.supp-chip {
+  font-size: 0.84rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: #FFFFFF;
+  border: 1px solid #D0D0D0;
+  color: #333333;
+}
+
+.supp-chip strong {
+  color: #B71C1C;
+}
+
+.supp-chip--am-dong {
+  background-color: #FFF3E0;
+  border-color: #FFE082;
+  color: #E65100;
+  font-weight: bold;
+}
+
+/* --------------------------------------------------------------------------
+   4. Interpretation Section
+   -------------------------------------------------------------------------- */
+
+.workspace-interpretation-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 2px solid #C62828;
+  padding-top: 20px;
+}
+
+.interpretation-section-header {
+  margin-bottom: 4px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #B71C1C;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.88rem;
+  color: #666666;
+}
+
+.interp-card {
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  background-color: #FFFFFF;
+  padding: 16px;
+}
+
+.interp-card__heading {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1A1A1A;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #EEEEEE;
+  padding-bottom: 8px;
+}
+
+.interp-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background-color: #C62828;
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.interp-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.interp-overview-box {
+  background-color: #FAFAFA;
+  border: 1px solid #EAEAEA;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.box-title {
+  margin: 0 0 6px 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #B71C1C;
+}
+
+.box-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #333333;
+}
+
+.classical-quote-box {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #FFFDE7;
+  border-left: 3px solid #FBC02D;
+  font-size: 0.88rem;
+}
+
+.quote-label {
+  display: block;
+  font-weight: 700;
+  color: #795548;
+  font-size: 0.8rem;
+  margin-bottom: 2px;
+}
+
+.quote-text {
+  margin: 0;
+  color: #424242;
+}
+
+/* Ti/Yong Mai Hua */
+.tiyong-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.tiyong-badge-group {
+  display: flex;
+  gap: 8px;
+}
+
+.tiyong-pill {
+  font-size: 0.85rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.tiyong-pill--body {
+  background-color: #E3F2FD;
+  color: #0D47A1;
+  border: 1px solid #BBDEFB;
+}
+
+.tiyong-pill--use {
+  background-color: #FFF3E0;
+  color: #E65100;
+  border: 1px solid #FFE0B2;
+}
+
+.tiyong-judgment-tag {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2E7D32;
+}
+
+.tiyong-narrative {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* Interp Lines List */
+.interp-lines-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.interp-line-item {
+  border: 1px solid #EAEAEA;
+  border-radius: 6px;
+  padding: 10px 14px;
+  background-color: #FAFAFA;
+}
+
+.interp-line-item--moving {
+  border-color: #FFCDD2;
+  background-color: #FFFAFA;
+}
+
+.interp-line-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.line-tag {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #212121;
+}
+
+.badge-moving {
+  background-color: #C62828;
+  color: #FFFFFF;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  margin-left: 6px;
+}
+
+.line-trad-name {
+  color: #555555;
+  font-size: 0.88rem;
+}
+
+.line-canchi-element {
+  color: #1565C0;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.line-classical-text {
+  margin: 0 0 4px 0;
+  color: #4A148C;
+  font-size: 0.9rem;
+}
+
+.line-meaning-text {
+  margin: 0;
+  color: #333333;
+  font-size: 0.9rem;
+}
+
+.line-moving-effect {
+  margin: 4px 0 0 0;
+  color: #B71C1C;
+  font-size: 0.88rem;
+}
+
+.interp-narrative-text {
+  margin: 0 0 8px 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.question-analysis-box {
+  background-color: #F1F8E9;
+  border: 1px solid #DCEDC8;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 0.92rem;
+}
+
+.question-analysis-box p {
+  margin: 0 0 6px 0;
+}
+
+.question-analysis-box p:last-child {
+  margin-bottom: 0;
+}
+
+.conclusion-summary-box {
+  background-color: #FAFAFA;
+  border-left: 4px solid #C62828;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.conclusion-title {
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #B71C1C;
+}
+
+.conclusion-text {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.conclusion-keypoints {
+  margin-bottom: 12px;
+}
+
+.keypoints-title {
+  margin: 0 0 6px 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.keypoints-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.9rem;
+  color: #333333;
+}
+
+.keypoints-list li {
+  margin-bottom: 4px;
+}
+
+.conclusion-timing-box {
+  padding: 8px 12px;
+  background-color: #E8F5E9;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #1B5E20;
+  margin-bottom: 14px;
+}
+
+.workspace-disclaimer-box {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  background-color: #FFFDE7;
+  border: 1px solid #FFF59D;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #5D4037;
+  line-height: 1.4;
+}
+
+.disclaimer-icon {
+  color: #F57F17;
+  font-weight: bold;
+}
+
+.disclaimer-text {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   5. Responsive & Print Media Styles
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .single-divination-workspace {
+    padding: 10px 12px 32px;
+  }
+
+  .workspace-brand-banner {
+    flex-direction: column;
+    padding: 12px 14px;
+  }
+
+  .workspace-coin-emblem {
+    display: none;
+  }
+
+  .workspace-hexagrams-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .meta-row--multi {
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  .workspace-master-table,
+  .workspace-supp-table {
+    font-size: 0.85rem;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .single-divination-workspace {
+    padding: 0;
+    max-width: 100%;
+  }
+
+  .workspace-brand-banner {
+    box-shadow: none;
+    border: 1px solid #999999;
+  }
+
+  .workspace-table-card,
+  .workspace-supplementary-card,
+  .interp-card {
+    box-shadow: none;
+    border: 1px solid #CCCCCC;
+    break-inside: avoid;
+  }
+
+  .workspace-master-table th,
+  .workspace-supp-table th {
+    background-color: #EEEEEE !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .text-red {
+    color: #B71C1C !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
