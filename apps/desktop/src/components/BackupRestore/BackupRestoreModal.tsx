@@ -15,6 +15,14 @@ import {
   ImportSummary,
   KinDichBackupData,
 } from '@kindich/domain';
+import {
+  ISqliteDatabase,
+  exportSqliteBackup,
+  validateSqliteBackupData,
+  checkSqliteImportConflicts,
+  importSqliteBackup,
+} from '../../database';
+import { getDivinationDatabase } from '../../services/repository.service';
 import './BackupRestore.css';
 
 export interface BackupRestoreModalProps {
@@ -22,19 +30,22 @@ export interface BackupRestoreModalProps {
   readonly onClose: () => void;
   readonly onRestoreSuccess?: () => void;
   readonly database?: KinDichDatabase;
+  readonly sqliteDatabase?: ISqliteDatabase;
 }
 
 type ActiveTab = 'export' | 'restore';
 
 /**
- * Modal Sao Lưu & Khôi Phục Dữ Liệu Offline (Requirements 1-8)
+ * Modal Sao Lưu & Khôi Phục Dữ Liệu Offline (Hỗ trợ cả SQLite Desktop và Dexie Fallback)
  */
 export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
   isOpen,
   onClose,
   onRestoreSuccess,
   database,
+  sqliteDatabase,
 }) => {
+  const sqliteDb = sqliteDatabase ?? getDivinationDatabase();
   const db = database ?? getKinDichDatabase();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -65,22 +76,37 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
   // Tải thống kê hiện tại
   const loadDbStats = useCallback(async () => {
     try {
-      const [divCount, resCount, anaCount, noteCount] = await Promise.all([
-        db.divinations.count(),
-        db.divination_results.count(),
-        db.divination_analyses.count(),
-        db.divination_notes.count(),
-      ]);
-      setStats({
-        divinationsCount: divCount,
-        resultsCount: resCount,
-        analysesCount: anaCount,
-        notesCount: noteCount,
-      });
+      if (sqliteDb) {
+        const [divRow, resRow, anaRow, noteRow] = await Promise.all([
+          sqliteDb.getFirstAsync<{ cnt: number }>('SELECT COUNT(*) as cnt FROM divinations;'),
+          sqliteDb.getFirstAsync<{ cnt: number }>('SELECT COUNT(*) as cnt FROM divination_results;'),
+          sqliteDb.getFirstAsync<{ cnt: number }>('SELECT COUNT(*) as cnt FROM divination_analyses;'),
+          sqliteDb.getFirstAsync<{ cnt: number }>('SELECT COUNT(*) as cnt FROM divination_notes;'),
+        ]);
+        setStats({
+          divinationsCount: divRow?.cnt ?? 0,
+          resultsCount: resRow?.cnt ?? 0,
+          analysesCount: anaRow?.cnt ?? 0,
+          notesCount: noteRow?.cnt ?? 0,
+        });
+      } else {
+        const [divCount, resCount, anaCount, noteCount] = await Promise.all([
+          db.divinations.count(),
+          db.divination_results.count(),
+          db.divination_analyses.count(),
+          db.divination_notes.count(),
+        ]);
+        setStats({
+          divinationsCount: divCount,
+          resultsCount: resCount,
+          analysesCount: anaCount,
+          notesCount: noteCount,
+        });
+      }
     } catch (err) {
       console.error('Lỗi khi tải thống kê cơ sở dữ liệu:', err);
     }
-  }, [db]);
+  }, [sqliteDb, db]);
 
   useEffect(() => {
     if (isOpen) {
@@ -96,18 +122,24 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
   }, [isOpen, loadDbStats]);
 
   /**
-   * Xuất toàn bộ dữ liệu ra file JSON offline (Requirement 1, 2, 3, 8)
+   * Xuất toàn bộ dữ liệu ra file JSON offline
    */
   const handleExport = async () => {
     try {
       setIsExporting(true);
       setExportNotice(null);
 
-      const backupData = await exportBackup(db, {
-        appVersion: '1.0.0',
-        defaultRuleSetId: 'BO_PHE_CHINH_TONG_V1',
-        defaultAlgorithmVersion: 'SERIAL-MOD8-V1',
-      });
+      const backupData = sqliteDb
+        ? await exportSqliteBackup(sqliteDb, {
+            appVersion: '1.0.0',
+            defaultRuleSetId: 'BO_PHE_CHINH_TONG_V1',
+            defaultAlgorithmVersion: 'SERIAL-MOD8-V1',
+          })
+        : await exportBackup(db, {
+            appVersion: '1.0.0',
+            defaultRuleSetId: 'BO_PHE_CHINH_TONG_V1',
+            defaultAlgorithmVersion: 'SERIAL-MOD8-V1',
+          });
 
       const jsonStr = JSON.stringify(backupData, null, 2);
       const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
@@ -117,7 +149,7 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
       const dateStr = now.toISOString().slice(0, 10);
       const fileName = `kindich_backup_${dateStr}.json`;
 
-      // Tạo link tải ảo và tự động kích hoạt tải về trên trình duyệt
+      // Tạo link tải ảo và tự động kích hoạt tải về
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -139,7 +171,7 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
   };
 
   /**
-   * Xử lý khi người dùng chọn file JSON sao lưu (Requirement 4, 5, 6)
+   * Xử lý khi người dùng chọn file JSON sao lưu
    */
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -162,8 +194,10 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
         return;
       }
 
-      // Kiểm tra tính hợp lệ trước khi nhập (Requirement 5)
-      const validation = validateBackupData(json);
+      // Kiểm tra tính hợp lệ trước khi nhập
+      const validation = sqliteDb
+        ? validateSqliteBackupData(json)
+        : validateBackupData(json);
       setValidationResult(validation);
 
       if (!validation.isValid) {
@@ -176,8 +210,10 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
       const backupObj = json as KinDichBackupData;
       setParsedBackup(backupObj);
 
-      // Kiểm tra xung đột trùng lặp (Requirement 6)
-      const conflicts = await checkImportConflicts(db, backupObj);
+      // Kiểm tra xung đột trùng lặp
+      const conflicts = sqliteDb
+        ? await checkSqliteImportConflicts(sqliteDb, backupObj)
+        : await checkImportConflicts(db, backupObj);
       setConflictSummary(conflicts);
     } catch (err) {
       console.error('Lỗi khi đọc file sao lưu:', err);
@@ -186,7 +222,7 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
   };
 
   /**
-   * Thực hiện khôi phục dữ liệu vào IndexedDB (Requirement 4, 6, 7, 8)
+   * Thực hiện khôi phục dữ liệu
    */
   const handleExecuteRestore = async () => {
     if (!parsedBackup) return;
@@ -195,7 +231,9 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
       setIsImporting(true);
       setImportError(null);
 
-      const result = await importBackup(db, parsedBackup, { mode: importMode });
+      const result = sqliteDb
+        ? await importSqliteBackup(sqliteDb, parsedBackup, { mode: importMode === 'overwrite' ? 'overwrite' : 'merge' })
+        : await importBackup(db, parsedBackup, { mode: importMode });
 
       if (result.success) {
         setImportSuccessSummary(result);
@@ -210,7 +248,7 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
       }
     } catch (err) {
       console.error('Lỗi khi khôi phục dữ liệu:', err);
-      setImportError('Đã xảy ra sự cố trong quá trình ghi dữ liệu vào IndexedDB.');
+      setImportError('Đã xảy ra sự cố trong quá trình ghi dữ liệu.');
     } finally {
       setIsImporting(false);
     }
@@ -239,10 +277,8 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
             aria-selected={activeTab === 'export'}
             className={`backup-tab-btn ${activeTab === 'export' ? 'backup-tab-btn--active' : ''}`}
             onClick={() => setActiveTab('export')}
-            data-testid="tab-export"
           >
-            <span>📤</span>
-            <span>Sao Lưu Dữ Liệu (Export)</span>
+            📤 Xuất Sao Lưu (JSON)
           </button>
           <button
             type="button"
@@ -250,245 +286,171 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
             aria-selected={activeTab === 'restore'}
             className={`backup-tab-btn ${activeTab === 'restore' ? 'backup-tab-btn--active' : ''}`}
             onClick={() => setActiveTab('restore')}
-            data-testid="tab-restore"
           >
-            <span>📥</span>
-            <span>Khôi Phục Dữ Liệu (Restore)</span>
+            📥 Khôi Phục Dữ Liệu
           </button>
         </div>
 
-        {/* ============================================================== */}
-        {/* TAB 1: SAO LƯU DỮ LIỆU (EXPORT) */}
-        {/* ============================================================== */}
-        {activeTab === 'export' ? (
-          <div>
-            <p style={{ fontSize: '0.9rem', color: 'var(--bha-text-secondary)', marginTop: 0 }}>
-              Xuất toàn bộ lịch sử lập quẻ, phân tích Lục Hào, ghi chú và cấu hình cá nhân ra file
-              JSON. Dữ liệu được đóng gói an toàn và lưu trực tiếp trên máy của bạn (100% offline).
-            </p>
-
-            {/* Thống kê dữ liệu hiện có trong DB */}
-            <div className="backup-stats-grid" data-testid="backup-stats-grid">
-              <div className="backup-stat-card">
-                <div className="backup-stat-card__label">Tổng Lần Lập Quẻ</div>
-                <div className="backup-stat-card__value" data-testid="stat-divinations">
-                  {stats.divinationsCount}
-                </div>
-              </div>
-              <div className="backup-stat-card">
-                <div className="backup-stat-card__label">Kết Quả Quẻ</div>
-                <div className="backup-stat-card__value">{stats.resultsCount}</div>
-              </div>
-              <div className="backup-stat-card">
-                <div className="backup-stat-card__label">Bản Phân Tích</div>
-                <div className="backup-stat-card__value">{stats.analysesCount}</div>
-              </div>
-              <div className="backup-stat-card">
-                <div className="backup-stat-card__label">Ghi Chú Nghiệm Lý</div>
-                <div className="backup-stat-card__value" data-testid="stat-notes">
-                  {stats.notesCount}
-                </div>
+        {/* Nội dung Tab Xuất Dữ Liệu */}
+        {activeTab === 'export' && (
+          <div className="backup-tab-content">
+            <div className="backup-stats-box">
+              <h4 className="backup-section-title">📊 Dữ liệu hiện có trong ứng dụng:</h4>
+              <ul className="backup-stats-list">
+                <li>
+                  Lần lập quẻ: <strong>{stats.divinationsCount}</strong>
+                </li>
+                <li>
+                  Kết quả quẻ: <strong>{stats.resultsCount}</strong>
+                </li>
+                <li>
+                  Bản ghi phân tích: <strong>{stats.analysesCount}</strong>
+                </li>
+                <li>
+                  Ghi chú & Nghiệm lý: <strong>{stats.notesCount}</strong>
+                </li>
+              </ul>
+              <div style={{ marginTop: '10px', fontSize: '12px', color: 'var(--bha-text-secondary)' }}>
+                Lưu trữ: <strong>{sqliteDb ? 'SQLite Cục Bộ (Tauri 2)' : 'IndexedDB (Offline)'}</strong> • Schema v{CURRENT_SCHEMA_VERSION}
               </div>
             </div>
 
-            {/* Thông tin Metadata chuẩn được lưu kèm (Requirement 3) */}
-            <div className="backup-meta-list">
-              <span className="backup-meta-pill">Schema: V{CURRENT_SCHEMA_VERSION}</span>
-              <span className="backup-meta-pill">RuleSet: BO_PHE_CHINH_TONG_V1</span>
-              <span className="backup-meta-pill">Algorithm: SERIAL-MOD8-V1</span>
-              <span className="backup-meta-pill">Offline: Không gửi dữ liệu lên máy chủ</span>
+            <div className="backup-action-area">
+              <Button
+                variant="primary"
+                onClick={handleExport}
+                isLoading={isExporting}
+                disabled={isExporting}
+              >
+                {isExporting ? 'Đang xuất dữ liệu...' : '💾 Xuất Toàn Bộ Dữ Liệu Ra File JSON'}
+              </Button>
             </div>
 
             {exportNotice && (
               <div
-                className={`backup-alert ${
-                  exportNotice.startsWith('✓') ? 'backup-alert--success' : 'backup-alert--error'
+                className={`backup-notice ${
+                  exportNotice.startsWith('✓') ? 'backup-notice--success' : 'backup-notice--error'
                 }`}
-                style={{ marginTop: '16px' }}
-                data-testid="export-notice"
               >
                 {exportNotice}
               </div>
             )}
-
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
-              <Button
-                variant="gold"
-                size="md"
-                onClick={handleExport}
-                disabled={isExporting}
-                data-testid="execute-export-button"
-              >
-                <span>{isExporting ? 'Đang đóng gói file...' : '📤 Tải file sao lưu (.json) ngay'}</span>
-              </Button>
-            </div>
           </div>
-        ) : (
-          /* ============================================================== */
-          /* TAB 2: KHÔI PHỤC DỮ LIỆU (RESTORE) */
-          /* ============================================================== */
-          <div>
-            <p style={{ fontSize: '0.9rem', color: 'var(--bha-text-secondary)', marginTop: 0 }}>
-              Chọn file JSON sao lưu từ máy để khôi phục lại dữ liệu lịch sử gieo quẻ và ghi chú.
-              Hệ thống sẽ tự động kiểm tra tính hợp lệ trước khi ghi dữ liệu.
-            </p>
+        )}
 
-            {/* Vùng chọn file */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept=".json"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-              data-testid="backup-file-input"
-            />
-
-            <div
-              className="backup-dropzone"
-              onClick={() => fileInputRef.current?.click()}
-              data-testid="backup-dropzone"
-            >
-              <div className="backup-dropzone__icon">📁</div>
-              <div className="backup-dropzone__text">
-                {selectedFile ? selectedFile.name : 'Bấm vào đây để chọn file JSON sao lưu'}
-              </div>
-              <div className="backup-dropzone__sub">
-                {selectedFile
-                  ? `${(selectedFile.size / 1024).toFixed(1)} KB - Nhấp để đổi file khác`
-                  : 'Chỉ chấp nhận file .json có định dạng KINDICH_BACKUP'}
-              </div>
+        {/* Nội dung Tab Khôi Phục Dữ Liệu */}
+        {activeTab === 'restore' && (
+          <div className="backup-tab-content">
+            <div className="backup-file-picker">
+              <label htmlFor="backup-file-input" className="backup-picker-label">
+                📁 Chọn tệp tin sao lưu (.json):
+              </label>
+              <input
+                id="backup-file-input"
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                onChange={handleFileChange}
+                className="backup-file-input"
+              />
+              {selectedFile && (
+                <div className="backup-file-info">
+                  Đã chọn: <strong>{selectedFile.name}</strong> ({(selectedFile.size / 1024).toFixed(1)} KB)
+                </div>
+              )}
             </div>
 
-            {/* Thông báo lỗi khi đọc / validate file */}
+            {/* Thông báo lỗi validation */}
             {importError && (
-              <div
-                className="backup-alert backup-alert--error"
-                style={{ marginTop: '16px' }}
-                data-testid="import-error-alert"
-              >
-                <div className="backup-alert__title">❌ Không thể khôi phục file</div>
-                <div style={{ whiteSpace: 'pre-wrap' }}>{importError}</div>
+              <div className="backup-notice backup-notice--error">
+                <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>
+                  {importError}
+                </pre>
               </div>
             )}
 
-            {/* Kết quả kiểm tra file hợp lệ và xem trước thông tin */}
-            {validationResult?.isValid && validationResult.summary && (
-              <div style={{ marginTop: '16px' }}>
-                <div className="backup-alert backup-alert--success" data-testid="file-preview-card">
-                  <div className="backup-alert__title">
-                    ✓ File hợp lệ (KINDICH_BACKUP Schema V{validationResult.summary.schemaVersion})
-                  </div>
-                  <div style={{ fontSize: '0.85rem' }}>
-                    Tìm thấy: <strong>{validationResult.summary.totalDivinations}</strong> lần lập quẻ,{' '}
-                    <strong>{validationResult.summary.totalNotes}</strong> ghi chú,{' '}
-                    <strong>{validationResult.summary.totalResults}</strong> kết quả.
-                    {validationResult.summary.requiresMigration && (
-                      <span style={{ color: '#E65100', marginLeft: '6px' }}>
-                        (Sẽ tự động nâng cấp từ Schema V{validationResult.summary.schemaVersion} lên V
-                        {CURRENT_SCHEMA_VERSION})
-                      </span>
-                    )}
-                  </div>
-                </div>
+            {/* Xem trước thông tin file hợp lệ & Cảnh báo trùng lặp */}
+            {validationResult?.isValid && parsedBackup && conflictSummary && (
+              <div className="backup-preview-box">
+                <h4 className="backup-section-title">🔍 Thông tin bản sao lưu:</h4>
+                <ul className="backup-stats-list">
+                  <li>
+                    Thời gian tạo:{' '}
+                    <strong>{new Date(parsedBackup.metadata.exportedAt).toLocaleString('vi-VN')}</strong>
+                  </li>
+                  <li>
+                    Phiên bản Schema:{' '}
+                    <strong>v{parsedBackup.metadata.schemaVersion}</strong>
+                  </li>
+                  <li>
+                    Tổng số quẻ trong file:{' '}
+                    <strong>{parsedBackup.metadata.totalDivinations}</strong>
+                  </li>
+                  <li>
+                    Tổng số ghi chú trong file:{' '}
+                    <strong>{parsedBackup.metadata.totalNotes}</strong>
+                  </li>
+                </ul>
 
-                {/* Cảnh báo xung đột trùng lặp (Requirement 6) */}
-                {conflictSummary?.hasConflicts && (
-                  <div
-                    className="backup-alert backup-alert--warning"
-                    style={{ marginTop: '14px' }}
-                    data-testid="duplicate-warning-banner"
-                  >
-                    <div className="backup-alert__title">
-                      ⚠️ Cảnh Báo Trùng Lặp: Phát hiện {conflictSummary.duplicateDivinationsCount} lần lập
-                      quẻ đã tồn tại trong máy!
-                    </div>
-                    <div>
-                      Có <strong>{conflictSummary.duplicateDivinationsCount}</strong> bản ghi trùng mã
-                      định danh (ID) và <strong>{conflictSummary.newDivinationsCount}</strong> bản ghi
-                      mới chưa có.
-                    </div>
-
-                    {/* Lựa chọn phương án xử lý trùng lặp */}
-                    <div className="conflict-options-box" style={{ marginTop: '8px' }}>
-                      <label className="conflict-option-item">
+                {/* Cảnh báo dữ liệu trùng lặp */}
+                {conflictSummary.hasConflicts ? (
+                  <div className="backup-conflict-warning">
+                    <strong>⚠️ Phát hiện {conflictSummary.duplicateDivinationsCount} bản ghi trùng lặp:</strong>
+                    <div style={{ marginTop: '8px' }}>
+                      <label style={{ marginRight: '16px', cursor: 'pointer' }}>
                         <input
                           type="radio"
                           name="importMode"
                           value="overwrite"
                           checked={importMode === 'overwrite'}
                           onChange={() => setImportMode('overwrite')}
-                          data-testid="radio-overwrite"
-                        />
-                        <div className="conflict-option-item__label">
-                          <span className="conflict-option-item__title">
-                            Ghi đè bản ghi trùng lặp (Khuyến nghị)
-                          </span>
-                          <span className="conflict-option-item__desc">
-                            Cập nhật lại các bản ghi trùng bằng dữ liệu mới nhất từ file sao lưu.
-                          </span>
-                        </div>
+                        />{' '}
+                        Ghi đè dữ liệu trùng lặp (Cập nhật mới)
                       </label>
-
-                      <label className="conflict-option-item">
+                      <label style={{ cursor: 'pointer' }}>
                         <input
                           type="radio"
                           name="importMode"
                           value="skip"
                           checked={importMode === 'skip'}
                           onChange={() => setImportMode('skip')}
-                          data-testid="radio-skip"
-                        />
-                        <div className="conflict-option-item__label">
-                          <span className="conflict-option-item__title">
-                            Bỏ qua bản ghi trùng lặp
-                          </span>
-                          <span className="conflict-option-item__desc">
-                            Giữ nguyên dữ liệu cũ trên máy, chỉ nhập {conflictSummary.newDivinationsCount}{' '}
-                            bản ghi mới.
-                          </span>
-                        </div>
+                        />{' '}
+                        Bỏ qua các bản ghi đã có (Giữ nguyên cũ)
                       </label>
                     </div>
                   </div>
+                ) : (
+                  <div className="backup-notice backup-notice--success" style={{ margin: '12px 0' }}>
+                    ✓ Không có xung đột trùng lặp. Tất cả dữ liệu đều mới!
+                  </div>
                 )}
 
-                {/* Nút bấm thực hiện khôi phục */}
-                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <div className="backup-action-area" style={{ marginTop: '16px' }}>
                   <Button
-                    variant="primary"
-                    size="md"
+                    variant="gold"
                     onClick={handleExecuteRestore}
+                    isLoading={isImporting}
                     disabled={isImporting}
-                    data-testid="execute-restore-button"
                   >
-                    <span>
-                      {isImporting
-                        ? 'Đang khôi phục dữ liệu...'
-                        : `📥 Khôi phục ${validationResult.summary.totalDivinations} lần lập quẻ`}
-                    </span>
+                    {isImporting ? 'Đang khôi phục dữ liệu...' : '⚡ Bắt Đầu Khôi Phục Dữ Liệu'}
                   </Button>
                 </div>
               </div>
             )}
 
-            {/* Thông báo kết quả khôi phục thành công (Requirement 7) */}
+            {/* Thông báo kết quả khôi phục thành công */}
             {importSuccessSummary && (
-              <div
-                className="backup-alert backup-alert--success"
-                style={{ marginTop: '16px' }}
-                data-testid="restore-success-notice"
-              >
-                <div className="backup-alert__title">✓ Khôi Phục Dữ Liệu Thành Công!</div>
-                <div>
-                  - Nhập mới: <strong>{importSuccessSummary.importedDivinations}</strong> lần lập quẻ.
-                  <br />- Ghi đè cập nhật:{' '}
-                  <strong>{importSuccessSummary.overwrittenDivinations}</strong> lần lập quẻ.
-                  <br />- Bỏ qua trùng lặp:{' '}
-                  <strong>{importSuccessSummary.skippedDivinations}</strong> lần lập quẻ.
-                  <br />- Ghi chú khôi phục: <strong>{importSuccessSummary.importedNotes}</strong>.
-                  <br />- Cấu hình khôi phục:{' '}
-                  <strong>{importSuccessSummary.importedSettings}</strong> mục.
-                </div>
+              <div className="backup-success-summary">
+                <h4 style={{ color: '#2e7d32', margin: '0 0 8px 0' }}>🎉 Khôi phục dữ liệu hoàn tất!</h4>
+                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px' }}>
+                  <li>Số lần lập quẻ đã nhập: <strong>{importSuccessSummary.importedDivinations}</strong></li>
+                  <li>Số kết quả quẻ đã nhập: <strong>{importSuccessSummary.importedResults}</strong></li>
+                  <li>Số phân tích đã nhập: <strong>{importSuccessSummary.importedAnalyses}</strong></li>
+                  <li>Số ghi chú đã nhập: <strong>{importSuccessSummary.importedNotes}</strong></li>
+                  {importSuccessSummary.skippedDivinations > 0 && (
+                    <li>Số bản ghi bỏ qua (do trùng lặp): <strong>{importSuccessSummary.skippedDivinations}</strong></li>
+                  )}
+                </ul>
               </div>
             )}
           </div>

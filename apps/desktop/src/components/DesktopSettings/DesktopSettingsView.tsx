@@ -102,8 +102,12 @@ export const DesktopSettingsView: React.FC = () => {
               <strong>BO_PHE_CHINH_TONG_V1</strong>
             </div>
             <div>
+              <span style={{ color: 'var(--bha-text-secondary)' }}>Cơ sở dữ liệu: </span>
+              <strong>SQLite Cục Bộ (%APPDATA%\com.kindich.desktop\kindich_desktop.db)</strong>
+            </div>
+            <div>
               <span style={{ color: 'var(--bha-text-secondary)' }}>Database Schema: </span>
-              <strong>Version 1 (IndexedDB / Dexie)</strong>
+              <strong>Version 2 (Tự động Migration & Versioning)</strong>
             </div>
           </div>
         </div>

@@ -20,15 +20,18 @@
     "@kindich/domain": "workspace:*",
     "@kindich/shared": "workspace:*",
     "@tauri-apps/api": "^2.12.4",
+    "@tauri-apps/plugin-sql": "^2.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.12.4",
+    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^22.13.9",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "better-sqlite3": "^13.0.3",
     "typescript": "^5.8.2",
     "vite": "^6.2.0",
     "vitest": "^5.0.5"
