@@ -142,4 +142,17 @@ describe('App Integration - Database Auto-Save & History Flow', () => {
       expect(mockRepo.list).toHaveBeenCalled();
     });
   });
+
+  it('chuyển đổi sang tab Nguồn tri thức hiển thị màn hình Knowledge Source Management', async () => {
+    render(<App />);
+
+    // Bấm tab "Nguồn tri thức"
+    const knowledgeTab = screen.getByRole('button', { name: /Nguồn tri thức/i });
+    fireEvent.click(knowledgeTab);
+
+    // Kiểm tra màn hình nguồn tri thức hiển thị
+    await waitFor(() => {
+      expect(screen.getByText(/Quản Lý Nguồn Tri Thức Kinh Điển/i)).toBeInTheDocument();
+    });
+  });
 });

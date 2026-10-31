@@ -1,0 +1,460 @@
+/**
+ * Stylesheet cho Giao diện Quản Lý Nguồn Tri Thức (Knowledge Source Management)
+ * Phong cách Hoàng gia Bắc Hà: Tông màu Đỏ thẫm, Vàng kim, Giấy điệp cổ kính.
+ */
+
+.knowledge-sources-view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+/* Thống kê Header */
+.ks-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.ks-stat-card {
+  background: var(--bha-surface, #ffffff);
+  border: 1px solid var(--bha-gold-300, #eed28b);
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.ks-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--bha-crimson-800, #800020);
+  line-height: 1.2;
+}
+
+.ks-stat-label {
+  font-size: 0.825rem;
+  color: var(--bha-text-secondary, #666666);
+  margin-top: 4px;
+}
+
+/* Navigation Tabs */
+.ks-tabs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 2px solid var(--bha-gold-300, #eed28b);
+  padding-bottom: 12px;
+}
+
+.ks-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--bha-text-secondary, #555555);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.ks-tab-btn:hover {
+  background: rgba(184, 134, 11, 0.08);
+  color: var(--bha-crimson-800, #800020);
+}
+
+.ks-tab-btn.active {
+  background: var(--bha-crimson-800, #800020);
+  color: #ffffff;
+  border-color: var(--bha-crimson-900, #5c0017);
+  box-shadow: 0 2px 6px rgba(128, 0, 32, 0.2);
+}
+
+/* Controls: Search and Filters */
+.ks-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--bha-surface-alt, #faf7f2);
+  border: 1px solid var(--bha-gold-300, #eed28b);
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.ks-search-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.ks-search-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--bha-gold-400, #d4af37);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: #ffffff;
+  color: inherit;
+}
+
+.ks-search-input:focus {
+  outline: none;
+  border-color: var(--bha-crimson-700, #990026);
+  box-shadow: 0 0 0 2px rgba(153, 0, 38, 0.15);
+}
+
+.ks-filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.ks-filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--bha-border, #d1d5db);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: #ffffff;
+  color: inherit;
+}
+
+/* Badge Styles */
+.ks-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.775rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ks-badge-canonical {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+.ks-badge-standard {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #38bdf8;
+}
+
+.ks-badge-commentary {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #9ca3af;
+}
+
+.ks-badge-verified {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.ks-badge-disputed {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.ks-badge-under-review {
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #fde047;
+}
+
+.ks-badge-ruleset {
+  background: #f5f3ff;
+  color: #5b21b6;
+  border: 1px solid #c4b5fd;
+  font-family: monospace;
+  font-size: 0.75rem;
+}
+
+/* Citation Card */
+.ks-citation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ks-citation-card {
+  background: var(--bha-surface, #ffffff);
+  border: 1px solid var(--bha-gold-300, #eed28b);
+  border-radius: 8px;
+  padding: 22px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ks-citation-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.ks-citation-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+  padding-bottom: 12px;
+}
+
+.ks-citation-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--bha-crimson-800, #800020);
+  margin: 0;
+}
+
+.ks-citation-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ks-source-meta {
+  background: rgba(184, 134, 11, 0.06);
+  border-left: 3px solid var(--bha-gold-500, #b8860b);
+  border-radius: 4px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  color: var(--bha-text-secondary, #555555);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ks-source-meta strong {
+  color: var(--bha-text-primary, #111111);
+}
+
+/* 3-Layer Text Container */
+.ks-three-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ks-layer {
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ks-layer-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Layer 1: Chữ Hán */
+.ks-layer-original {
+  background: #faf5ea;
+  border: 1px solid #e8d7b8;
+}
+
+.ks-layer-original .ks-layer-label {
+  color: #8b5a00;
+}
+
+.ks-layer-original .ks-text-original {
+  font-size: 1.25rem;
+  font-family: 'Kaiti', 'KaiTi', 'SimSun', 'Songti SC', 'Noto Serif SC', serif;
+  font-weight: 600;
+  color: #5c0017;
+  letter-spacing: 1px;
+  line-height: 1.6;
+}
+
+.ks-text-sino-viet {
+  font-size: 0.95rem;
+  font-style: italic;
+  color: #78350f;
+  margin-top: 4px;
+}
+
+/* Layer 2: Dịch nghĩa */
+.ks-layer-translation {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.ks-layer-translation .ks-layer-label {
+  color: #0369a1;
+}
+
+.ks-text-translation {
+  font-size: 0.975rem;
+  line-height: 1.55;
+  color: var(--bha-text-primary, #1e293b);
+}
+
+/* Layer 3: Giải thích & Ứng dụng */
+.ks-layer-explanation {
+  background: #fdfefe;
+  border: 1px solid #e5e7eb;
+}
+
+.ks-layer-explanation .ks-layer-label {
+  color: #047857;
+}
+
+.ks-text-explanation {
+  font-size: 0.925rem;
+  line-height: 1.5;
+  color: var(--bha-text-secondary, #475569);
+}
+
+/* Dispute Box */
+.ks-dispute-alert {
+  background: #fff1f2;
+  border-left: 4px solid #e11d48;
+  border-radius: 4px;
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  color: #9f1239;
+  line-height: 1.45;
+}
+
+/* RuleSet links footer */
+.ks-citation-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(212, 175, 55, 0.3);
+  font-size: 0.85rem;
+}
+
+/* Grid for Books & Authors */
+.ks-grid-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 20px;
+}
+
+.ks-grid-card {
+  background: var(--bha-surface, #ffffff);
+  border: 1px solid var(--bha-gold-300, #eed28b);
+  border-radius: 8px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.ks-grid-card-header {
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  padding-bottom: 10px;
+}
+
+.ks-grid-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--bha-crimson-800, #800020);
+  margin: 0;
+}
+
+.ks-grid-card-sub {
+  font-size: 0.85rem;
+  color: var(--bha-text-secondary, #666666);
+  margin-top: 4px;
+}
+
+/* Table for RuleSet Matrix */
+.ks-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin-top: 12px;
+}
+
+.ks-matrix-table th {
+  background: var(--bha-surface-alt, #faf7f2);
+  color: var(--bha-crimson-900, #5c0017);
+  font-weight: 700;
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 2px solid var(--bha-gold-400, #d4af37);
+}
+
+.ks-matrix-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--bha-border, #e5e7eb);
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+.ks-matrix-table tr:hover td {
+  background: rgba(184, 134, 11, 0.04);
+}
+
+/* Empty State */
+.ks-empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  background: var(--bha-surface-alt, #faf7f2);
+  border: 1px dashed var(--bha-gold-400, #d4af37);
+  border-radius: 8px;
+}
+
+.ks-empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+.ks-empty-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--bha-crimson-800, #800020);
+}
+
+.ks-empty-sub {
+  font-size: 0.9rem;
+  color: var(--bha-text-secondary, #666666);
+  margin-top: 6px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .ks-stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ks-search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .ks-filter-row {
+    grid-template-columns: 1fr;
+  }
+  .ks-grid-list {
+    grid-template-columns: 1fr;
+  }
+}

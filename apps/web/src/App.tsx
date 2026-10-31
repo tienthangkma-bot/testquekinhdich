@@ -29,8 +29,11 @@ const DivinationHistoryView = React.lazy(() =>
 const SettingsView = React.lazy(() =>
   import('./components/Settings').then((m) => ({ default: m.SettingsView }))
 );
+const KnowledgeSourceView = React.lazy(() =>
+  import('./components/KnowledgeSources').then((m) => ({ default: m.KnowledgeSourceView }))
+);
 
-type CastingMode = 'serial' | 'time' | 'six-yao' | 'history' | 'settings';
+type CastingMode = 'serial' | 'time' | 'six-yao' | 'history' | 'settings' | 'knowledge';
 
 export const App: React.FC = () => {
   const [activeMode, setActiveMode] = useState<CastingMode>('serial');
@@ -273,6 +276,14 @@ export const App: React.FC = () => {
         >
           <span className="tab-icon">⚙️</span>
           <span>Cài đặt</span>
+        </button>
+        <button
+          type="button"
+          className={`mode-tab ${activeMode === 'knowledge' ? 'active' : ''}`}
+          onClick={() => handleSelectMode('knowledge')}
+        >
+          <span className="tab-icon">📚</span>
+          <span>Nguồn tri thức</span>
         </button>
       </nav>
 
@@ -546,7 +557,7 @@ export const App: React.FC = () => {
               <DivinationHistoryView />
             </React.Suspense>
           </div>
-        ) : (
+        ) : activeMode === 'settings' ? (
           /* Màn hình Cài Đặt Hệ Thống (Settings Module) */
           <div className="settings-mode-section">
             <React.Suspense
@@ -557,6 +568,19 @@ export const App: React.FC = () => {
               }
             >
               <SettingsView />
+            </React.Suspense>
+          </div>
+        ) : (
+          /* Màn hình Quản Lý Nguồn Tri Thức (Knowledge Source Management) */
+          <div className="knowledge-mode-section">
+            <React.Suspense
+              fallback={
+                <div style={{ textAlign: 'center', padding: '32px', color: 'var(--bha-text-muted)' }}>
+                  Đang tải kho tri thức kinh điển...
+                </div>
+              }
+            >
+              <KnowledgeSourceView />
             </React.Suspense>
           </div>
         )}
