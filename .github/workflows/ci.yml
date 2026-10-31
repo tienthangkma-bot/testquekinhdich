@@ -1,0 +1,165 @@
+name: CI - Kiểm Tra & Build Tự Động
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Giai đoạn 1: Kiểm tra tính toàn vẹn phụ thuộc, TypeScript và Test Suites
+  verify:
+    name: 1. Kiểm tra Dependencies, TypeScript & Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài đặt Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cài đặt pnpm 12
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.16.1
+          run_install: false
+
+      - name: Lấy pnpm store path
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Cài đặt dependencies (Frozen Lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Kiểm tra TypeScript nghiêm ngặt (Monorepo Typecheck)
+        run: pnpm -r typecheck
+
+      - name: Chạy toàn bộ Test Suites (Automated Tests)
+        run: pnpm -r --if-present test
+
+  # Giai đoạn 2: Build ứng dụng Web
+  build-web:
+    name: 2. Build Ứng dụng Web (SPA/PWA)
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài đặt Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cài đặt pnpm 12
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.16.1
+
+      - name: Cài đặt dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build ứng dụng Web
+        run: node scripts/build-web.mjs --skip-verify
+
+      - name: Lưu trữ Artifacts Web
+        uses: actions/upload-artifact@v4
+        with:
+          name: kindich-web-build
+          path: apps/web/dist
+          retention-days: 7
+
+  # Giai đoạn 3: Build gói Mobile (Android & iOS Hermes Bundle)
+  build-mobile:
+    name: 3. Build Gói Mobile (Android & iOS)
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài đặt Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cài đặt pnpm 12
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.16.1
+
+      - name: Cài đặt dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Xuất gói Android (Hermes Bytecode & Assets)
+        run: node scripts/build-android.mjs --skip-verify
+
+      - name: Xuất gói iOS (Hermes Bytecode & Assets)
+        run: node scripts/build-ios.mjs --skip-verify
+
+      - name: Lưu trữ Artifacts Android
+        uses: actions/upload-artifact@v4
+        with:
+          name: kindich-mobile-android-bundle
+          path: apps/mobile/dist/android
+          retention-days: 7
+
+      - name: Lưu trữ Artifacts iOS
+        uses: actions/upload-artifact@v4
+        with:
+          name: kindich-mobile-ios-bundle
+          path: apps/mobile/dist/ios
+          retention-days: 7
+
+  # Giai đoạn 4: Build ứng dụng Desktop Windows (Tauri 2)
+  build-desktop-windows:
+    name: 4. Build Ứng dụng Desktop Windows
+    needs: verify
+    runs-on: windows-latest
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài đặt Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cài đặt Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cài đặt pnpm 12
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.16.1
+
+      - name: Cài đặt dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build ứng dụng Windows Desktop (Tauri 2)
+        run: node scripts/build-windows.mjs --skip-verify
+
+      - name: Lưu trữ Artifacts Windows Frontend & Dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: kindich-desktop-windows-dist
+          path: apps/desktop/dist
+          retention-days: 7

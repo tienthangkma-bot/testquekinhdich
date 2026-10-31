@@ -6,7 +6,14 @@
   "packageManager": "pnpm@12.16.1",
   "scripts": {
     "dev": "pnpm --filter web dev",
+    "verify": "node scripts/verify-all.mjs",
     "build": "pnpm -r build",
+    "build:web": "node scripts/build-web.mjs",
+    "build:android": "node scripts/build-android.mjs",
+    "build:ios": "node scripts/build-ios.mjs",
+    "build:windows": "node scripts/build-windows.mjs",
+    "build:all": "node scripts/build-all.mjs",
+    "version:bump": "node scripts/bump-version.mjs",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r --if-present lint",
     "test": "pnpm -r --if-present test"

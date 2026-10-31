@@ -1,0 +1,83 @@
+name: Đóng Gói Bản Phát Hành (Release Artifacts)
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: 'Phiên bản cần đóng gói (để trống nếu lấy từ package.json hoặc Git Tag)'
+        required: false
+        default: ''
+
+jobs:
+  package-release:
+    name: Đóng gói Artifacts đa nền tảng (Web, Mobile, Desktop)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout mã nguồn kèm toàn bộ lịch sử Git
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cài đặt Rust Stable cho Windows Desktop
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cài đặt Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cài đặt pnpm 12
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.16.1
+
+      - name: Cài đặt dependencies (Frozen Lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: [BƯỚC 1] Kiểm tra nghiêm ngặt Dependencies & TypeScript
+        run: pnpm verify
+
+      - name: [BƯỚC 2] Đóng gói toàn bộ 4 nền tảng (Web, Android, iOS, Windows)
+        run: node scripts/build-all.mjs
+
+      - name: [BƯỚC 3] Nén các gói Artifacts thành tệp ZIP phân phối
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "release-artifacts"
+          
+          # 1. Nén Web
+          Compress-Archive -Path "apps/web/dist/*" -DestinationPath "release-artifacts/kinhdich-web.zip" -Force
+          
+          # 2. Nén Android
+          if (Test-Path "apps/mobile/dist/android") {
+            Compress-Archive -Path "apps/mobile/dist/android/*" -DestinationPath "release-artifacts/kinhdich-android-bundle.zip" -Force
+          }
+          
+          # 3. Nén iOS
+          if (Test-Path "apps/mobile/dist/ios") {
+            Compress-Archive -Path "apps/mobile/dist/ios/*" -DestinationPath "release-artifacts/kinhdich-ios-bundle.zip" -Force
+          }
+          
+          # 4. Nén Windows Frontend
+          if (Test-Path "apps/desktop/dist") {
+            Compress-Archive -Path "apps/desktop/dist/*" -DestinationPath "release-artifacts/kinhdich-windows-dist.zip" -Force
+          }
+          
+          # 5. Đính kèm Windows Installers / Binaries nếu có
+          if (Test-Path "apps/desktop/src-tauri/target/release/bundle") {
+            Compress-Archive -Path "apps/desktop/src-tauri/target/release/bundle/*" -DestinationPath "release-artifacts/kinhdich-windows-installers.zip" -Force
+          }
+
+      - name: [BƯỚC 4] Lưu trữ Artifacts đóng gói (Internal QA / Review)
+        uses: actions/upload-artifact@v4
+        with:
+          name: kinhdich-all-platforms-release
+          path: release-artifacts/*
+          retention-days: 14
+
+      # QUY ĐỊNH AN TOÀN:
+      # Không cấu hình bước tải ứng dụng tự động lên Google Play Store, Apple App Store hoặc Microsoft Store.
+      # Mọi bản build phải được kiểm tra thực tế trên thiết bị vật lý và nghiệm thu thủ công trước khi xuất bản.
