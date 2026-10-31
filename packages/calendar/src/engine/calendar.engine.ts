@@ -63,6 +63,21 @@ export type DateTimeInput =
     };
 
 /**
+ * Cached Intl.DateTimeFormat instance for Asia/Ho_Chi_Minh (UTC+7)
+ * Tái sử dụng instance duy nhất, loại bỏ hàng ngàn lần cấp phát đối tượng và tra cứu ICU locale tốn kém
+ */
+const VN_DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+  timeZone: VN_TIMEZONE_NAME,
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+  hourCycle: 'h23',
+});
+
+/**
  * Tách và chuẩn hóa thời gian đầu vào theo múi giờ Asia/Ho_Chi_Minh (UTC+7)
  */
 export function parseToVietnamDateTime(input: DateTimeInput): {
@@ -89,19 +104,7 @@ export function parseToVietnamDateTime(input: DateTimeInput): {
     throw new Error(`Thời gian đầu vào không hợp lệ: "${input}"`);
   }
 
-  // Sử dụng Intl.DateTimeFormat để trích xuất chuẩn xác các thành phần theo múi giờ Asia/Ho_Chi_Minh
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: VN_TIMEZONE_NAME,
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hourCycle: 'h23',
-  });
-
-  const parts = formatter.formatToParts(dateObj);
+  const parts = VN_DATE_FORMATTER.formatToParts(dateObj);
   let year = 0;
   let month = 0;
   let day = 0;

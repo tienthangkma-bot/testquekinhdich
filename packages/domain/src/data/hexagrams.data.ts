@@ -205,15 +205,37 @@ export const HEXAGRAM_BY_TRIGRAMS_MAP: Readonly<Record<string, Hexagram>> = Obje
 );
 
 /**
- * Tra cứu quẻ theo ID hoặc số thứ tự Văn Vương (1 đến 64)
+ * Bản đồ tra cứu quẻ theo tên tiếng Việt, Hán Việt và chữ Hán (O(1) lookup map)
+ */
+export const HEXAGRAM_BY_NAME_MAP: Readonly<Record<string, Hexagram>> = Object.freeze(
+  HEXAGRAMS.reduce<Record<string, Hexagram>>((acc, hex) => {
+    acc[hex.name.toLowerCase()] = hex;
+    acc[hex.sinoVietnameseName.toLowerCase()] = hex;
+    acc[hex.chineseName.toLowerCase()] = hex;
+    return acc;
+  }, {})
+);
+
+/**
+ * Tra cứu quẻ theo tên (tiếng Việt, Hán Việt hoặc chữ Hán)
+ */
+export function getHexagramByName(name: string): Hexagram | undefined {
+  if (!name) return undefined;
+  return HEXAGRAM_BY_NAME_MAP[name.trim().toLowerCase()];
+}
+
+/**
+ * Tra cứu quẻ theo ID hoặc số thứ tự Văn Vương (1 đến 64) hoặc tên quẻ
  *
  * @param idOrNumber - ID quẻ ('HEX_01', 'HEX_64'), số thứ tự (1 - 64) hoặc tên quẻ
  * @returns Hexagram tương ứng, hoặc undefined nếu không tìm thấy
  */
 export function getHexagramById(idOrNumber: string | number): Hexagram | undefined {
   if (idOrNumber === undefined || idOrNumber === null) return undefined;
-  const key = idOrNumber.toString().trim().toUpperCase();
-  return HEXAGRAM_BY_ID_MAP[key];
+  const str = idOrNumber.toString().trim();
+  const byId = HEXAGRAM_BY_ID_MAP[str.toUpperCase()];
+  if (byId) return byId;
+  return HEXAGRAM_BY_NAME_MAP[str.toLowerCase()];
 }
 
 /**

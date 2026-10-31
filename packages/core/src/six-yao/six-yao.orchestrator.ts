@@ -26,10 +26,10 @@ import {
   getElementName,
   getHexagramBaGong,
   getHexagramById,
+  getHexagramByName,
   getHexagramByLines,
   getHexagramByTrigrams,
   getNaJiaForHexagram,
-  HEXAGRAMS,
   Hexagram,
   LinePosition,
   SixRelation,
@@ -178,9 +178,7 @@ export function resolveHexagram(
   }
 
   if (typeof input === 'string') {
-    const found =
-      getHexagramById(input) ||
-      HEXAGRAMS.find((h) => h.name.toLowerCase() === input.trim().toLowerCase());
+    const found = getHexagramById(input) || getHexagramByName(input);
     if (!found) {
       throw new Error(`Không tìm thấy quẻ với mã hoặc tên: "${input}".`);
     }

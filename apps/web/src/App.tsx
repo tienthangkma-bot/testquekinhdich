@@ -18,10 +18,13 @@ import { getDivinationRepository } from './services/repository.service';
 import { SerialCastingForm, SerialCastingResultView } from './components/SerialCasting';
 import { MaiHuaCastingForm, MaiHuaCastingResultView } from './components/MaiHuaCasting';
 import { SixYaoAnalysisView } from './components/SixYaoAnalysis';
-import { DivinationHistoryView } from './components/DivinationHistory';
 import { QuestionCategorySelector, QuestionCategory } from './components/NotesAndQuestions';
 import { PwaHeaderActions } from './pwa';
 import './App.css';
+
+const DivinationHistoryView = React.lazy(() =>
+  import('./components/DivinationHistory').then((m) => ({ default: m.DivinationHistoryView }))
+);
 
 type CastingMode = 'serial' | 'time' | 'six-yao' | 'history';
 
@@ -499,7 +502,15 @@ export const App: React.FC = () => {
         ) : (
           /* Màn hình Lịch Sử Lập Quẻ (Requirement 2) */
           <div className="history-mode-section">
-            <DivinationHistoryView />
+            <React.Suspense
+              fallback={
+                <div style={{ textAlign: 'center', padding: '32px', color: 'var(--bha-text-muted)' }}>
+                  Đang tải dữ liệu lịch sử...
+                </div>
+              }
+            >
+              <DivinationHistoryView />
+            </React.Suspense>
           </div>
         )}
 

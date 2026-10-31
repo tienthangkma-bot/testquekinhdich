@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SixYaoAnalysisResult, AnalyzedSixYaoLine } from '@kindich/core';
 import { theme } from '../theme/colors';
@@ -7,12 +7,133 @@ export interface SixYaoTableProps {
   analysis: SixYaoAnalysisResult;
 }
 
+interface SixYaoLineCardProps {
+  line: AnalyzedSixYaoLine;
+  isSelected: boolean;
+  onToggle: (position: number) => void;
+  dayCanChi: string;
+  monthCanChi: string;
+}
+
+const SixYaoLineCardComponent: React.FC<SixYaoLineCardProps> = ({
+  line,
+  isSelected,
+  onToggle,
+  dayCanChi,
+  monthCanChi,
+}) => {
+  const isShi = line.isWorld;
+  const isYing = line.isResponse;
+  const isMoving = line.isMoving;
+
+  return (
+    <TouchableOpacity
+      style={[
+        styles.yaoCard,
+        isSelected && styles.selectedYaoCard,
+        isMoving && styles.movingYaoCard,
+      ]}
+      onPress={() => onToggle(line.position)}
+      activeOpacity={0.8}
+    >
+      <View style={styles.yaoCardHeader}>
+        <View style={styles.yaoPosBadge}>
+          <Text style={styles.yaoPosText}>Hào {line.position}</Text>
+          {isShi && (
+            <View style={styles.shiBadge}>
+              <Text style={styles.badgeText}>THẾ</Text>
+            </View>
+          )}
+          {isYing && (
+            <View style={styles.yingBadge}>
+              <Text style={styles.badgeText}>ỨNG</Text>
+            </View>
+          )}
+          {isMoving && (
+            <View style={styles.movingBadge}>
+              <Text style={styles.badgeText}>ĐỘNG</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.beastBadge}>
+          <Text style={styles.beastText}>{line.sixSpiritName}</Text>
+        </View>
+      </View>
+
+      <View style={styles.yaoCardBody}>
+        <View style={styles.relationCol}>
+          <Text style={styles.relationText}>{line.fullRelationLabel}</Text>
+          <Text style={styles.elementSubText}>
+            {line.canChi} ({line.elementName}) • {line.yinYang === 1 ? 'Dương' : 'Âm'}
+          </Text>
+        </View>
+
+        <View style={styles.strengthCol}>
+          <View
+            style={[
+              styles.strengthPill,
+              line.strength.seasonalState === 'VUONG' && styles.vuongPill,
+              line.strength.seasonalState === 'TUONG' && styles.tuongPill,
+            ]}
+          >
+            <Text style={styles.strengthText}>{line.strength.seasonalStateName}</Text>
+          </View>
+          {line.calendar.isVoid && (
+            <Text style={styles.voidWarningText}>
+              [{line.strength.voidStatus === 'CHAN_KHONG' ? 'Chân Không' : 'Giả Không'}]
+            </Text>
+          )}
+          {line.calendar.isMonthlyBreak && (
+            <Text style={styles.voidWarningText}>[Nguyệt Phá]</Text>
+          )}
+          {line.strength.isAmDong && (
+            <Text style={[styles.voidWarningText, { color: theme.colors.gold[800] }]}>
+              [Ám Động]
+            </Text>
+          )}
+          {line.strength.isNhatPha && (
+            <Text style={styles.voidWarningText}>[Nhật Phá]</Text>
+          )}
+        </View>
+      </View>
+
+      {/* Chi tiết khi mở rộng */}
+      {isSelected && (
+        <View style={styles.detailsBox}>
+          <Text style={styles.detailTitle}>Chi tiết phân tích:</Text>
+          <Text style={styles.detailItem}>
+            • Nguyệt Kiến ({monthCanChi}): {line.calendar.monthEffect || 'Bình hòa'}
+          </Text>
+          <Text style={styles.detailItem}>
+            • Nhật Thần ({dayCanChi}): {line.calendar.dayEffect || 'Bình hòa'}
+          </Text>
+          {line.changingLine && (
+            <Text style={[styles.detailItem, { color: theme.colors.primary }]}>
+              • Hóa biến: {line.changingLine.interaction.description}
+            </Text>
+          )}
+          {line.strength.rationale ? (
+            <Text style={styles.detailNotes}>• Đánh giá: {line.strength.rationale}</Text>
+          ) : null}
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+};
+
+const SixYaoLineCard = React.memo(SixYaoLineCardComponent);
+
 export const SixYaoTable: React.FC<SixYaoTableProps> = ({ analysis }) => {
   const [selectedYao, setSelectedYao] = useState<number | null>(null);
 
   const primary = analysis.primaryHexagram;
-  // Hiển thị từ hào 6 xuống hào 1
-  const reversedLines = [...primary.lines].reverse();
+  // Memoize danh sách hào đảo ngược để tránh cấp phát mảng mới trên mỗi render
+  const reversedLines = useMemo(() => [...primary.lines].reverse(), [primary.lines]);
+
+  const handleToggleYao = useCallback((pos: number) => {
+    setSelectedYao((prev) => (prev === pos ? null : pos));
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -50,116 +171,16 @@ export const SixYaoTable: React.FC<SixYaoTableProps> = ({ analysis }) => {
       </Text>
 
       <View style={styles.linesList}>
-        {reversedLines.map((line: AnalyzedSixYaoLine) => {
-          const isSelected = selectedYao === line.position;
-          const isShi = line.isWorld;
-          const isYing = line.isResponse;
-          const isMoving = line.isMoving;
-
-          return (
-            <TouchableOpacity
-              key={`yao-${line.position}`}
-              style={[
-                styles.yaoCard,
-                isSelected && styles.selectedYaoCard,
-                isMoving && styles.movingYaoCard,
-              ]}
-              onPress={() => setSelectedYao(isSelected ? null : line.position)}
-              activeOpacity={0.8}
-            >
-              <View style={styles.yaoCardHeader}>
-                <View style={styles.yaoPosBadge}>
-                  <Text style={styles.yaoPosText}>Hào {line.position}</Text>
-                  {isShi && (
-                    <View style={styles.shiBadge}>
-                      <Text style={styles.badgeText}>THẾ</Text>
-                    </View>
-                  )}
-                  {isYing && (
-                    <View style={styles.yingBadge}>
-                      <Text style={styles.badgeText}>ỨNG</Text>
-                    </View>
-                  )}
-                  {isMoving && (
-                    <View style={styles.movingBadge}>
-                      <Text style={styles.badgeText}>ĐỘNG</Text>
-                    </View>
-                  )}
-                </View>
-
-                <View style={styles.beastBadge}>
-                  <Text style={styles.beastText}>{line.sixSpiritName}</Text>
-                </View>
-              </View>
-
-              <View style={styles.yaoCardBody}>
-                <View style={styles.relationCol}>
-                  <Text style={styles.relationText}>
-                    {line.fullRelationLabel}
-                  </Text>
-                  <Text style={styles.elementSubText}>
-                    {line.canChi} ({line.elementName}) • {line.yinYang === 1 ? 'Dương' : 'Âm'}
-                  </Text>
-                </View>
-
-                <View style={styles.strengthCol}>
-                  <View
-                    style={[
-                      styles.strengthPill,
-                      line.strength.seasonalState === 'VUONG' && styles.vuongPill,
-                      line.strength.seasonalState === 'TUONG' && styles.tuongPill,
-                    ]}
-                  >
-                    <Text style={styles.strengthText}>
-                      {line.strength.seasonalStateName}
-                    </Text>
-                  </View>
-                  {line.calendar.isVoid && (
-                    <Text style={styles.voidWarningText}>
-                      [{line.strength.voidStatus === 'CHAN_KHONG' ? 'Chân Không' : 'Giả Không'}]
-                    </Text>
-                  )}
-                  {line.calendar.isMonthlyBreak && (
-                    <Text style={styles.voidWarningText}>[Nguyệt Phá]</Text>
-                  )}
-                  {line.strength.isAmDong && (
-                    <Text style={[styles.voidWarningText, { color: theme.colors.gold[800] }]}>
-                      [Ám Động]
-                    </Text>
-                  )}
-                  {line.strength.isNhatPha && (
-                    <Text style={styles.voidWarningText}>[Nhật Phá]</Text>
-                  )}
-                </View>
-              </View>
-
-              {/* Chi tiết khi mở rộng */}
-              {isSelected && (
-                <View style={styles.detailsBox}>
-                  <Text style={styles.detailTitle}>Chi tiết phân tích:</Text>
-                  <Text style={styles.detailItem}>
-                    • Nguyệt Kiến ({analysis.dateTime.canChi.month}):{' '}
-                    {line.calendar.monthEffect || 'Bình hòa'}
-                  </Text>
-                  <Text style={styles.detailItem}>
-                    • Nhật Thần ({analysis.dateTime.canChi.day}):{' '}
-                    {line.calendar.dayEffect || 'Bình hòa'}
-                  </Text>
-                  {line.changingLine && (
-                    <Text style={[styles.detailItem, { color: theme.colors.primary }]}>
-                      • Hóa biến: {line.changingLine.interaction.description}
-                    </Text>
-                  )}
-                  {line.strength.rationale ? (
-                    <Text style={styles.detailNotes}>
-                      • Đánh giá: {line.strength.rationale}
-                    </Text>
-                  ) : null}
-                </View>
-              )}
-            </TouchableOpacity>
-          );
-        })}
+        {reversedLines.map((line: AnalyzedSixYaoLine) => (
+          <SixYaoLineCard
+            key={`yao-${line.position}`}
+            line={line}
+            isSelected={selectedYao === line.position}
+            onToggle={handleToggleYao}
+            dayCanChi={analysis.dateTime.canChi.day}
+            monthCanChi={analysis.dateTime.canChi.month}
+          />
+        ))}
       </View>
     </View>
   );

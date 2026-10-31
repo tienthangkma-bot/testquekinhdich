@@ -401,7 +401,119 @@ export class SqliteDivinationRepository implements IDivinationRepository {
   ): Promise<PaginatedResult<DivinationSummaryItem>> {
     await this.initialize();
 
-    // Lấy toàn bộ divinations kết hợp với thông tin kết quả và số lượng ghi chú
+    // 1. Xây dựng các điều kiện WHERE trong SQL để tận dụng tối đa Index B-Tree
+    const whereClauses: string[] = [];
+    const params: unknown[] = [];
+
+    if (filter?.method) {
+      whereClauses.push('d.method = ?');
+      params.push(filter.method);
+    }
+    if (filter?.inquiryType) {
+      whereClauses.push('d.inquiry_type = ?');
+      params.push(filter.inquiryType);
+    }
+    if (filter?.starred !== undefined) {
+      whereClauses.push('d.starred = ?');
+      params.push(filter.starred ? 1 : 0);
+    }
+    if (filter?.startDate) {
+      whereClauses.push('d.created_at >= ?');
+      params.push(filter.startDate);
+    }
+    if (filter?.endDate) {
+      whereClauses.push('d.created_at <= ?');
+      params.push(filter.endDate);
+    }
+    if (filter?.hexagramNumber !== undefined) {
+      whereClauses.push('(r.primary_hexagram_number = ? OR r.changing_hexagram_number = ?)');
+      params.push(filter.hexagramNumber, filter.hexagramNumber);
+    }
+
+    const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+    const sortBy = pagination?.sortBy ?? 'createdAt';
+    const sortDirection = pagination?.sortDirection ?? 'desc';
+    const sortByField = sortBy === 'updatedAt' ? 'd.updated_at' : 'd.created_at';
+    const sortDir = sortDirection === 'asc' ? 'ASC' : 'DESC';
+    const page = pagination?.page ?? 1;
+    const pageSize = pagination?.pageSize ?? 10;
+    const offset = (page - 1) * pageSize;
+
+    // 2. Tối ưu: Nếu không tìm kiếm toàn văn và không lọc tags, phân trang trực tiếp trong SQL
+    const hasFullTextSearch = filter?.query && filter.query.trim().length > 0;
+    const hasTagsFilter = filter?.tags && filter.tags.length > 0;
+
+    if (!hasFullTextSearch && !hasTagsFilter) {
+      const countSql = `
+        SELECT COUNT(*) as count
+        FROM divinations d
+        LEFT JOIN divination_results r ON d.id = r.divination_id
+        ${whereSql};
+      `;
+      const countRow = await this.db.getFirstAsync<{ count: number }>(countSql, params);
+      const totalCount = countRow?.count ?? 0;
+      const totalPages = Math.ceil(totalCount / pageSize) || 1;
+
+      const dataSql = `
+        SELECT
+          d.id, d.created_at, d.updated_at, d.method, d.question, d.inquiry_type, d.tags, d.starred,
+          d.date_time_info,
+          r.primary_hexagram_number, r.primary_hexagram_name, r.primary_hexagram_sino_vietnamese_name,
+          r.changing_hexagram_number, r.changing_hexagram_name, r.changing_hexagram_sino_vietnamese_name,
+          r.moving_lines,
+          a.palace_id, a.world_line, a.response_line,
+          (SELECT COUNT(*) FROM divination_notes WHERE divination_id = d.id) as note_count
+        FROM divinations d
+        LEFT JOIN divination_results r ON d.id = r.divination_id
+        LEFT JOIN divination_analyses a ON d.id = a.divination_id
+        ${whereSql}
+        ORDER BY ${sortByField} ${sortDir}
+        LIMIT ? OFFSET ?;
+      `;
+      const paginatedRows = await this.db.getAllAsync<any>(dataSql, [...params, pageSize, offset]);
+
+      const items: DivinationSummaryItem[] = paginatedRows.map((r) => {
+        let dt: any = {};
+        try {
+          dt = r.date_time_info ? JSON.parse(r.date_time_info) : {};
+        } catch {}
+
+        return {
+          id: r.id,
+          createdAt: r.created_at,
+          updatedAt: r.updated_at,
+          method: r.method,
+          question: r.question ?? undefined,
+          inquiryType: r.inquiry_type ?? undefined,
+          tags: r.tags ? JSON.parse(r.tags) : [],
+          primaryHexagramNumber: r.primary_hexagram_number,
+          primaryHexagramName: r.primary_hexagram_name,
+          primaryHexagramSinoVietnameseName: r.primary_hexagram_sino_vietnamese_name ?? undefined,
+          changingHexagramNumber: r.changing_hexagram_number ?? undefined,
+          changingHexagramName: r.changing_hexagram_name ?? undefined,
+          changingHexagramSinoVietnameseName: r.changing_hexagram_sino_vietnamese_name ?? undefined,
+          movingLines: r.moving_lines ? JSON.parse(r.moving_lines) : [],
+          lunarDateStr: dt.lunarDateStr ?? `Ngày ${dt.lunarDay ?? ''} tháng ${dt.lunarMonth ?? ''}`,
+          dayCanChi: dt.dayCanChi ?? '',
+          monthCanChi: dt.monthCanChi ?? '',
+          palaceId: r.palace_id ?? undefined,
+          worldLine: r.world_line ?? undefined,
+          responseLine: r.response_line ?? undefined,
+          noteCount: r.note_count ?? 0,
+          starred: r.starred === 1,
+        };
+      });
+
+      return {
+        items,
+        totalCount,
+        page,
+        pageSize,
+        totalPages,
+      };
+    }
+
+    // 3. Trường hợp có tìm kiếm văn bản hoặc tags: Lấy các bản ghi đã lọc qua SQL WHERE
     const sql = `
       SELECT
         d.id, d.created_at, d.updated_at, d.method, d.question, d.inquiry_type, d.tags, d.starred,
@@ -414,16 +526,18 @@ export class SqliteDivinationRepository implements IDivinationRepository {
       FROM divinations d
       LEFT JOIN divination_results r ON d.id = r.divination_id
       LEFT JOIN divination_analyses a ON d.id = a.divination_id
-      ORDER BY d.created_at DESC;
+      ${whereSql}
+      ORDER BY ${sortByField} ${sortDir};
     `;
 
-    const rawRows = await this.db.getAllAsync<any>(sql);
+    const rawRows = await this.db.getAllAsync<any>(sql, params);
 
-    // Lấy toàn bộ ghi chú phục vụ cho việc tìm kiếm text trong ghi chú nếu có filter.query
+    // Chỉ truy vấn ghi chú của các bản ghi thỏa mãn điều kiện WHERE
     let allNotesForSearch: Map<string, string[]> = new Map();
-    if (filter?.query && filter.query.trim().length > 0) {
+    if (hasFullTextSearch && rawRows.length > 0) {
       const noteRows = await this.db.getAllAsync<{ divination_id: string; content: string }>(
-        'SELECT divination_id, content FROM divination_notes;'
+        `SELECT divination_id, content FROM divination_notes WHERE divination_id IN (SELECT id FROM divinations ${whereSql});`,
+        params
       );
       for (const n of noteRows) {
         const list = allNotesForSearch.get(n.divination_id) ?? [];
@@ -432,45 +546,15 @@ export class SqliteDivinationRepository implements IDivinationRepository {
       }
     }
 
-    // Lọc theo các tiêu chí nghiệp vụ
     const filtered = rawRows.filter((row) => {
-      // 1. Phương pháp
-      if (filter?.method && row.method !== filter.method) {
-        return false;
-      }
-      // 2. Danh mục (inquiryType)
-      if (filter?.inquiryType && row.inquiry_type !== filter.inquiryType) {
-        return false;
-      }
-      // 3. Yêu thích (starred)
-      if (filter?.starred !== undefined && (row.starred === 1) !== filter.starred) {
-        return false;
-      }
-      // 4. Ngày bắt đầu
-      if (filter?.startDate && row.created_at < filter.startDate) {
-        return false;
-      }
-      // 5. Ngày kết thúc
-      if (filter?.endDate && row.created_at > filter.endDate) {
-        return false;
-      }
-      // 6. Số quẻ
-      if (filter?.hexagramNumber !== undefined) {
-        const matchesPrimary = row.primary_hexagram_number === filter.hexagramNumber;
-        const matchesChanging = row.changing_hexagram_number === filter.hexagramNumber;
-        if (!matchesPrimary && !matchesChanging) {
-          return false;
-        }
-      }
-      // 7. Tags
+      // Tags
       if (filter?.tags && filter.tags.length > 0) {
         const rowTags: string[] = row.tags ? JSON.parse(row.tags) : [];
         const hasAllTags = filter.tags.every((t) => rowTags.includes(t));
-        if (!hasAllTags) {
-          return false;
-        }
+        if (!hasAllTags) return false;
       }
-      // 8. Từ khóa tìm kiếm (query)
+
+      // Từ khóa tìm kiếm (query)
       if (filter?.query && filter.query.trim().length > 0) {
         const queryNorm = normalizeVietnamese(filter.query);
         const questionNorm = normalizeVietnamese(row.question ?? '');
@@ -503,32 +587,14 @@ export class SqliteDivinationRepository implements IDivinationRepository {
           tagsNorm.includes(queryNorm) ||
           notesNorm.includes(queryNorm);
 
-        if (!isMatch) {
-          return false;
-        }
+        if (!isMatch) return false;
       }
 
       return true;
     });
 
-    // Sắp xếp
-    const sortBy = pagination?.sortBy ?? 'createdAt';
-    const sortDirection = pagination?.sortDirection ?? 'desc';
-
-    filtered.sort((a, b) => {
-      const fieldA = sortBy === 'updatedAt' ? a.updated_at : a.created_at;
-      const fieldB = sortBy === 'updatedAt' ? b.updated_at : b.created_at;
-      if (sortDirection === 'asc') {
-        return fieldA.localeCompare(fieldB);
-      }
-      return fieldB.localeCompare(fieldA);
-    });
-
     const totalCount = filtered.length;
-    const page = pagination?.page ?? 1;
-    const pageSize = pagination?.pageSize ?? 10;
     const totalPages = Math.ceil(totalCount / pageSize) || 1;
-    const offset = (page - 1) * pageSize;
     const paginatedRows = filtered.slice(offset, offset + pageSize);
 
     const items: DivinationSummaryItem[] = paginatedRows.map((r) => {

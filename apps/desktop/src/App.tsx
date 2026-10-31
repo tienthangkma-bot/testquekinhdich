@@ -24,18 +24,27 @@ import { SerialCastingForm, SerialCastingResultView } from './components/SerialC
 import { MaiHuaCastingForm, MaiHuaCastingResultView } from './components/MaiHuaCasting';
 import { SixYaoAnalysisView } from './components/SixYaoAnalysis';
 import { HexagramInterpretationView } from './components/HexagramInterpretation';
-import { DivinationHistoryView } from './components/DivinationHistory';
 import {
   QuestionCategorySelector,
   QuestionCategory,
   DivinationNotesSection,
 } from './components/NotesAndQuestions';
 import { DesktopHomeView, DesktopNavScreen } from './components/DesktopHome/DesktopHomeView';
-import { DesktopSettingsView } from './components/DesktopSettings/DesktopSettingsView';
 import { DesktopMenuBar } from './components/DesktopMenuBar/DesktopMenuBar';
-import { DesktopAboutModal } from './components/DesktopAboutModal/DesktopAboutModal';
-import { BackupRestoreModal } from './components/BackupRestore/BackupRestoreModal';
 import './App.css';
+
+const DivinationHistoryView = React.lazy(() =>
+  import('./components/DivinationHistory').then((m) => ({ default: m.DivinationHistoryView }))
+);
+const DesktopSettingsView = React.lazy(() =>
+  import('./components/DesktopSettings/DesktopSettingsView').then((m) => ({ default: m.DesktopSettingsView }))
+);
+const DesktopAboutModal = React.lazy(() =>
+  import('./components/DesktopAboutModal/DesktopAboutModal').then((m) => ({ default: m.DesktopAboutModal }))
+);
+const BackupRestoreModal = React.lazy(() =>
+  import('./components/BackupRestore/BackupRestoreModal').then((m) => ({ default: m.BackupRestoreModal }))
+);
 
 const ZOOM_LEVELS = [0.8, 0.9, 1.0, 1.1, 1.25, 1.5];
 
@@ -857,18 +866,36 @@ export const App: React.FC = () => {
 
               {/* 5. Màn hình Lịch Sử & Ghi Chú */}
               {activeScreen === 'history' && (
-                <DivinationHistoryView
-                  repository={getDivinationRepository()}
-                  onSelectForAnalysis={(hexNumber, movingLines) => {
-                    setSelectedHexNumber(hexNumber);
-                    setSelectedMovingLines(movingLines);
-                    setActiveScreen('six-yao');
-                  }}
-                />
+                <React.Suspense
+                  fallback={
+                    <div style={{ textAlign: 'center', padding: '32px', color: 'var(--bha-text-muted)' }}>
+                      Đang tải danh sách lịch sử...
+                    </div>
+                  }
+                >
+                  <DivinationHistoryView
+                    repository={getDivinationRepository()}
+                    onSelectForAnalysis={(hexNumber, movingLines) => {
+                      setSelectedHexNumber(hexNumber);
+                      setSelectedMovingLines(movingLines);
+                      setActiveScreen('six-yao');
+                    }}
+                  />
+                </React.Suspense>
               )}
 
               {/* 6. Màn hình Cài Đặt */}
-              {activeScreen === 'settings' && <DesktopSettingsView />}
+              {activeScreen === 'settings' && (
+                <React.Suspense
+                  fallback={
+                    <div style={{ textAlign: 'center', padding: '32px', color: 'var(--bha-text-muted)' }}>
+                      Đang tải cài đặt hệ thống...
+                    </div>
+                  }
+                >
+                  <DesktopSettingsView />
+                </React.Suspense>
+              )}
             </div>
           </main>
         </div>
@@ -921,17 +948,25 @@ export const App: React.FC = () => {
       </Modal>
 
       {/* Modal Giới Thiệu (About) */}
-      <DesktopAboutModal
-        isOpen={isAboutModalOpen}
-        onClose={() => setIsAboutModalOpen(false)}
-      />
+      {isAboutModalOpen && (
+        <React.Suspense fallback={null}>
+          <DesktopAboutModal
+            isOpen={isAboutModalOpen}
+            onClose={() => setIsAboutModalOpen(false)}
+          />
+        </React.Suspense>
+      )}
 
       {/* Modal Sao Lưu & Khôi Phục Dữ Liệu (Backup/Restore) */}
-      <BackupRestoreModal
-        isOpen={isBackupModalOpen}
-        onClose={() => setIsBackupModalOpen(false)}
-        initialTab={backupModalTab}
-      />
+      {isBackupModalOpen && (
+        <React.Suspense fallback={null}>
+          <BackupRestoreModal
+            isOpen={isBackupModalOpen}
+            onClose={() => setIsBackupModalOpen(false)}
+            initialTab={backupModalTab}
+          />
+        </React.Suspense>
+      )}
     </div>
   );
 };
