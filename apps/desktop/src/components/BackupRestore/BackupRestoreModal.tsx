@@ -31,6 +31,7 @@ export interface BackupRestoreModalProps {
   readonly onRestoreSuccess?: () => void;
   readonly database?: KinDichDatabase;
   readonly sqliteDatabase?: ISqliteDatabase;
+  readonly initialTab?: ActiveTab;
 }
 
 type ActiveTab = 'export' | 'restore';
@@ -44,12 +45,19 @@ export const BackupRestoreModal: React.FC<BackupRestoreModalProps> = ({
   onRestoreSuccess,
   database,
   sqliteDatabase,
+  initialTab,
 }) => {
   const sqliteDb = sqliteDatabase ?? getDivinationDatabase();
   const db = database ?? getKinDichDatabase();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>('export');
+  const [activeTab, setActiveTab] = useState<ActiveTab>(initialTab || 'export');
+
+  useEffect(() => {
+    if (initialTab && isOpen) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab, isOpen]);
 
   // Thống kê cơ sở dữ liệu hiện tại
   const [stats, setStats] = useState({
