@@ -143,6 +143,16 @@ export const HEXAGRAMS: readonly Hexagram[] = [
 ] as const;
 
 /**
+ * Bảng tra cứu quẻ trực tiếp theo số thứ tự (1 - 64)
+ */
+export const HEXAGRAM_MAP: Readonly<Record<number, Hexagram>> = Object.freeze(
+  HEXAGRAMS.reduce<Record<number, Hexagram>>((acc, hex) => {
+    acc[hex.number] = hex;
+    return acc;
+  }, {})
+);
+
+/**
  * Bảng tra cứu quẻ theo ID, số thứ tự Văn Vương hoặc tên
  */
 export const HEXAGRAM_BY_ID_MAP: Readonly<Record<string, Hexagram>> = Object.freeze(

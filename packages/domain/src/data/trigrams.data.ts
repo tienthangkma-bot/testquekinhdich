@@ -143,6 +143,9 @@ export const EIGHT_TRIGRAMS: readonly Trigram[] = [
   TRIGRAM_KHON,
 ] as const;
 
+/** Alias thuận tiện cho EIGHT_TRIGRAMS */
+export const TRIGRAMS: readonly Trigram[] = EIGHT_TRIGRAMS;
+
 /**
  * Bảng tra cứu Bát Quái theo ID (mã định danh)
  */
