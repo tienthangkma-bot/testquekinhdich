@@ -7,12 +7,24 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#1A1A1A",
-  "theme_color": "#8B0000",
+  "background_color": "#0D1117",
+  "theme_color": "#0D1117",
   "lang": "vi",
   "dir": "ltr",
   "categories": ["lifestyle", "utilities", "books"],
   "icons": [
+    {
+      "src": "/logo-tan-an-phai.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo-tan-an-phai.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "/icons/icon-192.svg",
       "sizes": "192x192",
@@ -24,12 +36,6 @@
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any"
-    },
-    {
-      "src": "/icons/icon-maskable.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
     }
   ],
   "shortcuts": [
@@ -38,21 +44,21 @@
       "short_name": "Quẻ Seri",
       "description": "Lập quẻ theo số seri tiền (SERIAL-MOD8-V1)",
       "url": "/?mode=serial",
-      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo-tan-an-phai.png", "sizes": "512x512" }]
     },
     {
       "name": "Lập quẻ Mai Hoa",
       "short_name": "Mai Hoa",
       "description": "Khởi quẻ theo giờ động tâm",
       "url": "/?mode=time",
-      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo-tan-an-phai.png", "sizes": "512x512" }]
     },
     {
-      "name": "Lịch sử lập quẻ",
-      "short_name": "Lịch sử",
-      "description": "Xem lại các lần lập quẻ và ghi chú offline",
-      "url": "/?mode=history",
-      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+      "name": "Lập quẻ Lục Hào Cổ Pháp",
+      "short_name": "Lục Hào",
+      "description": "Gieo quẻ 3 đồng xu 6 lần",
+      "url": "/?mode=manual",
+      "icons": [{ "src": "/logo-tan-an-phai.png", "sizes": "512x512" }]
     }
   ]
 }

@@ -5,13 +5,29 @@
     "version": "0.1.0",
     "sdkVersion": "58.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/logo-tan-an-phai.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/logo-tan-an-phai.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0D1117"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.kindich.mobile"
     },
     "android": {
-      "package": "com.kindich.mobile"
-    }
+      "package": "com.kindich.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo-tan-an-phai.png",
+        "backgroundColor": "#0D1117"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a635daaa-a6c1-4154-861a-0775e7888b96"
+      }
+    },
+    "owner": "thangok"
   }
 }
