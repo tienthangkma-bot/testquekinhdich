@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,16 +8,17 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { CastingMethod, DivinationNoteEntity } from '@kindich/domain';
+import { CastingMethod, DivinationNoteEntity, LinePosition } from '@kindich/domain';
 import {
   getClassicalHexagramData,
   interpretHexagram,
-  determineDivinationRuleByMovingLines,
+  orchestrateSixYaoAnalysis,
+  SixYaoAnalysisResult,
 } from '@kindich/core';
-import { theme } from '../theme/colors';
 import { Header } from '../components/Header';
-import { SixLinesDisplay } from '../components/SixLinesDisplay';
-import { SixYaoTable } from '../components/SixYaoTable';
+import { MobileWorkspaceHexagrams } from '../components/MobileWorkspaceHexagrams';
+import { MobileMasterTable } from '../components/MobileMasterTable';
+import { MobileSupplementaryTable } from '../components/MobileSupplementaryTable';
 import { MobileDivinationRecord } from '../types/navigation';
 
 export interface HexagramResultScreenProps {
@@ -27,19 +28,40 @@ export interface HexagramResultScreenProps {
   onAddNote?: (divinationId: string, content: string, actualOutcome?: string) => Promise<void>;
 }
 
+export type WorkspaceTab = 'an-que' | 'luan-giai';
+
 export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
   record,
   onBack,
   onNewCast,
   onAddNote,
 }) => {
-  const [activeTab, setActiveTab] = useState<'trio' | 'sixyao' | 'classical' | 'interpretation' | 'notes'>('trio');
+  // Trạng thái chuyển đổi 2 chế độ xem: Bảng An Quẻ & Đồ Hình vs Luận Giải Quẻ Toàn Diện
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>('an-que');
   const [showAllLines, setShowAllLines] = useState<boolean>(false);
   const [noteContent, setNoteContent] = useState<string>('');
   const [actualOutcome, setActualOutcome] = useState<string>('');
   const [localNotes, setLocalNotes] = useState<DivinationNoteEntity[]>(record.notes ? [...record.notes] : []);
 
-  const { trio, movingLines, sixYaoAnalysis, theDung, dateTimeInfo, question, method } = record;
+  const { trio, movingLines, sixYaoAnalysis: initialSixYao, theDung, dateTimeInfo, question, method } = record;
+
+  // Đảm bảo luôn có SixYaoAnalysisResult chuẩn tắc từ Core Orchestrator
+  const sixYaoResult: SixYaoAnalysisResult = useMemo(() => {
+    if (initialSixYao) {
+      return initialSixYao;
+    }
+    return orchestrateSixYaoAnalysis({
+      primaryHexagram: trio.primary.number,
+      changingHexagram: trio.transformed?.number,
+      movingLineIndices: (movingLines || trio.movingLineIndices) as LinePosition[],
+      dateTime: {
+        dayCanChi: dateTimeInfo.dayCanChi,
+        monthCanChi: dateTimeInfo.monthCanChi,
+        yearCanChi: dateTimeInfo.yearCanChi,
+        hourCanChi: dateTimeInfo.hourCanChi,
+      },
+    });
+  }, [initialSixYao, trio, movingLines, dateTimeInfo]);
 
   // 1. Dữ liệu Kinh Văn Cổ Điển
   const classicalLookup = getClassicalHexagramData(trio.primary.number);
@@ -48,9 +70,14 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
   // 2. Dữ liệu Động Cơ Luận Giải (Interpretation Engine từ @kindich/core)
   const interpretation = interpretHexagram({
     trio,
-    sixYaoResult: sixYaoAnalysis,
+    sixYaoResult,
     includeAllLines: showAllLines,
   });
+
+  // Tách Nhật thần, Nguyệt lệnh và Tuần không
+  const dayBranch = (dateTimeInfo.dayCanChi || '').split(' ')[1] || (dateTimeInfo.dayCanChi || '');
+  const monthBranch = (dateTimeInfo.monthCanChi || '').split(' ')[1] || (dateTimeInfo.monthCanChi || '');
+  const voidBranchesStr = sixYaoResult.dateTime.dayMaster.voidBranches.join(', ');
 
   // Xử lý thêm ghi chú / nghiệm lý
   const handleSaveNote = async () => {
@@ -87,299 +114,116 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
   return (
     <View style={styles.container}>
       <Header
-        title="Kết Quả Chiêm Bói"
-        subtitle={
-          method === CastingMethod.SERIAL
-            ? '🔢 Seri tiền (SERIAL-MOD8-V1)'
-            : '⏳ Giờ động tâm (Mai Hoa Dịch Số)'
-        }
+        title="Kinh Dịch Tân An Phái"
+        subtitle="Bắc Hà Tân An Phái • Luận Quẻ Tập Trung"
         showBackButton={true}
         onBack={onBack}
         rightAction={
-          <TouchableOpacity onPress={onNewCast} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.newCastBtn} onPress={onNewCast} activeOpacity={0.7}>
             <Text style={styles.newCastBtnText}>+ Lập mới</Text>
           </TouchableOpacity>
         }
       />
 
-      {/* Thanh Tabs cuộn ngang mượt mà cho mọi kích thước màn hình */}
-      <View style={styles.tabsContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsRow}>
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'trio' && styles.activeTabItem]}
-            onPress={() => setActiveTab('trio')}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.tabItemText, activeTab === 'trio' && styles.activeTabItemText]}>
-              ☯ Bộ Ba Quẻ
-            </Text>
-          </TouchableOpacity>
+      {/* 2 Tab điều hướng chính: Bảng An Quẻ & Đồ Hình vs Luận Giải Toàn Diện */}
+      <View style={styles.viewModeTabs}>
+        <TouchableOpacity
+          style={[styles.viewModeTabBtn, activeTab === 'an-que' && styles.viewModeTabBtnActive]}
+          onPress={() => setActiveTab('an-que')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.viewModeTabText, activeTab === 'an-que' && styles.viewModeTabTextActive]}>
+            📊 Bảng An Quẻ & Đồ Hình
+          </Text>
+        </TouchableOpacity>
 
-          {sixYaoAnalysis && (
-            <TouchableOpacity
-              style={[styles.tabItem, activeTab === 'sixyao' && styles.activeTabItem]}
-              onPress={() => setActiveTab('sixyao')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.tabItemText, activeTab === 'sixyao' && styles.activeTabItemText]}>
-                📊 Đồ Bản Lục Hào
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'classical' && styles.activeTabItem]}
-            onPress={() => setActiveTab('classical')}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.tabItemText, activeTab === 'classical' && styles.activeTabItemText]}>
-              📜 Kinh Văn Thoán Hào
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'interpretation' && styles.activeTabItem]}
-            onPress={() => setActiveTab('interpretation')}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.tabItemText, activeTab === 'interpretation' && styles.activeTabItemText]}>
-              🔮 Luận Giải Toàn Diện
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'notes' && styles.activeTabItem]}
-            onPress={() => setActiveTab('notes')}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.tabItemText, activeTab === 'notes' && styles.activeTabItemText]}>
-              📝 Ghi Chú & Nghiệm Lý ({localNotes.length})
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
+        <TouchableOpacity
+          style={[styles.viewModeTabBtn, activeTab === 'luan-giai' && styles.viewModeTabBtnActive]}
+          onPress={() => setActiveTab('luan-giai')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.viewModeTabText, activeTab === 'luan-giai' && styles.viewModeTabTextActive]}>
+            📖 Luận Giải Quẻ Toàn Diện
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Banner tóm tắt thông tin lần lập quẻ */}
-        <View style={styles.metaCard}>
-          {question ? (
-            <View style={styles.questionBox}>
-              <Text style={styles.questionLabel}>Việc cần hỏi:</Text>
-              <Text style={styles.questionText}>"{question}"</Text>
-            </View>
-          ) : null}
-
-          <View style={styles.dateTimeBox}>
-            <Text style={styles.dateText}>🕒 {dateTimeInfo.solarDateStr} (Dương lịch)</Text>
-            <Text style={styles.canChiText}>
-              Âm lịch: {dateTimeInfo.lunarDateStr} • Can Chi: {dateTimeInfo.dayCanChi} (Ngày) -{' '}
-              {dateTimeInfo.monthCanChi} (Tháng)
-            </Text>
-          </View>
-        </View>
-
-        {/* TAB 1: BỘ BA QUẺ & THỂ DỤNG */}
-        {activeTab === 'trio' && (
+        {/* ========================================================================= */}
+        {/* TRANG 1: MÀN HÌNH KẾT QUẢ TẬP TRUNG (SINGLE DIVINATION WORKSPACE)       */}
+        {/* ========================================================================= */}
+        {activeTab === 'an-que' && (
           <View>
-            {/* Phân tích Thể Dụng (Mai Hoa) nếu có */}
-            {theDung && (
-              <View style={styles.theDungCard}>
-                <Text style={styles.theDungTitle}>Phân Tích Thể / Dụng (Mai Hoa)</Text>
-                <View style={styles.theDungRow}>
-                  <View style={styles.theDungCol}>
-                    <Text style={styles.theDungLabel}>QUÁI THỂ (Chủ):</Text>
-                    <Text style={styles.theDungValue}>{theDung.theTrigramName}</Text>
-                    <Text style={styles.theDungSub}>
-                      Vị trí: {theDung.theLocation === 'upper' ? 'Thượng' : 'Hạ'}
-                    </Text>
-                  </View>
-                  <Text style={styles.theDungVersus}>⚡</Text>
-                  <View style={styles.theDungCol}>
-                    <Text style={styles.theDungLabel}>QUÁI DỤNG (Biến):</Text>
-                    <Text style={[styles.theDungValue, { color: theme.colors.primary }]}>
-                      {theDung.dungTrigramName}
-                    </Text>
-                    <Text style={styles.theDungSub}>
-                      Vị trí: {theDung.dungLocation === 'upper' ? 'Thượng' : 'Hạ'}
-                    </Text>
-                  </View>
+            {/* KHU VỰC 1: THÔNG TIN CHUNG (META CARD) */}
+            <View style={styles.metaCard}>
+              <View style={styles.metaHeaderRow}>
+                <View style={styles.brandTitleWrap}>
+                  <Text style={styles.brandSubtitle}>BẮC HÀ TÂN AN PHÁI</Text>
+                  <Text style={styles.brandTitle}>KINH DỊCH TÂN AN PHÁI</Text>
                 </View>
-              </View>
-            )}
-
-            {/* Quẻ Chủ */}
-            <View style={styles.hexCard}>
-              <View style={styles.hexCardHeader}>
-                <View style={styles.hexTitleCol}>
-                  <View style={styles.hexTag}>
-                    <Text style={styles.hexTagText}>QUẺ CHỦ #{trio.primary.number}</Text>
-                  </View>
-                  <Text style={styles.hexName}>{trio.primary.name}</Text>
-                  <Text style={styles.hexSubName}>
-                    {trio.primary.sinoVietnameseName} • {trio.primary.chineseName}
+                <View style={styles.methodBadge}>
+                  <Text style={styles.methodBadgeText}>
+                    {method === CastingMethod.SERIAL
+                      ? `Số seri tiền${record.serialNumber ? `: ${record.serialNumber}` : ''}`
+                      : 'Giờ động tâm (Mai Hoa)'}
                   </Text>
                 </View>
-                <Text style={styles.hexSymbol}>{trio.primary.symbol}</Text>
               </View>
 
-              <View style={styles.trigramsBar}>
-                <Text style={styles.trigramText}>
-                  Thượng: {trio.primary.upperTrigram.name} ({trio.primary.upperTrigram.symbol})
-                </Text>
-                <Text style={styles.trigramDivider}>•</Text>
-                <Text style={styles.trigramText}>
-                  Hạ: {trio.primary.lowerTrigram.name} ({trio.primary.lowerTrigram.symbol})
-                </Text>
-              </View>
-
-              <SixLinesDisplay hexagram={trio.primary} movingLineIndices={movingLines} />
-            </View>
-
-            {/* Quẻ Biến & Quẻ Hỗ */}
-            <View style={styles.trioSecondaryGrid}>
-              {/* Quẻ Biến */}
-              <View style={[styles.hexCard, styles.secondaryCard]}>
-                <View style={styles.secondaryHeader}>
-                  <Text style={styles.secondaryBadge}>QUẺ BIẾN #{trio.transformed.number}</Text>
-                  <Text style={styles.secondarySymbol}>{trio.transformed.symbol}</Text>
+              {question ? (
+                <View style={styles.questionBox}>
+                  <Text style={styles.questionLabel}>Việc cần hỏi:</Text>
+                  <Text style={styles.questionText}>"{question}"</Text>
                 </View>
-                <Text style={styles.secondaryName}>{trio.transformed.name}</Text>
-                <Text style={styles.secondarySubName}>({trio.transformed.sinoVietnameseName})</Text>
-                <SixLinesDisplay hexagram={trio.transformed} movingLineIndices={[]} showLabels={false} />
-              </View>
+              ) : null}
 
-              {/* Quẻ Hỗ */}
-              <View style={[styles.hexCard, styles.secondaryCard]}>
-                <View style={styles.secondaryHeader}>
-                  <Text style={[styles.secondaryBadge, styles.nuclearBadge]}>
-                    QUẺ HỖ #{trio.nuclear.number}
+              {/* Thông tin thời gian và Can Chi 4 trụ */}
+              <View style={styles.dateTimeGrid}>
+                <View style={styles.timeRow}>
+                  <Text style={styles.timeLabel}>🕒 Dương lịch:</Text>
+                  <Text style={styles.timeValue}>{dateTimeInfo.solarDateStr}</Text>
+                </View>
+
+                <View style={styles.timeRow}>
+                  <Text style={styles.timeLabel}>🌙 Âm lịch:</Text>
+                  <Text style={styles.timeValue}>{dateTimeInfo.lunarDateStr}</Text>
+                </View>
+
+                <View style={styles.canChiBlock}>
+                  <Text style={styles.canChiBlockLabel}>Can Chi 4 Trụ:</Text>
+                  <Text style={styles.canChiBlockValue}>
+                    Giờ {dateTimeInfo.hourCanChi} • Ngày {dateTimeInfo.dayCanChi} • Tháng {dateTimeInfo.monthCanChi} • Năm {dateTimeInfo.yearCanChi}
                   </Text>
-                  <Text style={styles.secondarySymbol}>{trio.nuclear.symbol}</Text>
                 </View>
-                <Text style={styles.secondaryName}>{trio.nuclear.name}</Text>
-                <Text style={styles.secondarySubName}>({trio.nuclear.sinoVietnameseName})</Text>
-                <SixLinesDisplay hexagram={trio.nuclear} movingLineIndices={[]} showLabels={false} />
+
+                <View style={styles.deitiesSummaryRow}>
+                  <Text style={styles.deitiesSummaryText}>
+                    Nhật thần: <Text style={styles.goldText}>{dayBranch}</Text> • Nguyệt lệnh: <Text style={styles.goldText}>{monthBranch}</Text> • Tuần không: <Text style={styles.redText}>[{voidBranchesStr || '—'}]</Text>
+                  </Text>
+                </View>
               </View>
             </View>
+
+            {/* KHU VỰC 2: HÌNH TƯỢNG BỘ BA QUẺ (HEXAGRAM SHOWCASE) */}
+            <MobileWorkspaceHexagrams trio={trio} />
+
+            {/* KHU VỰC 3: BẢNG LỤC HÀO TỔNG HỢP CỔ PHÁP */}
+            <MobileMasterTable sixYaoResult={sixYaoResult} />
+
+            {/* KHU VỰC 4: BẢNG PHÂN TÍCH BỔ SUNG */}
+            <MobileSupplementaryTable sixYaoResult={sixYaoResult} />
           </View>
         )}
 
-        {/* TAB 2: ĐỒ BẢN LỤC HÀO CỔ PHÁP */}
-        {activeTab === 'sixyao' && sixYaoAnalysis && (
-          <View>
-            <SixYaoTable analysis={sixYaoAnalysis} />
-          </View>
-        )}
-
-        {/* TAB 3: KINH VĂN THOÁN HÀO */}
-        {activeTab === 'classical' && (
-          <View style={styles.textsContainer}>
-            {/* Bộ lọc Hào Từ */}
-            <View style={styles.filterRow}>
-              <Text style={styles.filterLabel}>Phạm vi Hào Từ:</Text>
-              <View style={styles.filterButtonGroup}>
-                <TouchableOpacity
-                  style={[styles.filterBtn, !showAllLines && styles.filterBtnActive]}
-                  onPress={() => setShowAllLines(false)}
-                >
-                  <Text style={[styles.filterBtnText, !showAllLines && styles.filterBtnTextActive]}>
-                    Chỉ Hào Động ({movingLines.length})
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.filterBtn, showAllLines && styles.filterBtnActive]}
-                  onPress={() => setShowAllLines(true)}
-                >
-                  <Text style={[styles.filterBtnText, showAllLines && styles.filterBtnTextActive]}>
-                    Toàn Bộ 6 Hào
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Thoán từ */}
-            <View style={styles.textSection}>
-              <View style={styles.sectionHeaderRow}>
-                <Text style={styles.textSectionTitle}>Thoán Từ (Lời Quán Quẻ)</Text>
-                <Text style={styles.sourceTag}>Chu Dịch Chính Nghĩa</Text>
-              </View>
-              <Text style={styles.textOriginal}>
-                {classicalData?.thuanTu.chinese || 'Chưa có bản văn chữ Hán.'}
-              </Text>
-              {classicalData?.thuanTu.sinoVietnamese && (
-                <Text style={styles.textSino}>Phiên âm: {classicalData.thuanTu.sinoVietnamese}</Text>
-              )}
-              <Text style={styles.textTranslation}>
-                Dịch nghĩa: {classicalData?.thuanTu.translation || 'Chưa có bản dịch nghĩa.'}
-              </Text>
-            </View>
-
-            {/* Đại Tượng */}
-            <View style={styles.textSection}>
-              <View style={styles.sectionHeaderRow}>
-                <Text style={styles.textSectionTitle}>Đại Tượng Từ (Tượng Quẻ)</Text>
-                <Text style={styles.sourceTag}>Văn Vương Tượng</Text>
-              </View>
-              <Text style={styles.textOriginal}>
-                {classicalData?.daiTuong.chinese || 'Chưa có bản văn tượng quẻ.'}
-              </Text>
-              {classicalData?.daiTuong.sinoVietnamese && (
-                <Text style={styles.textSino}>Phiên âm: {classicalData.daiTuong.sinoVietnamese}</Text>
-              )}
-              <Text style={styles.textTranslation}>
-                Dịch nghĩa: {classicalData?.daiTuong.translation || 'Chưa có bản dịch nghĩa.'}
-              </Text>
-            </View>
-
-            {/* Hào từ */}
-            <View style={styles.textSection}>
-              <View style={styles.sectionHeaderRow}>
-                <Text style={styles.textSectionTitle}>
-                  Hào Từ ({showAllLines ? 'Toàn bộ 6 hào' : `Các hào động: ${movingLines.map((l: number) => `Hào ${l}`).join(', ') || 'Không có'}`})
-                </Text>
-                <Text style={styles.sourceTag}>Chu Công Hào Từ</Text>
-              </View>
-
-              {classicalData?.lines
-                .filter((l) => (showAllLines ? true : movingLines.includes(l.position)))
-                .map((line) => {
-                  const isMoving = movingLines.includes(line.position);
-                  return (
-                    <View
-                      key={`line-text-${line.position}`}
-                      style={[styles.movingTextItem, isMoving && styles.movingTextHighlight]}
-                    >
-                      <View style={styles.lineHeaderRow}>
-                        <Text style={[styles.movingLineTitle, isMoving && { color: theme.colors.primary }]}>
-                          • Hào {line.position} ({line.lineName}):
-                        </Text>
-                        {isMoving && (
-                          <View style={styles.movingPill}>
-                            <Text style={styles.movingPillText}>HÀO ĐỘNG</Text>
-                          </View>
-                        )}
-                      </View>
-                      <Text style={styles.textOriginal}>{line.haoTu.chinese}</Text>
-                      {line.haoTu.sinoVietnamese && (
-                        <Text style={styles.textSino}>Phiên âm: {line.haoTu.sinoVietnamese}</Text>
-                      )}
-                      {line.haoTu.translation && (
-                        <Text style={styles.textTranslation}>Dịch nghĩa: {line.haoTu.translation}</Text>
-                      )}
-                    </View>
-                  );
-                })}
-            </View>
-          </View>
-        )}
-
-        {/* TAB 4: LUẬN GIẢI TOÀN DIỆN */}
-        {activeTab === 'interpretation' && (
-          <View style={styles.textsContainer}>
-            {/* Quy tắc Chu Hi Dịch Học Khải Mông */}
-            <View style={[styles.textSection, styles.interpCard]}>
-              <View style={styles.sectionHeaderRow}>
-                <Text style={styles.textSectionTitle}>1. Trọng Tâm Chiêm Đoán (Chu Hi)</Text>
+        {/* ========================================================================= */}
+        {/* TRANG 2: LUẬN GIẢI QUẺ TOÀN DIỆN & KINH VĂN & GHI CHÚ                     */}
+        {/* ========================================================================= */}
+        {activeTab === 'luan-giai' && (
+          <View style={styles.interpContainer}>
+            {/* 1. Trọng tâm chiêm đoán (Chu Hi - Dịch Học Khải Mông) */}
+            <View style={styles.interpCard}>
+              <View style={styles.cardHeaderRow}>
+                <Text style={styles.cardSectionTitle}>1. Trọng Tâm Chiêm Đoán (Chu Hi)</Text>
                 <Text style={styles.sourceTag}>Dịch Học Khải Mông</Text>
               </View>
               <Text style={styles.ruleName}>
@@ -390,11 +234,11 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
               </Text>
             </View>
 
-            {/* Luận giải Mai Hoa nếu có */}
+            {/* 2. Luận giải Thể / Dụng (Mai Hoa) nếu có */}
             {interpretation.maiHua && (
-              <View style={[styles.textSection, styles.interpCard]}>
-                <View style={styles.sectionHeaderRow}>
-                  <Text style={styles.textSectionTitle}>2. Luận Giải Thể / Dụng (Mai Hoa)</Text>
+              <View style={styles.interpCard}>
+                <View style={styles.cardHeaderRow}>
+                  <Text style={styles.cardSectionTitle}>2. Luận Giải Thể / Dụng (Mai Hoa)</Text>
                   <Text style={styles.sourceTag}>Mai Hoa Dịch Số</Text>
                 </View>
                 <Text style={styles.ruleName}>
@@ -409,18 +253,18 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
                   </Text>
                 ) : null}
                 {interpretation.maiHua.content.classicalVerse ? (
-                  <Text style={[styles.ruleExplanation, { marginTop: 4, color: theme.colors.gold[800] }]}>
+                  <Text style={[styles.ruleExplanation, { marginTop: 4, color: '#C9A227' }]}>
                     • Thi từ: "{interpretation.maiHua.content.classicalVerse}"
                   </Text>
                 ) : null}
               </View>
             )}
 
-            {/* Luận giải Lục Hào nếu có */}
+            {/* 3. Luận giải Thế / Ứng & Lục Hào */}
             {interpretation.sixYao && (
-              <View style={[styles.textSection, styles.interpCard]}>
-                <View style={styles.sectionHeaderRow}>
-                  <Text style={styles.textSectionTitle}>3. Luận Giải Thế / Ứng & Nhật Nguyệt (Lục Hào)</Text>
+              <View style={styles.interpCard}>
+                <View style={styles.cardHeaderRow}>
+                  <Text style={styles.cardSectionTitle}>3. Luận Giải Thế / Ứng (Lục Hào)</Text>
                   <Text style={styles.sourceTag}>Tăng San Bốc Dịch</Text>
                 </View>
                 <Text style={styles.ruleName}>
@@ -429,7 +273,7 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
                 <Text style={styles.ruleExplanation}>
                   {interpretation.sixYao.content.shiYing.explanation}
                 </Text>
-                <Text style={[styles.ruleExplanation, { marginTop: 8 }]}>
+                <Text style={[styles.ruleExplanation, { marginTop: 6 }]}>
                   {interpretation.sixYao.content.officerImpact.summaryOverview}
                 </Text>
                 <Text style={[styles.ruleExplanation, { marginTop: 4 }]}>
@@ -438,76 +282,122 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
               </View>
             )}
 
-            {/* Tuyên bố trách nhiệm học thuật */}
-            <View style={[styles.textSection, styles.disclaimerCard]}>
-              <Text style={styles.disclaimerTitle}>TÔN CHỈ KHOA HỌC & KHÁCH QUAN</Text>
-              <Text style={styles.disclaimerText}>
-                {interpretation.disclaimer}
+            {/* 4. Kinh Văn Thoán Từ & Đại Tượng */}
+            <View style={styles.interpCard}>
+              <View style={styles.cardHeaderRow}>
+                <Text style={styles.cardSectionTitle}>4. Thoán Từ & Đại Tượng Từ</Text>
+                <Text style={styles.sourceTag}>Chu Dịch Chính Nghĩa</Text>
+              </View>
+              <Text style={styles.classicalOriginal}>
+                {classicalData?.thuanTu.chinese || 'Chưa có bản văn chữ Hán.'}
+              </Text>
+              {classicalData?.thuanTu.sinoVietnamese && (
+                <Text style={styles.classicalSino}>Phiên âm: {classicalData.thuanTu.sinoVietnamese}</Text>
+              )}
+              <Text style={styles.classicalTranslation}>
+                Dịch nghĩa: {classicalData?.thuanTu.translation || 'Chưa có bản dịch nghĩa.'}
+              </Text>
+
+              <View style={styles.innerDivider} />
+
+              <Text style={styles.classicalOriginal}>
+                {classicalData?.daiTuong.chinese || 'Chưa có bản văn đại tượng.'}
+              </Text>
+              {classicalData?.daiTuong.sinoVietnamese && (
+                <Text style={styles.classicalSino}>Tượng truyện: {classicalData.daiTuong.sinoVietnamese}</Text>
+              )}
+              <Text style={styles.classicalTranslation}>
+                Dịch nghĩa: {classicalData?.daiTuong.translation || 'Chưa có bản dịch nghĩa.'}
               </Text>
             </View>
-          </View>
-        )}
 
-        {/* TAB 5: GHI CHÚ & NGHIỆM LÝ */}
-        {activeTab === 'notes' && (
-          <View style={styles.notesContainer}>
-            {/* Form thêm ghi chú */}
-            <View style={styles.addNoteCard}>
-              <Text style={styles.addNoteTitle}>Thêm Ghi Chú & Nghiệm Lý</Text>
-              <Text style={styles.inputSubLabel}>Nội dung bối cảnh / cảm nghĩ khi gieo:</Text>
+            {/* 5. Hào Từ Các Hào Động */}
+            <View style={styles.interpCard}>
+              <View style={styles.cardHeaderRow}>
+                <Text style={styles.cardSectionTitle}>
+                  5. Hào Từ ({showAllLines ? 'Toàn bộ 6 hào' : `Các hào động: ${movingLines.map((l: number) => `Hào ${l}`).join(', ') || 'Không có'}`})
+                </Text>
+                <TouchableOpacity
+                  style={styles.toggleHaoBtn}
+                  onPress={() => setShowAllLines(!showAllLines)}
+                >
+                  <Text style={styles.toggleHaoBtnText}>
+                    {showAllLines ? 'Chỉ Hào Động' : 'Xem Cả 6 Hào'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {classicalData?.lines
+                .filter((l) => (showAllLines ? true : movingLines.includes(l.position)))
+                .map((line) => {
+                  const isMoving = movingLines.includes(line.position);
+                  return (
+                    <View
+                      key={`line-classical-${line.position}`}
+                      style={[styles.lineClassicalItem, isMoving && styles.lineClassicalItemMoving]}
+                    >
+                      <View style={styles.lineHeaderRow}>
+                        <Text style={[styles.lineTitle, isMoving && styles.lineTitleMoving]}>
+                          • Hào {line.position} ({line.lineName}):
+                        </Text>
+                        {isMoving && (
+                          <View style={styles.movingBadge}>
+                            <Text style={styles.movingBadgeText}>HÀO ĐỘNG</Text>
+                          </View>
+                        )}
+                      </View>
+                      <Text style={styles.classicalOriginal}>{line.haoTu.chinese}</Text>
+                      {line.haoTu.sinoVietnamese && (
+                        <Text style={styles.classicalSino}>Phiên âm: {line.haoTu.sinoVietnamese}</Text>
+                      )}
+                      {line.haoTu.translation && (
+                        <Text style={styles.classicalTranslation}>Dịch nghĩa: {line.haoTu.translation}</Text>
+                      )}
+                    </View>
+                  );
+                })}
+            </View>
+
+            {/* 6. Ghi Chú & Nghiệm Lý */}
+            <View style={styles.interpCard}>
+              <Text style={styles.cardSectionTitle}>6. Ghi Chú & Nghiệm Lý ({localNotes.length})</Text>
+
               <TextInput
                 style={styles.noteInput}
-                multiline
-                placeholder="Ghi lại bối cảnh, sự việc hoặc linh cảm lúc lập quẻ..."
-                placeholderTextColor={theme.colors.textMuted}
+                placeholder="Nhập ghi chú chiêm đoán..."
+                placeholderTextColor="#64748B"
                 value={noteContent}
                 onChangeText={setNoteContent}
+                multiline
+                numberOfLines={3}
               />
 
-              <Text style={styles.inputSubLabel}>Kết quả nghiệm chứng thực tế (nếu có):</Text>
               <TextInput
-                style={[styles.noteInput, { minHeight: 60 }]}
-                multiline
-                placeholder="Kết quả thực tế diễn ra sau này để đối chiếu chiêm nghiệm..."
-                placeholderTextColor={theme.colors.textMuted}
+                style={[styles.noteInput, { height: 40, marginTop: 8 }]}
+                placeholder="Kết quả thực tế / nghiệm chứng (nếu có)..."
+                placeholderTextColor="#64748B"
                 value={actualOutcome}
                 onChangeText={setActualOutcome}
               />
 
               <TouchableOpacity style={styles.saveNoteBtn} onPress={handleSaveNote} activeOpacity={0.8}>
-                <Text style={styles.saveNoteBtnText}>💾 Lưu Ghi Chú & Nghiệm Lý</Text>
+                <Text style={styles.saveNoteBtnText}>💾 Lưu Ghi Chú</Text>
               </TouchableOpacity>
-            </View>
 
-            {/* Danh sách ghi chú */}
-            <View style={styles.notesList}>
-              <Text style={styles.notesListTitle}>Lịch Sử Ghi Chú Của Quẻ Này ({localNotes.length})</Text>
-              {localNotes.length === 0 ? (
-                <View style={styles.emptyNotesBox}>
-                  <Text style={styles.emptyNotesText}>Chưa có ghi chú nào cho lần lập quẻ này.</Text>
-                </View>
-              ) : (
-                localNotes.map((note) => (
-                  <View key={note.id} style={styles.noteItemCard}>
-                    <View style={styles.noteHeader}>
+              {localNotes.length > 0 && (
+                <View style={styles.notesList}>
+                  {localNotes.map((n) => (
+                    <View key={n.id} style={styles.noteItem}>
                       <Text style={styles.noteDate}>
-                        📅 {new Date(note.createdAt).toLocaleString('vi-VN')}
+                        {new Date(n.createdAt).toLocaleDateString('vi-VN')} {new Date(n.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                       </Text>
-                      {note.isVerified ? (
-                        <View style={styles.verifiedBadge}>
-                          <Text style={styles.verifiedBadgeText}>ĐÃ NGHIỆM LÝ</Text>
-                        </View>
+                      <Text style={styles.noteText}>{n.content}</Text>
+                      {n.actualOutcome ? (
+                        <Text style={styles.outcomeText}>✓ Nghiệm chứng: {n.actualOutcome}</Text>
                       ) : null}
                     </View>
-                    <Text style={styles.noteContentText}>{note.content}</Text>
-                    {note.actualOutcome ? (
-                      <View style={styles.outcomeBox}>
-                        <Text style={styles.outcomeLabel}>Kết quả thực tế:</Text>
-                        <Text style={styles.outcomeText}>{note.actualOutcome}</Text>
-                      </View>
-                    ) : null}
-                  </View>
-                ))
+                  ))}
+                </View>
               )}
             </View>
           </View>
@@ -520,509 +410,323 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: '#0B0F1A',
+  },
+  newCastBtn: {
+    backgroundColor: '#C9A227',
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   newCastBtnText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
-    color: theme.colors.primary,
-    backgroundColor: theme.colors.primaryLight,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    color: '#0B0F1A',
   },
-  tabsContainer: {
-    backgroundColor: theme.colors.card,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  tabsRow: {
+  viewModeTabs: {
     flexDirection: 'row',
-    paddingHorizontal: 8,
+    backgroundColor: '#151B2B',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
-  tabItem: {
-    paddingHorizontal: 12,
-    paddingVertical: 11,
+  viewModeTabBtn: {
+    flex: 1,
+    paddingVertical: 10,
     alignItems: 'center',
     borderBottomWidth: 2,
     borderBottomColor: 'transparent',
   },
-  activeTabItem: {
-    borderBottomColor: theme.colors.primary,
+  viewModeTabBtnActive: {
+    borderBottomColor: '#C9A227',
+    backgroundColor: 'rgba(201, 162, 39, 0.08)',
   },
-  tabItemText: {
-    fontSize: 12,
+  viewModeTabText: {
+    fontSize: 12.5,
     fontWeight: '600',
-    color: theme.colors.textSecondary,
+    color: '#94A3B8',
   },
-  activeTabItemText: {
-    color: theme.colors.primary,
+  viewModeTabTextActive: {
+    color: '#C9A227',
     fontWeight: '700',
   },
   scrollContent: {
-    padding: 14,
-    paddingBottom: 36,
+    paddingBottom: 40,
   },
   metaCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 10,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.borderGold,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  questionBox: {
-    marginBottom: 8,
-  },
-  questionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: theme.colors.textSecondary,
-    textTransform: 'uppercase',
-  },
-  questionText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    marginTop: 2,
-  },
-  dateTimeBox: {
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-    paddingTop: 8,
-  },
-  dateText: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    fontWeight: '500',
-  },
-  canChiText: {
-    fontSize: 12,
-    color: theme.colors.text,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  theDungCard: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 10,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.borderGold,
-    marginBottom: 12,
-  },
-  theDungTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  theDungRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-  },
-  theDungCol: {
-    alignItems: 'center',
-  },
-  theDungLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: theme.colors.textSecondary,
-  },
-  theDungValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.colors.text,
-    marginVertical: 2,
-  },
-  theDungSub: {
-    fontSize: 11,
-    color: theme.colors.textMuted,
-  },
-  theDungVersus: {
-    fontSize: 16,
-  },
-  hexCard: {
-    backgroundColor: theme.colors.card,
+    backgroundColor: '#151B2B',
     borderRadius: 12,
-    padding: 14,
     borderWidth: 1,
-    borderColor: theme.colors.borderGold,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+    borderColor: 'rgba(201, 162, 39, 0.3)',
+    marginHorizontal: 12,
+    marginTop: 10,
+    marginBottom: 6,
+    padding: 12,
   },
-  hexCardHeader: {
+  metaHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 8,
   },
-  hexTitleCol: {
+  brandTitleWrap: {
     flex: 1,
   },
-  hexTag: {
-    alignSelf: 'flex-start',
-    backgroundColor: theme.colors.primaryLight,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginBottom: 4,
+  brandSubtitle: {
+    fontSize: 10,
+    color: '#94A3B8',
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
-  hexTagText: {
+  brandTitle: {
+    fontFamily: 'serif',
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#C9A227',
+    letterSpacing: 0.5,
+  },
+  methodBadge: {
+    backgroundColor: 'rgba(201, 162, 39, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(201, 162, 39, 0.4)',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  methodBadgeText: {
+    fontSize: 10.5,
+    fontWeight: '600',
+    color: '#C9A227',
+  },
+  questionBox: {
+    backgroundColor: '#0D1117',
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#C9A227',
+  },
+  questionLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: theme.colors.primary,
+    color: '#C9A227',
   },
-  hexName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
-  hexSubName: {
+  questionText: {
     fontSize: 12,
-    color: theme.colors.textSecondary,
-    marginTop: 2,
+    color: '#E8EDF5',
+    fontStyle: 'italic',
+    marginTop: 1,
   },
-  hexSymbol: {
-    fontSize: 34,
-    color: theme.colors.primary,
-    marginLeft: 8,
+  dateTimeGrid: {
+    backgroundColor: '#0D1117',
+    borderRadius: 8,
+    padding: 8,
+    gap: 4,
   },
-  trigramsBar: {
+  timeRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    marginBottom: 10,
+    justifyContent: 'space-between',
   },
-  trigramText: {
-    fontSize: 12,
+  timeLabel: {
+    fontSize: 11,
+    color: '#94A3B8',
+  },
+  timeValue: {
+    fontSize: 11,
     fontWeight: '600',
-    color: theme.colors.text,
+    color: '#E8EDF5',
   },
-  trigramDivider: {
-    marginHorizontal: 8,
-    color: theme.colors.borderGold,
+  canChiBlock: {
+    marginTop: 4,
+    paddingTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
   },
-  trioSecondaryGrid: {
-    flexDirection: 'row',
+  canChiBlockLabel: {
+    fontSize: 10.5,
+    color: '#94A3B8',
+    marginBottom: 1,
+  },
+  canChiBlockValue: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#C9A227',
+  },
+  deitiesSummaryRow: {
+    marginTop: 3,
+    paddingTop: 3,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  deitiesSummaryText: {
+    fontSize: 11,
+    color: '#94A3B8',
+  },
+  goldText: {
+    color: '#C9A227',
+    fontWeight: '700',
+  },
+  redText: {
+    color: '#F87171',
+    fontWeight: '700',
+  },
+  interpContainer: {
+    paddingHorizontal: 12,
+    paddingTop: 8,
     gap: 10,
   },
-  secondaryCard: {
-    flex: 1,
-    padding: 10,
-  },
-  secondaryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  secondaryBadge: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    backgroundColor: theme.colors.primaryLight,
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  nuclearBadge: {
-    color: theme.colors.gold[800],
-    backgroundColor: theme.colors.gold[100],
-  },
-  secondarySymbol: {
-    fontSize: 20,
-    color: theme.colors.text,
-  },
-  secondaryName: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
-  secondarySubName: {
-    fontSize: 11,
-    color: theme.colors.textSecondary,
-    marginBottom: 6,
-  },
-  textsContainer: {
-    gap: 12,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: theme.colors.card,
-    padding: 10,
-    borderRadius: 8,
+  interpCard: {
+    backgroundColor: '#151B2B',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 12,
   },
-  filterLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-  },
-  filterButtonGroup: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  filterBtn: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    backgroundColor: theme.colors.background,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  filterBtnActive: {
-    backgroundColor: theme.colors.primaryLight,
-    borderColor: theme.colors.primary,
-  },
-  filterBtnText: {
-    fontSize: 11,
-    color: theme.colors.textSecondary,
-  },
-  filterBtnTextActive: {
-    color: theme.colors.primary,
-    fontWeight: '700',
-  },
-  textSection: {
-    backgroundColor: theme.colors.card,
-    borderRadius: 10,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  sectionHeaderRow: {
+  cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
-  textSectionTitle: {
-    fontSize: 14,
+  cardSectionTitle: {
+    fontFamily: 'serif',
+    fontSize: 13,
     fontWeight: '700',
-    color: theme.colors.primary,
+    color: '#C9A227',
   },
   sourceTag: {
-    fontSize: 10,
-    color: theme.colors.gold[800],
-    backgroundColor: theme.colors.gold[100],
+    fontSize: 9.5,
+    color: '#94A3B8',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
-    fontWeight: '600',
-  },
-  textOriginal: {
-    fontSize: 15,
-    fontFamily: 'serif',
-    color: theme.colors.text,
-    lineHeight: 22,
-    marginBottom: 6,
-  },
-  textSino: {
-    fontSize: 13,
-    fontStyle: 'italic',
-    color: theme.colors.textSecondary,
-    marginBottom: 6,
-  },
-  textTranslation: {
-    fontSize: 13,
-    color: theme.colors.text,
-    lineHeight: 19,
-  },
-  movingTextItem: {
-    paddingTop: 8,
-    marginTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-  },
-  movingTextHighlight: {
-    backgroundColor: '#FFFDF7',
-    padding: 8,
-    borderRadius: 6,
-  },
-  lineHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  movingLineTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: theme.colors.text,
-  },
-  movingPill: {
-    backgroundColor: theme.colors.primary,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  movingPillText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  interpCard: {
-    borderColor: theme.colors.borderGold,
   },
   ruleName: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
-    color: theme.colors.text,
+    color: '#E8EDF5',
     marginBottom: 4,
   },
   ruleExplanation: {
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    lineHeight: 19,
-  },
-  disclaimerCard: {
-    backgroundColor: '#FBF9F4',
-    borderColor: theme.colors.borderGold,
-  },
-  disclaimerTitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: theme.colors.gold[800],
-    marginBottom: 4,
-    letterSpacing: 0.5,
-  },
-  disclaimerText: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
+    fontSize: 11.5,
+    color: '#94A3B8',
     lineHeight: 17,
   },
-  notesContainer: {
-    gap: 14,
-  },
-  addNoteCard: {
-    backgroundColor: theme.colors.card,
-    padding: 14,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: theme.colors.borderGold,
-  },
-  addNoteTitle: {
+  classicalOriginal: {
+    fontFamily: 'serif',
     fontSize: 14,
-    fontWeight: '700',
-    color: theme.colors.primary,
-    marginBottom: 8,
-  },
-  inputSubLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-    marginTop: 6,
+    color: '#E8EDF5',
+    lineHeight: 20,
     marginBottom: 4,
   },
-  noteInput: {
-    backgroundColor: theme.colors.background,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 13,
-    color: theme.colors.text,
-    minHeight: 70,
-    textAlignVertical: 'top',
-  },
-  saveNoteBtn: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  saveNoteBtnText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  notesList: {
-    gap: 8,
-  },
-  notesListTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: theme.colors.text,
+  classicalSino: {
+    fontSize: 11.5,
+    color: '#C9A227',
     marginBottom: 4,
+    fontStyle: 'italic',
   },
-  emptyNotesBox: {
-    backgroundColor: theme.colors.card,
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.border,
+  classicalTranslation: {
+    fontSize: 11.5,
+    color: '#94A3B8',
+    lineHeight: 16,
   },
-  emptyNotesText: {
-    fontSize: 13,
-    color: theme.colors.textMuted,
+  innerDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    marginVertical: 8,
   },
-  noteItemCard: {
-    backgroundColor: theme.colors.card,
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    marginBottom: 6,
-  },
-  noteHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  noteDate: {
-    fontSize: 11,
-    color: theme.colors.textMuted,
-  },
-  verifiedBadge: {
-    backgroundColor: '#DCFCE7',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+  toggleHaoBtn: {
+    backgroundColor: 'rgba(201, 162, 39, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: 4,
   },
-  verifiedBadgeText: {
+  toggleHaoBtnText: {
+    fontSize: 10,
+    color: '#C9A227',
+    fontWeight: '700',
+  },
+  lineClassicalItem: {
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  lineClassicalItemMoving: {
+    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+    borderRadius: 6,
+    paddingHorizontal: 6,
+  },
+  lineHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 3,
+  },
+  lineTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#E8EDF5',
+  },
+  lineTitleMoving: {
+    color: '#F87171',
+  },
+  movingBadge: {
+    backgroundColor: '#EF4444',
+    borderRadius: 3,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+  },
+  movingBadgeText: {
     fontSize: 9,
-    fontWeight: '700',
-    color: '#15803D',
+    fontWeight: '800',
+    color: '#FFFFFF',
   },
-  noteContentText: {
-    fontSize: 13,
-    color: theme.colors.text,
-    lineHeight: 18,
-  },
-  outcomeBox: {
+  noteInput: {
+    backgroundColor: '#0D1117',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    color: '#E8EDF5',
+    padding: 8,
+    fontSize: 12,
+    textAlignVertical: 'top',
     marginTop: 6,
-    paddingTop: 6,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
   },
-  outcomeLabel: {
-    fontSize: 11,
+  saveNoteBtn: {
+    backgroundColor: '#C9A227',
+    borderRadius: 6,
+    paddingVertical: 8,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  saveNoteBtnText: {
+    fontSize: 12,
     fontWeight: '700',
-    color: '#15803D',
+    color: '#0B0F1A',
+  },
+  notesList: {
+    marginTop: 10,
+    gap: 6,
+  },
+  noteItem: {
+    backgroundColor: '#0D1117',
+    borderRadius: 6,
+    padding: 8,
+    borderLeftWidth: 2,
+    borderLeftColor: '#C9A227',
+  },
+  noteDate: {
+    fontSize: 9.5,
+    color: '#64748B',
+    marginBottom: 2,
+  },
+  noteText: {
+    fontSize: 11.5,
+    color: '#E8EDF5',
   },
   outcomeText: {
-    fontSize: 12,
-    color: theme.colors.text,
-    fontStyle: 'italic',
+    fontSize: 11,
+    color: '#34D399',
     marginTop: 2,
   },
 });

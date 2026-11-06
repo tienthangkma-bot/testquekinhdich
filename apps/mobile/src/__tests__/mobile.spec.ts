@@ -390,4 +390,36 @@ describe('KinhDich Mobile App (apps/mobile)', () => {
       expect(reset.divination.defaultMethod).toBe('serial');
     });
   });
+
+  // =========================================================================
+  // 11. Single Divination Workspace Mobile Components
+  // =========================================================================
+  describe('Single Divination Workspace Mobile Components', () => {
+    it('chuẩn bị đầy đủ dữ liệu cho MobileMasterTable và MobileSupplementaryTable', async () => {
+      const hex1 = getHexagramById(1)!;
+      const hex44 = getHexagramById(44)!;
+
+      const analysis = orchestrateSixYaoAnalysis({
+        primaryHexagram: hex1,
+        changingHexagram: hex44,
+        movingLineIndices: [1],
+        dateTime: {
+          dayCanChi: 'Giáp Tý',
+          monthCanChi: 'Bính Thìn',
+          yearCanChi: 'Bính Ngọ',
+          hourCanChi: 'Kỷ Tỵ',
+        },
+      });
+
+      expect(analysis.primaryHexagram.lines.length).toBe(6);
+      expect(analysis.changingHexagram?.lines.length).toBe(6);
+
+      // Kiểm tra Lời Triệu của Quẻ Chủ và Quẻ Biến
+      const omenPrimary = hex1.number ? (await import('@kindich/domain')).getHexagramOmen(1) : null;
+      expect(omenPrimary?.omen).toBe('Khốn long đắc thủy');
+
+      const omenNuclear = (await import('@kindich/domain')).getHexagramOmen(1);
+      expect(omenNuclear.omen).toBeDefined();
+    });
+  });
 });
