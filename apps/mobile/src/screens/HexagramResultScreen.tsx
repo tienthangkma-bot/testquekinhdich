@@ -8,7 +8,13 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { CastingMethod, DivinationNoteEntity, LinePosition } from '@kindich/domain';
+import {
+  CastingMethod,
+  DivinationNoteEntity,
+  LinePosition,
+  getHexagramOmen,
+  getPalaceInfoByHexagramNumber,
+} from '@kindich/domain';
 import {
   getClassicalHexagramData,
   interpretHexagram,
@@ -28,7 +34,16 @@ export interface HexagramResultScreenProps {
   onAddNote?: (divinationId: string, content: string, actualOutcome?: string) => Promise<void>;
 }
 
-export type WorkspaceTab = 'an-que' | 'luan-giai';
+export type WorkspaceTab = 'an-que' | 'luan-giai' | 'ghi-chu';
+
+const STUDY_CATEGORIES = [
+  { id: 'academic', label: 'Học tập' },
+  { id: 'career', label: 'Công danh' },
+  { id: 'wealth', label: 'Tài lộc' },
+  { id: 'relationship', label: 'Tình duyên' },
+  { id: 'health', label: 'Sức khỏe' },
+  { id: 'general', label: 'Tổng hợp' },
+];
 
 export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
   record,
@@ -36,12 +51,21 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
   onNewCast,
   onAddNote,
 }) => {
-  // Trạng thái chuyển đổi 2 chế độ xem: Bảng An Quẻ & Đồ Hình vs Luận Giải Quẻ Toàn Diện
+  // Trạng thái chuyển đổi 3 chế độ xem: Bảng An Quẻ & Đồ Hình vs Luận Giải Quẻ Toàn Diện vs Sổ Tay Nghiệm Lý
   const [activeTab, setActiveTab] = useState<WorkspaceTab>('an-que');
   const [showAllLines, setShowAllLines] = useState<boolean>(false);
   const [noteContent, setNoteContent] = useState<string>('');
   const [actualOutcome, setActualOutcome] = useState<string>('');
   const [localNotes, setLocalNotes] = useState<DivinationNoteEntity[]>(record.notes ? [...record.notes] : []);
+
+  // Form Sổ tay nghiệm lý & làm sách
+  const [studyTopic, setStudyTopic] = useState<string>(record.question || '');
+  const [studyCategory, setStudyCategory] = useState<string>('academic');
+  const [studyDeduction, setStudyDeduction] = useState<string>('');
+  const [studyOutcome, setStudyOutcome] = useState<string>('');
+  const [studyLesson, setStudyLesson] = useState<string>('');
+  const [studyVerified, setStudyVerified] = useState<boolean>(false);
+  const [showMarkdownPreview, setShowMarkdownPreview] = useState<boolean>(false);
 
   const { trio, movingLines, sixYaoAnalysis: initialSixYao, theDung, dateTimeInfo, question, method } = record;
 
@@ -111,6 +135,89 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
     Alert.alert('Thành công', 'Đã lưu ghi chú cho quẻ này.');
   };
 
+  // Lưu ghi chú chuyên sâu phục vụ nghiên cứu & làm sách
+  const handleSaveStudyNote = async () => {
+    if (!studyDeduction.trim() && !studyOutcome.trim() && !studyLesson.trim()) {
+      Alert.alert('Chưa có nội dung', 'Vui lòng nhập chiêm đoán lý thuyết, diễn biến thực tế hoặc bài học làm sách.');
+      return;
+    }
+
+    const fullContent = [
+      `[CHỦ ĐỀ]: ${studyTopic.trim() || question || `Quẻ #${trio.primary.number} ${trio.primary.name}`}`,
+      `[DANH MỤC]: ${studyCategory}`,
+      studyDeduction.trim() ? `[CHIÊM ĐOÁN BAN ĐẦU]:\n${studyDeduction.trim()}` : '',
+      studyLesson.trim() ? `[BÀI HỌC LÀM SÁCH]:\n${studyLesson.trim()}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+
+    const newNote: DivinationNoteEntity = {
+      id: `note-${Date.now()}`,
+      divinationId: record.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      content: fullContent,
+      actualOutcome: studyOutcome.trim() || undefined,
+      isVerified: studyVerified || Boolean(studyOutcome.trim()),
+    };
+
+    setLocalNotes((prev) => [newNote, ...prev]);
+    setStudyDeduction('');
+    setStudyOutcome('');
+    setStudyLesson('');
+
+    if (onAddNote) {
+      try {
+        await onAddNote(record.id, newNote.content, newNote.actualOutcome);
+      } catch (err) {
+        console.warn('Lỗi lưu ghi chú SQLite:', err);
+      }
+    }
+
+    Alert.alert('Thành công', 'Đã lưu tư liệu nghiệm lý và làm sách vào cơ sở dữ liệu!');
+  };
+
+  // Trích xuất tư liệu sách Markdown
+  const primaryOmen = getHexagramOmen(trio.primary.number);
+  const primaryPalace = getPalaceInfoByHexagramNumber(trio.primary.number);
+  const transformedOmen = trio.transformed ? getHexagramOmen(trio.transformed.number) : null;
+  const transformedPalace = trio.transformed ? getPalaceInfoByHexagramNumber(trio.transformed.number) : null;
+
+  const bookMarkdown = `# TƯ LIỆU NGHIỆM LÝ KINH DỊCH - BẮC HÀ TÂN AN PHÁI
+**Chủ đề chiêm bói:** ${studyTopic.trim() || question || 'Chiêm nghiệm học thuật'}
+**Thời gian lập quẻ:** ${dateTimeInfo.solarDateStr} (${dateTimeInfo.hourCanChi} - ${dateTimeInfo.dayCanChi} - ${dateTimeInfo.monthCanChi} - ${dateTimeInfo.yearCanChi})
+**Tuần không:** [${voidBranchesStr}]
+**Phương pháp:** ${method === CastingMethod.SERIAL ? 'Seri tiền' : 'Mai Hoa Dịch Số (Giờ động tâm)'}
+
+---
+
+## 1. THÔNG SỐ ĐỒ HÌNH
+* **Quẻ Chủ (#${trio.primary.number}):** ${trio.primary.name} (${trio.primary.sinoVietnameseName})
+  - Cung Bát Quái: Cung ${primaryPalace.palaceName} (${primaryPalace.palaceElement}) | Lục Hào: Thế Hào ${sixYaoResult.summary.worldLinePosition}, Ứng Hào ${sixYaoResult.summary.responseLinePosition}
+  - Lời Triệu: "${primaryOmen.omen}"
+* **Quẻ Hỗ (#${trio.nuclear.number}):** ${trio.nuclear.name}
+* **Quẻ Biến (#${trio.transformed?.number || '—'}):** ${trio.transformed?.name || 'Tĩnh'}
+  - Cung Bát Quái: ${transformedPalace ? `Cung ${transformedPalace.palaceName} (${transformedPalace.palaceElement})` : '—'}
+  - Lời Triệu: "${transformedOmen?.omen || '—'}"
+* **Hào động:** ${trio.movingLineIndices.length > 0 ? trio.movingLineIndices.map((p) => `Hào ${p}`).join(', ') : 'Tĩnh (Không có hào động)'}
+
+---
+
+## 2. CHIÊM ĐOÁN BAN ĐẦU & NGUYÊN LÝ LỤC HÀO
+${studyDeduction.trim() || 'Chưa ghi chú chiêm đoán ban đầu.'}
+
+---
+
+## 3. DIỄN BIẾN THỰC TẾ & NGHIỆM CHỨNG
+* **Trạng thái:** ${studyVerified ? '✅ ĐÃ ỨNG NGHIỆM CHUẨN XÁC' : '⏳ ĐANG THEO DÕI NGHIỆM LÝ'}
+${studyOutcome.trim() || 'Chưa có cập nhật nghiệm chứng thực tế.'}
+
+---
+
+## 4. BÀI HỌC ĐÚC KẾT & TƯ LIỆU LÀM SÁCH
+${studyLesson.trim() || 'Chưa ghi chú bài học làm sách.'}
+`;
+
   return (
     <View style={styles.container}>
       <Header
@@ -125,7 +232,7 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
         }
       />
 
-      {/* 2 Tab điều hướng chính: Bảng An Quẻ & Đồ Hình vs Luận Giải Toàn Diện */}
+      {/* 3 Tab điều hướng chính */}
       <View style={styles.viewModeTabs}>
         <TouchableOpacity
           style={[styles.viewModeTabBtn, activeTab === 'an-que' && styles.viewModeTabBtnActive]}
@@ -133,7 +240,7 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
           activeOpacity={0.8}
         >
           <Text style={[styles.viewModeTabText, activeTab === 'an-que' && styles.viewModeTabTextActive]}>
-            📊 Bảng An Quẻ & Đồ Hình
+            📊 An Quẻ
           </Text>
         </TouchableOpacity>
 
@@ -143,7 +250,17 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
           activeOpacity={0.8}
         >
           <Text style={[styles.viewModeTabText, activeTab === 'luan-giai' && styles.viewModeTabTextActive]}>
-            📖 Luận Giải Quẻ Toàn Diện
+            📖 Luận Giải
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.viewModeTabBtn, activeTab === 'ghi-chu' && styles.viewModeTabBtnActive]}
+          onPress={() => setActiveTab('ghi-chu')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.viewModeTabText, activeTab === 'ghi-chu' && styles.viewModeTabTextActive]}>
+            📝 Sổ Tay ({localNotes.length})
           </Text>
         </TouchableOpacity>
       </View>
@@ -398,6 +515,165 @@ export const HexagramResultScreen: React.FC<HexagramResultScreenProps> = ({
                     </View>
                   ))}
                 </View>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TRANG 3: SỔ TAY NGHIỆM LÝ & TƯ LIỆU LÀM SÁCH                           */}
+        {/* ========================================================================= */}
+        {activeTab === 'ghi-chu' && (
+          <View>
+            {/* Banner giới thiệu */}
+            <View style={styles.studyBannerCard}>
+              <View style={styles.studyBadge}>
+                <Text style={styles.studyBadgeText}>📚 Kho Tri Thức & Sáng Tác</Text>
+              </View>
+              <Text style={styles.studyMainTitle}>Sổ Tay Nghiệm Lý & Tư Liệu Sách</Text>
+              <Text style={styles.studySubtitle}>
+                Ghi chép chiêm đoán lý thuyết, theo dõi diễn biến thực tế và đúc kết kinh nghiệm Lục Hào & Mai Hoa phục vụ giảng dạy, xuất bản sách.
+              </Text>
+
+              <TouchableOpacity
+                style={styles.markdownToggleBtn}
+                onPress={() => setShowMarkdownPreview(!showMarkdownPreview)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.markdownToggleBtnText}>
+                  {showMarkdownPreview ? '▲ Ẩn Bản Thảo Sách (Markdown)' : '📋 Xem Bản Thảo Sách (Markdown)'}
+                </Text>
+              </TouchableOpacity>
+
+              {showMarkdownPreview && (
+                <View style={styles.markdownPreviewBox}>
+                  <Text style={styles.markdownPreviewTip}>
+                    💡 Chạm giữ đoạn văn bản dưới đây để sao chép vào bộ nhớ tạm hoặc Word/Notion:
+                  </Text>
+                  <Text selectable={true} style={styles.markdownPreviewContent}>
+                    {bookMarkdown}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Form ghi chép nghiệm lý */}
+            <View style={styles.studyFormCard}>
+              <Text style={styles.formSectionHeading}>✍️ Ghi Chép Nghiệm Lý Mới</Text>
+
+              <Text style={styles.inputFieldLabel}>Chủ đề / Vấn đề chiêm bói:</Text>
+              <TextInput
+                style={styles.singleLineInput}
+                placeholder="Nhập chủ đề hoặc câu hỏi..."
+                placeholderTextColor="#64748B"
+                value={studyTopic}
+                onChangeText={setStudyTopic}
+              />
+
+              <Text style={styles.inputFieldLabel}>Danh mục học thuật:</Text>
+              <View style={styles.categoryPillsRow}>
+                {STUDY_CATEGORIES.map((cat) => (
+                  <TouchableOpacity
+                    key={cat.id}
+                    style={[styles.categoryPill, studyCategory === cat.id && styles.categoryPillActive]}
+                    onPress={() => setStudyCategory(cat.id)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.categoryPillText, studyCategory === cat.id && styles.categoryPillTextActive]}>
+                      {cat.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.inputFieldLabel}>1. Chiêm đoán ban đầu & Phân tích Thế/Ứng/Dụng thần:</Text>
+              <TextInput
+                style={styles.studyTextArea}
+                placeholder="Phân tích Hào Thế, Hào Ứng, Dụng Thần vượng tướng hưu tù, sinh khắc chế hóa..."
+                placeholderTextColor="#64748B"
+                value={studyDeduction}
+                onChangeText={setStudyDeduction}
+                multiline
+                numberOfLines={4}
+              />
+
+              <Text style={styles.inputFieldLabel}>2. Diễn biến thực tế & Kết quả nghiệm chứng:</Text>
+              <TextInput
+                style={styles.studyTextArea}
+                placeholder="Ghi lại sự việc đã diễn ra trên thực tế vào ngày tháng nào, đúng/sai so với suy đoán..."
+                placeholderTextColor="#64748B"
+                value={studyOutcome}
+                onChangeText={setStudyOutcome}
+                multiline
+                numberOfLines={3}
+              />
+
+              <Text style={styles.inputFieldLabel}>3. Bài học đúc kết & Tư liệu làm sách:</Text>
+              <TextInput
+                style={styles.studyTextArea}
+                placeholder="Nguyên lý mấu chốt, bài học từ quẻ này để đưa vào giáo trình/sách..."
+                placeholderTextColor="#64748B"
+                value={studyLesson}
+                onChangeText={setStudyLesson}
+                multiline
+                numberOfLines={3}
+              />
+
+              <TouchableOpacity
+                style={[styles.verifiedToggleRow, studyVerified && styles.verifiedToggleRowActive]}
+                onPress={() => setStudyVerified(!studyVerified)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.verifiedCheckIcon}>{studyVerified ? '☑' : '☐'}</Text>
+                <Text style={[styles.verifiedToggleText, studyVerified && styles.verifiedToggleTextActive]}>
+                  ✓ Đã nghiệm chứng chuẩn xác (Đủ tiêu chuẩn làm sách thực chiến)
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.submitStudyBtn} onPress={handleSaveStudyNote} activeOpacity={0.8}>
+                <Text style={styles.submitStudyBtnText}>💾 Lưu Ghi Chú Nghiệm Lý Vào Cơ Sở Dữ Liệu</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Danh sách các ghi chú đã lưu */}
+            <View style={styles.savedStudyNotesCard}>
+              <View style={styles.savedNotesHeaderRow}>
+                <Text style={styles.savedNotesCardTitle}>📑 Nhật Ký Nghiệm Lý Đã Lưu</Text>
+                <View style={styles.notesCountBadge}>
+                  <Text style={styles.notesCountBadgeText}>{localNotes.length}</Text>
+                </View>
+              </View>
+
+              {localNotes.length === 0 ? (
+                <View style={styles.emptyNotesWrap}>
+                  <Text style={styles.emptyNotesEmoji}>📝</Text>
+                  <Text style={styles.emptyNotesTitle}>Chưa có ghi chú nghiệm lý nào cho quẻ này.</Text>
+                  <Text style={styles.emptyNotesSub}>
+                    Hãy nhập các thông số chiêm đoán và nghiệm chứng ở biểu mẫu trên để tích lũy kho tư liệu học thuật.
+                  </Text>
+                </View>
+              ) : (
+                localNotes.map((note) => (
+                  <View key={note.id} style={styles.studyNoteCardItem}>
+                    <View style={styles.noteItemTopRow}>
+                      <View style={[styles.statusBadge, note.isVerified ? styles.statusBadgeVerified : styles.statusBadgePending]}>
+                        <Text style={[styles.statusBadgeText, note.isVerified ? styles.statusBadgeTextVerified : styles.statusBadgeTextPending]}>
+                          {note.isVerified ? '✓ Đã nghiệm chứng' : '⏳ Đang theo dõi'}
+                        </Text>
+                      </View>
+                      <Text style={styles.noteItemDate}>
+                        {new Date(note.createdAt).toLocaleDateString('vi-VN')} {new Date(note.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                      </Text>
+                    </View>
+                    <Text style={styles.noteItemContent}>{note.content}</Text>
+                    {note.actualOutcome ? (
+                      <View style={styles.actualOutcomeBox}>
+                        <Text style={styles.actualOutcomeTitle}>✓ Nghiệm chứng thực tế:</Text>
+                        <Text style={styles.actualOutcomeContent}>{note.actualOutcome}</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                ))
               )}
             </View>
           </View>
@@ -728,5 +1004,298 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#34D399',
     marginTop: 2,
+  },
+  // Sổ tay Nghiệm lý & Tư liệu sách
+  studyBannerCard: {
+    backgroundColor: '#151B2B',
+    borderRadius: 12,
+    padding: 14,
+    marginHorizontal: 12,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(201, 162, 39, 0.3)',
+  },
+  studyBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(201, 162, 39, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: '#C9A227',
+  },
+  studyBadgeText: {
+    fontSize: 10.5,
+    fontWeight: '700',
+    color: '#E8C547',
+  },
+  studyMainTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#E8EDF5',
+    marginBottom: 4,
+  },
+  studySubtitle: {
+    fontSize: 11.5,
+    lineHeight: 16,
+    color: '#94A3B8',
+    marginBottom: 10,
+  },
+  markdownToggleBtn: {
+    backgroundColor: 'rgba(201, 162, 39, 0.12)',
+    borderWidth: 1,
+    borderColor: '#C9A227',
+    borderRadius: 8,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  markdownToggleBtnText: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#E8C547',
+  },
+  markdownPreviewBox: {
+    marginTop: 10,
+    backgroundColor: '#0D1117',
+    borderRadius: 8,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  markdownPreviewTip: {
+    fontSize: 10.5,
+    color: '#60A5FA',
+    marginBottom: 8,
+    fontStyle: 'italic',
+  },
+  markdownPreviewContent: {
+    fontFamily: 'monospace',
+    fontSize: 10.5,
+    lineHeight: 16,
+    color: '#E2E8F0',
+  },
+  studyFormCard: {
+    backgroundColor: '#151B2B',
+    borderRadius: 12,
+    padding: 14,
+    marginHorizontal: 12,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  formSectionHeading: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: '#C9A227',
+    marginBottom: 10,
+  },
+  inputFieldLabel: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#CBD5E1',
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  singleLineInput: {
+    backgroundColor: '#0D1117',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    color: '#E8EDF5',
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    fontSize: 12,
+  },
+  categoryPillsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginVertical: 4,
+  },
+  categoryPill: {
+    backgroundColor: '#0D1117',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  categoryPillActive: {
+    backgroundColor: '#C9A227',
+    borderColor: '#C9A227',
+  },
+  categoryPillText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#94A3B8',
+  },
+  categoryPillTextActive: {
+    color: '#0B0F1A',
+    fontWeight: '800',
+  },
+  studyTextArea: {
+    backgroundColor: '#0D1117',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    color: '#E8EDF5',
+    padding: 8,
+    fontSize: 11.5,
+    textAlignVertical: 'top',
+  },
+  verifiedToggleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 12,
+    padding: 8,
+    backgroundColor: '#0D1117',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  verifiedToggleRowActive: {
+    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+    borderColor: '#22C55E',
+  },
+  verifiedCheckIcon: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#22C55E',
+  },
+  verifiedToggleText: {
+    flex: 1,
+    fontSize: 11.5,
+    fontWeight: '600',
+    color: '#94A3B8',
+  },
+  verifiedToggleTextActive: {
+    color: '#22C55E',
+    fontWeight: '700',
+  },
+  submitStudyBtn: {
+    backgroundColor: '#C9A227',
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginTop: 14,
+  },
+  submitStudyBtnText: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    color: '#0B0F1A',
+  },
+  savedStudyNotesCard: {
+    backgroundColor: '#151B2B',
+    borderRadius: 12,
+    padding: 14,
+    marginHorizontal: 12,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  savedNotesHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  savedNotesCardTitle: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: '#E8EDF5',
+  },
+  notesCountBadge: {
+    backgroundColor: 'rgba(201, 162, 39, 0.15)',
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  notesCountBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#E8C547',
+  },
+  emptyNotesWrap: {
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  emptyNotesEmoji: {
+    fontSize: 26,
+    marginBottom: 6,
+  },
+  emptyNotesTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#CBD5E1',
+    marginBottom: 4,
+  },
+  emptyNotesSub: {
+    fontSize: 11,
+    color: '#64748B',
+    textAlign: 'center',
+    lineHeight: 15,
+  },
+  studyNoteCardItem: {
+    backgroundColor: '#0D1117',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#C9A227',
+  },
+  noteItemTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  statusBadge: {
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  statusBadgeVerified: {
+    backgroundColor: 'rgba(34, 197, 94, 0.15)',
+  },
+  statusBadgePending: {
+    backgroundColor: 'rgba(234, 179, 8, 0.15)',
+  },
+  statusBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  statusBadgeTextVerified: {
+    color: '#22C55E',
+  },
+  statusBadgeTextPending: {
+    color: '#EAB308',
+  },
+  noteItemDate: {
+    fontSize: 9.5,
+    color: '#64748B',
+  },
+  noteItemContent: {
+    fontSize: 11.5,
+    lineHeight: 16,
+    color: '#E8EDF5',
+  },
+  actualOutcomeBox: {
+    marginTop: 6,
+    paddingTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  actualOutcomeTitle: {
+    fontSize: 10.5,
+    fontWeight: '700',
+    color: '#22C55E',
+    marginBottom: 2,
+  },
+  actualOutcomeContent: {
+    fontSize: 11,
+    color: '#86EFAC',
   },
 });

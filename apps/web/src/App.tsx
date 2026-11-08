@@ -42,6 +42,7 @@ export const App: React.FC = () => {
   const [question, setQuestion] = useState<string>('');
   const [inquiryType, setInquiryType] = useState<QuestionCategory>('work');
   const [serialResult, setSerialResult] = useState<SerialCastingResult | null>(null);
+  const [activeDivinationId, setActiveDivinationId] = useState<string | null>(null);
   const [maiHuaData, setMaiHuaData] = useState<{
     result: MaiHuaCastingResult;
     calendarInfo: CalendarConversionResult;
@@ -178,7 +179,7 @@ export const App: React.FC = () => {
         },
       });
 
-      await repo.create({
+      const created = await repo.create({
         method: CastingMethod.SERIAL,
         algorithmVersion: 'SERIAL-MOD8-V1',
         ruleSetId: 'BO_PHE_CHINH_TONG_V1',
@@ -201,6 +202,9 @@ export const App: React.FC = () => {
       });
 
       setSaveSuccessNotice('✓ Đã tự động lưu phiên lập quẻ vào Lịch sử!');
+      if (created && created.divination) {
+        setActiveDivinationId(created.divination.id);
+      }
       setTimeout(() => setSaveSuccessNotice(null), 4000);
     } catch (err) {
       console.error('Lỗi khi tự động lưu lịch sử quẻ seri:', err);
@@ -251,7 +255,7 @@ export const App: React.FC = () => {
         },
       });
 
-      await repo.create({
+      const created = await repo.create({
         method: CastingMethod.MAI_HUA,
         algorithmVersion: 'MAI-HUA-V1',
         ruleSetId: 'BO_PHE_CHINH_TONG_V1',
@@ -274,6 +278,9 @@ export const App: React.FC = () => {
       });
 
       setSaveSuccessNotice('✓ Đã tự động lưu phiên lập quẻ vào Lịch sử!');
+      if (created && created.divination) {
+        setActiveDivinationId(created.divination.id);
+      }
       setTimeout(() => setSaveSuccessNotice(null), 4000);
     } catch (err) {
       console.error('Lỗi khi tự động lưu lịch sử quẻ Mai Hoa:', err);
@@ -411,9 +418,11 @@ export const App: React.FC = () => {
                 question={question}
                 inquiryType={inquiryType}
                 serialResult={serialResult}
+                divinationId={activeDivinationId || undefined}
                 onBackToCasting={() => {
                   setSerialResult(null);
                   setSerialDateTimeInfo(null);
+                  setActiveDivinationId(null);
                 }}
                 onSaveNote={() => setActiveMode('history')}
               />
@@ -447,6 +456,7 @@ export const App: React.FC = () => {
                     onReset={() => {
                       setSerialResult(null);
                       setSerialDateTimeInfo(null);
+                  setActiveDivinationId(null);
                     }}
                   />
                 </div>
@@ -475,6 +485,7 @@ export const App: React.FC = () => {
                 inquiryType={inquiryType}
                 maiHuaResult={maiHuaData.result}
                 calendarInfo={maiHuaData.calendarInfo}
+                divinationId={activeDivinationId || undefined}
                 onBackToCasting={() => {
                   setMaiHuaData(null);
                   setMaiHuaDateTimeInfo(null);

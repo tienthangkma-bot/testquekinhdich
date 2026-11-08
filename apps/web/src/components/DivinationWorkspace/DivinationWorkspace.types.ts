@@ -38,6 +38,8 @@ export interface SingleDivinationWorkspaceProps {
   onSaveNote?: () => void;
   /** Đã lưu vào CSDL chưa */
   isSaved?: boolean;
-  /** Tab màn hình khởi tạo ('an-que' hoặc 'luan-giai') */
-  initialTab?: 'an-que' | 'luan-giai';
+  /** Tab màn hình khởi tạo ('an-que', 'luan-giai', hoặc 'ghi-chu') */
+  initialTab?: 'an-que' | 'luan-giai' | 'ghi-chu';
+  /** ID định danh phiên lập quẻ trong CSDL để lưu trữ ghi chú nghiệm lý */
+  divinationId?: string;
 }

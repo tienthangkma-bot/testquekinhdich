@@ -1,0 +1,402 @@
+/* ==========================================================================
+   WorkspaceStudyNotes.css - Sổ Tay Nghiệm Lý & Tư Liệu Học Tập Làm Sách
+   ========================================================================== */
+
+.study-notes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 4px;
+}
+
+/* Banner giới thiệu sổ tay */
+.study-notes-banner {
+  background: linear-gradient(135deg, rgba(201, 162, 39, 0.12) 0%, rgba(133, 22, 22, 0.08) 100%);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.study-notes-banner-left {
+  flex: 1;
+  min-width: 280px;
+}
+
+.study-notes-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #B88E28;
+  background-color: rgba(201, 162, 39, 0.15);
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.study-notes-main-title {
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #851616;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.5px;
+}
+
+.study-notes-subtitle {
+  font-size: 0.9rem;
+  color: #64748B;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.study-notes-banner-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Thẻ form ghi chú */
+.study-note-form-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.study-note-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #EDF2F7;
+}
+
+.study-form-title {
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1E293B;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.study-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 768px) {
+  .study-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.study-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.study-form-group--full {
+  grid-column: 1 / -1;
+}
+
+.study-form-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.study-form-hint {
+  font-size: 0.78rem;
+  font-weight: normal;
+  color: #94A3B8;
+  margin-left: 4px;
+}
+
+.study-form-input,
+.study-form-select,
+.study-form-textarea {
+  padding: 10px 14px;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1E293B;
+  background-color: #F8FAFC;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.study-form-input:focus,
+.study-form-select:focus,
+.study-form-textarea:focus {
+  outline: none;
+  border-color: #C9A227;
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.15);
+}
+
+.study-form-textarea {
+  min-height: 90px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.study-form-textarea--highlight {
+  border-color: rgba(201, 162, 39, 0.5);
+  background-color: rgba(201, 162, 39, 0.03);
+}
+
+.study-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #EDF2F7;
+}
+
+/* Danh sách các ghi chú đã lưu */
+.saved-notes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.saved-notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.saved-notes-title {
+  font-family: var(--font-serif, 'Playfair Display', serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1E293B;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.saved-notes-count {
+  font-size: 0.85rem;
+  background-color: #E2E8F0;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.saved-note-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.saved-note-card:hover {
+  border-color: rgba(201, 162, 39, 0.5);
+  box-shadow: 0 4px 14px rgba(201, 162, 39, 0.08);
+}
+
+.saved-note-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.saved-note-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.status-pill--verified {
+  background-color: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #86EFAC;
+}
+
+.status-pill--pending {
+  background-color: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+.category-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748B;
+  background-color: #F1F5F9;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.note-timestamp {
+  font-size: 0.78rem;
+  color: #94A3B8;
+}
+
+.saved-note-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.saved-note-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.note-subblock {
+  background-color: #F8FAFC;
+  border-radius: 8px;
+  padding: 12px 14px;
+  border-left: 3px solid #CBD5E1;
+}
+
+.note-subblock--outcome {
+  border-left-color: #10B981;
+  background-color: rgba(16, 185, 129, 0.04);
+}
+
+.note-subblock--book {
+  border-left-color: #C9A227;
+  background-color: rgba(201, 162, 39, 0.05);
+}
+
+.note-subblock-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748B;
+  margin-bottom: 4px;
+}
+
+.note-subblock--outcome .note-subblock-title {
+  color: #047857;
+}
+
+.note-subblock--book .note-subblock-title {
+  color: #92400E;
+}
+
+.note-subblock-content {
+  font-size: 0.92rem;
+  color: #1E293B;
+  line-height: 1.55;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.empty-notes-card {
+  background-color: #F8FAFC;
+  border: 2px dashed #CBD5E1;
+  border-radius: 12px;
+  padding: 36px 20px;
+  text-align: center;
+  color: #64748B;
+}
+
+.empty-notes-icon {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .study-notes-banner {
+  background: linear-gradient(135deg, rgba(201, 162, 39, 0.15) 0%, rgba(26, 35, 50, 0.6) 100%);
+  border-color: rgba(201, 162, 39, 0.4);
+}
+
+[data-theme="dark"] .study-notes-main-title {
+  color: #C9A227;
+}
+
+[data-theme="dark"] .study-notes-subtitle {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .study-note-form-card,
+[data-theme="dark"] .saved-note-card {
+  background-color: #151B2B;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .study-form-title,
+[data-theme="dark"] .saved-notes-title {
+  color: #E8EDF5;
+}
+
+[data-theme="dark"] .study-form-label {
+  color: #CBD5E1;
+}
+
+[data-theme="dark"] .study-form-input,
+[data-theme="dark"] .study-form-select,
+[data-theme="dark"] .study-form-textarea {
+  background-color: #0D1117;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #E8EDF5;
+}
+
+[data-theme="dark"] .study-form-input:focus,
+[data-theme="dark"] .study-form-select:focus,
+[data-theme="dark"] .study-form-textarea:focus {
+  border-color: #C9A227;
+  background-color: #111827;
+}
+
+[data-theme="dark"] .note-subblock {
+  background-color: #0D1117;
+  border-left-color: #334155;
+}
+
+[data-theme="dark"] .note-subblock-content {
+  color: #E8EDF5;
+}
+
+[data-theme="dark"] .empty-notes-card {
+  background-color: #151B2B;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #94A3B8;
+}
