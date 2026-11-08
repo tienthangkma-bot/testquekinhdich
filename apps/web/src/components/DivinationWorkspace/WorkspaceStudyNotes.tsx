@@ -46,7 +46,7 @@ function parseNoteContent(rawContent: string): ParsedNoteContent {
   let theoreticalDeduction = rawContent;
   let bookLesson = '';
 
-  const topicMatch = rawContent.match(/\[CHỦ ĐỀ\]:\s*([^\n]+)/);
+  const topicMatch = rawContent.match(/(?:\[CHỦ ĐỀ\]|\[ĐƯƠNG SỐ \/ CHỦ ĐỀ\]):\s*([^\n]+)/);
   if (topicMatch && topicMatch[1]) topic = topicMatch[1].trim();
 
   const catMatch = rawContent.match(/\[DANH MỤC\]:\s*([^\n]+)/);
@@ -358,13 +358,13 @@ ${bookLesson.trim() || 'Chưa ghi chú bài học làm sách.'}
             {/* Chủ đề */}
             <div className="study-form-group">
               <label className="study-form-label">
-                📌 Chủ đề / Câu hỏi chiêm bói:
-                <span className="study-form-hint">(Tiêu đề mục sách)</span>
+                📌 Đương số / Việc cần xem:
+                <span className="study-form-hint">(Tên đương số & việc cần đoán)</span>
               </label>
               <input
                 type="text"
                 className="study-form-input"
-                placeholder="Ví dụ: Dự đoán kỳ thi thạc sĩ, mua bất động sản..."
+                placeholder="Ví dụ: Anh Nguyễn Văn A xem chuyển công tác, mua bán đất..."
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
               />
@@ -374,7 +374,7 @@ ${bookLesson.trim() || 'Chưa ghi chú bài học làm sách.'}
             <div className="study-form-group">
               <label className="study-form-label">
                 📂 Phân loại chuyên đề:
-                <span className="study-form-hint">(Chương sách)</span>
+                <span className="study-form-hint">(Lĩnh vực việc xem)</span>
               </label>
               <select
                 className="study-form-select"
@@ -392,13 +392,13 @@ ${bookLesson.trim() || 'Chưa ghi chú bài học làm sách.'}
             {/* 1. Chiêm đoán ban đầu */}
             <div className="study-form-group study-form-group--full">
               <label className="study-form-label">
-                🧠 1. Chiêm Đoán Ban Đầu & Luận Lý Thuyết:
-                <span className="study-form-hint">(Dụng thần, Thế Ứng, Ngũ Hành sinh khắc, Nhật/Nguyệt vượng suy, Ứng kỳ dự kiến)</span>
+                🧠 1. Chiêm Đoán Ban Đầu & Luận Giải Cho Đương Số:
+                <span className="study-form-hint">(Dụng thần, Thế Ứng, Ngũ Hành sinh khắc, vượng suy, Ứng kỳ dự kiến, Lời dặn đương số)</span>
               </label>
               <textarea
                 className="study-form-textarea"
                 rows={4}
-                placeholder="Ví dụ: Hào Thế lâm Huynh Đệ trì Thế, Dụng thần Thê Tài phục dưới hào 2 lâm Nguyệt phá... Dự kiến ngày Giáp Thân tiền tài mới xuất hiện."
+                placeholder="Ghi lại luận đoán lúc xem quẻ: Dụng thần vượng suy ra sao, hào Thế/Ứng thế nào, dự kiến ngày tháng nào ứng nghiệm, lời khuyên cho đương số..."
                 value={theoreticalDeduction}
                 onChange={(e) => setTheoreticalDeduction(e.target.value)}
               />
@@ -407,13 +407,13 @@ ${bookLesson.trim() || 'Chưa ghi chú bài học làm sách.'}
             {/* 2. Diễn biến thực tế */}
             <div className="study-form-group">
               <label className="study-form-label">
-                🔍 2. Diễn Biến Thực Tế & Nghiệm Chứng:
-                <span className="study-form-hint">(Sự việc thực tế diễn ra như thế nào, ngày giờ)</span>
+                🔍 2. Diễn Biến Thực Tế & Phản Hồi Của Đương Số:
+                <span className="study-form-hint">(Ghi lại khi đương số phản hồi lại kết quả thực tế)</span>
               </label>
               <textarea
                 className="study-form-textarea study-form-textarea--highlight"
                 rows={3}
-                placeholder="Ví dụ: Đúng ngày Giáp Thân đối tác chuyển tiền thanh toán hợp đồng trọn gói..."
+                placeholder="Ví dụ: Đúng ngày Giáp Thân đương số phản hồi đã ký hợp đồng thành công, đúng như dự đoán..."
                 value={actualOutcome}
                 onChange={(e) => setActualOutcome(e.target.value)}
               />
@@ -422,13 +422,13 @@ ${bookLesson.trim() || 'Chưa ghi chú bài học làm sách.'}
             {/* 3. Bài học làm sách */}
             <div className="study-form-group">
               <label className="study-form-label">
-                📖 3. Bài Học Học Thuật & Đúc Kết Làm Sách:
+                📖 3. Bài Học Đúc Kết & Tư Liệu Làm Sách:
                 <span className="study-form-hint">(Khẩu quyết, kinh nghiệm quý báu trích yếu vào sách)</span>
               </label>
               <textarea
                 className="study-form-textarea study-form-textarea--highlight"
                 rows={3}
-                placeholder="Ví dụ: Phục thần gặp ngày xung khai là ứng kỳ chuẩn xác. Độc giả cần lưu ý không vội kết luận khi Dụng thần lâm Không..."
+                placeholder="Ví dụ: Dụng thần tuy lâm Không nhưng ngày xung là ứng kỳ. Trích làm ví dụ thực chiến trong sách..."
                 value={bookLesson}
                 onChange={(e) => setBookLesson(e.target.value)}
               />

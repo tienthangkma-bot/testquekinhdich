@@ -559,12 +559,12 @@ ${studyLesson.trim() || 'Chưa ghi chú bài học làm sách.'}
 
             {/* Form ghi chép nghiệm lý */}
             <View style={styles.studyFormCard}>
-              <Text style={styles.formSectionHeading}>✍️ Ghi Chép Nghiệm Lý Mới</Text>
+              <Text style={styles.formSectionHeading}>✍️ Ghi Chép Cho Đương Số & Nghiệm Lý</Text>
 
-              <Text style={styles.inputFieldLabel}>Chủ đề / Vấn đề chiêm bói:</Text>
+              <Text style={styles.inputFieldLabel}>Đương số / Vấn đề chiêm bói:</Text>
               <TextInput
                 style={styles.singleLineInput}
-                placeholder="Nhập chủ đề hoặc câu hỏi..."
+                placeholder="Nhập tên đương số hoặc việc cần xem..."
                 placeholderTextColor="#64748B"
                 value={studyTopic}
                 onChangeText={setStudyTopic}
@@ -586,10 +586,10 @@ ${studyLesson.trim() || 'Chưa ghi chú bài học làm sách.'}
                 ))}
               </View>
 
-              <Text style={styles.inputFieldLabel}>1. Chiêm đoán ban đầu & Phân tích Thế/Ứng/Dụng thần:</Text>
+              <Text style={styles.inputFieldLabel}>1. Chiêm đoán ban đầu & Luận giải cho đương số:</Text>
               <TextInput
                 style={styles.studyTextArea}
-                placeholder="Phân tích Hào Thế, Hào Ứng, Dụng Thần vượng tướng hưu tù, sinh khắc chế hóa..."
+                placeholder="Ghi lại luận đoán lúc xem: Dụng thần, Thế/Ứng, ngày tháng ứng nghiệm, lời dặn đương số..."
                 placeholderTextColor="#64748B"
                 value={studyDeduction}
                 onChangeText={setStudyDeduction}
@@ -597,10 +597,10 @@ ${studyLesson.trim() || 'Chưa ghi chú bài học làm sách.'}
                 numberOfLines={4}
               />
 
-              <Text style={styles.inputFieldLabel}>2. Diễn biến thực tế & Kết quả nghiệm chứng:</Text>
+              <Text style={styles.inputFieldLabel}>2. Diễn biến thực tế & Phản hồi của đương số:</Text>
               <TextInput
                 style={styles.studyTextArea}
-                placeholder="Ghi lại sự việc đã diễn ra trên thực tế vào ngày tháng nào, đúng/sai so với suy đoán..."
+                placeholder="Ghi lại kết quả thực tế khi đương số phản hồi lại (đúng/sai thế nào, ứng vào ngày nào)..."
                 placeholderTextColor="#64748B"
                 value={studyOutcome}
                 onChangeText={setStudyOutcome}
@@ -631,7 +631,7 @@ ${studyLesson.trim() || 'Chưa ghi chú bài học làm sách.'}
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.submitStudyBtn} onPress={handleSaveStudyNote} activeOpacity={0.8}>
-                <Text style={styles.submitStudyBtnText}>💾 Lưu Ghi Chú Nghiệm Lý Vào Cơ Sở Dữ Liệu</Text>
+                <Text style={styles.submitStudyBtnText}>💾 Lưu Ghi Chú Vào Cơ Sở Dữ Liệu</Text>
               </TouchableOpacity>
             </View>
 
